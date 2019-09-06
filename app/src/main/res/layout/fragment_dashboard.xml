@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/dashboard_layout"
+    android:background="@color/colorToolbar"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="vertical">
+
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_horizontal"
+    android:padding="15dp"
+    android:weightSum="3"
+    android:orientation="vertical">
+
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/user_policy_btn"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_gravity="center"
+        app:cardCornerRadius="5dp"
+        android:padding="@dimen/size_four"
+        android:layout_weight="1"
+        app:cardElevation="@dimen/size_four"
+        android:layout_marginTop="@dimen/size_twenty_three"
+        android:layout_marginBottom="@dimen/size_twenty"
+        app:cardBackgroundColor="@color/colorPrimary"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:gravity="start"
+            android:orientation="vertical"
+            android:padding="@dimen/size_six">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/montserrat_regular"
+                android:text="Welcome"
+                android:textColor="@color/colorWhite"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/firstname_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/montserrat_semibold"
+                android:text="ALU"
+                android:textColor="@color/colorWhite"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/lastname_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/montserrat_regular"
+                android:text="MICHAEL"
+                android:textColor="@color/colorWhite"
+                android:textSize="20sp" />
+
+            <Spinner
+                android:id="@+id/user_policy_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginBottom="@dimen/size_eight"
+                android:background="@drawable/spinner_bg" />
+
+
+        </LinearLayout>
+
+
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Our recommendation products for you"
+        android:textAlignment="textStart"
+        android:textSize="16sp"
+        android:textColor="@color/colorBlack"
+        android:fontFamily="@font/montserrat_regular"
+        />
+
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="@dimen/size_four"
+        android:layout_marginTop="@dimen/size_twenty_three"
+        android:layout_marginBottom="@dimen/size_twenty_three"
+        >
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:gravity="center_horizontal"
+
+
+            >
+            <com.daimajia.slider.library.SliderLayout
+                android:id="@+id/slider"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+
+            <Button
+                android:id="@+id/product_tag_btn"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Take a Look"
+                android:textSize="10sp"
+                android:padding="10dp"
+                android:textColor="@color/colorWhite"
+                android:fontFamily="@font/montserrat_semibold"
+                android:background="@drawable/rounded_bg_color_btn"
+                android:layout_gravity="end|bottom"
+                />
+
+        </FrameLayout>
+
+
+
+    </com.google.android.material.card.MaterialCardView>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="News and Update "
+        android:textAlignment="textStart"
+        android:textSize="18sp"
+        android:textColor="@color/colorBlack"
+        android:fontFamily="@font/montserrat_regular"
+        />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/news_update_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="@dimen/size_four"
+        android:layout_marginTop="@dimen/size_twenty_three"
+        android:layout_marginBottom="@dimen/size_twenty_three"
+        app:cardBackgroundColor="@color/colorWhite"
+
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:padding="@dimen/size_six"
+            >
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                app:cardCornerRadius="4dp">
+
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/thumbnail"
+                />
+
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <View
+                android:layout_width="8dp"
+                android:layout_height="4dp"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="STI Promote Academic Excellence in Primary Schools "
+                    android:textAlignment="textStart"
+                    android:textSize="15sp"
+                    android:textColor="@color/colorBlack"
+                    android:fontFamily="@font/montserrat_regular"
+                    />
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"/>
+                <TextView
+                    android:id="@+id/read_more"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Read more... "
+                    android:textAlignment="textStart"
+                    android:textSize="11sp"
+                    android:textColor="@color/colorBlack"
+                    android:fontFamily="@font/montserrat_regular"
+                    />
+
+            </LinearLayout>
+
+
+
+
+        </LinearLayout>
+
+
+
+    </com.google.android.material.card.MaterialCardView>
+
+
+
+
+
+
+</LinearLayout>
+</ScrollView>
+
+
+</FrameLayout>
