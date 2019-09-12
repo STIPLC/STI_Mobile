@@ -93,7 +93,7 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
                 break;
 
             case R.id.register:
-                startActivity(new Intent(getApplicationContext(),SignUp.class));
+                startActivity(new Intent(SignIn.this,SignUp.class));
                 finish();
                 break;
 
@@ -125,7 +125,6 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
                 mInputLayoutPassword.setErrorEnabled(false);
             }
 
-
             if (isValid) {
 
                 //Post Request to Api
@@ -147,7 +146,9 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
                 mPasswordEditxt.getText().toString()
 
         );
+        Log.i("UserObj",userPostData.toString());
         UserPostObj userPostObj=new UserPostObj(userPostData);
+        Log.i("UserHead",userPostObj.toString());
 
         sentNetworkRequest(userPostObj);
     }
@@ -161,7 +162,7 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
             //get client and call object for request
             ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
 
-            Call<UserGetObj> call = client.login(userPostObj, hashMap);
+            Call<UserGetObj> call = client.login(userPostObj);
 
             call.enqueue(new Callback<UserGetObj>() {
                 @Override

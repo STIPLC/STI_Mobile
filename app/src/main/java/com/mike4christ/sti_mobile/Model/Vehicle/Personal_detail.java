@@ -25,6 +25,8 @@ public class Personal_detail extends RealmObject {
     String office_address;
     String contact_person;
 
+    String picture;
+
     RealmList<VehicleDetails> vehicle_info;
 
 
@@ -163,6 +165,13 @@ public class Personal_detail extends RealmObject {
 
     public void setContact_person(String contact_person) {
         this.contact_person = contact_person;
+    }
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
     }
 
     public RealmList<VehicleDetails> getVehicle_info() {

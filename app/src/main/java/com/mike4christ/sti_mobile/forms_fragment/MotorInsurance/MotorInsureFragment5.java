@@ -1,5 +1,6 @@
 package com.mike4christ.sti_mobile.forms_fragment.MotorInsurance;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,15 +25,32 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
+import com.mike4christ.sti_mobile.Constant;
+import com.mike4christ.sti_mobile.Model.Auth.RegisterObj;
+import com.mike4christ.sti_mobile.Model.Auth.UserDataHead;
+import com.mike4christ.sti_mobile.Model.Errors.APIError;
+import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
+import com.mike4christ.sti_mobile.Model.ServiceGenerator;
 import com.mike4christ.sti_mobile.Model.Vehicle.Personal_detail;
 import com.mike4christ.sti_mobile.Model.Vehicle.VehicleDetails;
 import com.mike4christ.sti_mobile.Model.Vehicle.VehiclePictures;
 import com.mike4christ.sti_mobile.Model.Vehicle.VehiclePolicy;
+import com.mike4christ.sti_mobile.Model.Vehicle.VehiclePost.Persona;
+import com.mike4christ.sti_mobile.Model.Vehicle.VehiclePost.Vehicle;
+import com.mike4christ.sti_mobile.Model.Vehicle.VehiclePost.VehiclePostHead;
+import com.mike4christ.sti_mobile.NetworkConnection;
 import com.mike4christ.sti_mobile.R;
+import com.mike4christ.sti_mobile.SignIn;
+import com.mike4christ.sti_mobile.SignUp;
 import com.mike4christ.sti_mobile.UserPreferences;
 import com.mike4christ.sti_mobile.adapter.VehiclesListAdapter;
+import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.shuhart.stepview.StepView;
 import com.wang.avi.AVLoadingIndicatorView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,6 +58,12 @@ import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.mike4christ.sti_mobile.SignUp.isValidEmailAddress;
 
 class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
     // TODO: Rename parameter arguments, choose names that match
@@ -68,7 +92,7 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
     TextInputLayout inputLayoutPin_m5;
 
     @BindView(R.id.pin_txt_m5)
-    EditText pin_txt_m4;
+    EditText pin_txt_m5;
 
     @BindView(R.id.modeOfPayment_spinner_m5)
     Spinner modeOfPayment_spinner_m5;
@@ -87,6 +111,17 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
     Realm realm;
     VehiclesListAdapter vehiclesListAdapter;
     String modeofPaymentString;
+    UserPreferences userPreferences;
+    VehiclePolicy vehiclePolicy;
+    RealmList<Personal_detail> personal_details;
+
+    String total_quoteprice;
+
+    List<Vehicle> vehiclesList_post=new ArrayList<Vehicle>();
+
+    List<String> vehiclePictureList_post=new ArrayList<>();
+
+    NetworkConnection networkConnection=new NetworkConnection();
 
 
 
@@ -174,19 +209,20 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
 
     private void init(){
 
-        UserPreferences userPreferences=new UserPreferences(getContext());
+        userPreferences=new UserPreferences(getContext());
 
         //retrieve data for personal detail first
-        VehiclePolicy vehiclePolicy;
+
 
         vehiclePolicy=realm.where(VehiclePolicy.class).equalTo("id",primaryKey).findFirst();
-        String total_quoteprice=vehiclePolicy.getQuote_price();
-        RealmList<Personal_detail> personal_details=vehiclePolicy.getPersonal_info();
+        total_quoteprice=vehiclePolicy.getQuote_price();
+        personal_details=vehiclePolicy.getPersonal_info();
 
 
 
 
         if(userPreferences.getMotorPtype().equals("Corporate")){
+
             String corperate="Comapany Name: "+personal_details.get(0).getCompany_name()+"\n"+"TIN Number: "+personal_details.get(0).getTin_number()+"\n"+
                     "\n"+"Phone Number: "+personal_details.get(0).getPhone()+"\n"+
                     "Office Address: "+personal_details.get(0).getOffice_address()+"\n"+"Contact Person: "+personal_details.get(0).getContact_person()+"\n"+
@@ -225,7 +261,7 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
         switch (view.getId()) {
             case R.id.v_next_btn2:
 //                send quote to client and sti
-                mSubmit();
+                ValidateForm();
                 break;
 
             case R.id.v_back_btn2:
@@ -289,24 +325,212 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
         dialog.show();
     }
 
+    private void ValidateForm() {
+
+        if (networkConnection.isNetworkConnected(getContext())) {
+            boolean isValid = true;
+
+            if (pin_txt_m5.getText().toString().isEmpty()) {
+                inputLayoutPin_m5.setError("Pin is required!");
+                isValid = false;
+            } else {
+                inputLayoutPin_m5.setErrorEnabled(false);
+            }
+            //Prefix Spinner
+            modeofPaymentString = modeOfPayment_spinner_m5.getSelectedItem().toString();
+            if (modeofPaymentString.equals("Mode of Payment")) {
+                showMessage("Select your mode of payment");
+                isValid = false;
+            }
+
+            if (isValid) {
+
+                //Post Request to Api
+
+                mSubmit();
+            }
+
+            return;
+        }
+        showMessage("No Internet connection discovered!");
+    }
+
     private void mSubmit() {
 
         btn_layout3.setVisibility(View.GONE);
         progressbar.setVisibility(View.VISIBLE);
 
+        //retrieve data
+        final RealmResults<VehicleDetails> results;
+
+        //String title;
+        results=realm.where(VehicleDetails.class).findAll();
+
+        //VehiclePictures
+        //retrieve data
+        final RealmResults<VehiclePictures> picture_results;
+        //String title;
+        picture_results=realm.where(VehiclePictures.class).findAll();
+
+        Log.i("pix_result",results.toString());
+
+
+
+        if(userPreferences.getMotorPtype().equals("Corporate")){
+
+            Persona persona=new Persona("null","null",personal_details.get(0).getEmail(),"null",personal_details.get(0).getPhone(),"null",
+                    "null","null",personal_details.get(0).getPicture(),"null","null","null","null",personal_details.get(0).getCompany_name(),
+                    personal_details.get(0).getOffice_address(),"2",personal_details.get(0).getCompany_name(),"null",personal_details.get(0).getTin_number(),
+                    personal_details.get(0).getOffice_address(),personal_details.get(0).getContact_person());
+
+            for(int i=0;i<results.size();i++) {
+
+                VehiclePictures vehiclePictures= results.get(i).getVehiclePictures();
+
+                vehiclePictureList_post.add(vehiclePictures.getFront_view());
+                vehiclePictureList_post.add(vehiclePictures.getBack_view());
+                vehiclePictureList_post.add(vehiclePictures.getLeft_view());
+                vehiclePictureList_post.add(vehiclePictures.getRight_view());
+
+            }
+
+
+            for(int i=0;i<results.size();i++) {
+                VehicleDetails vehicleDetails=results.get(i);
+                Vehicle vehicle=new Vehicle(vehicleDetails.getPeriod(),vehicleDetails.getPolicy_type(),vehicleDetails.getEnhanced_third_party(),
+                        vehicleDetails.getPrivate_policy(),vehicleDetails.getMotor_cycle_policy(),vehicleDetails.getVehicle_make(),
+                        vehicleDetails.getBody_type(),vehicleDetails.getYear(),"null",vehicleDetails.getRegistration_number(),
+                        vehicleDetails.getChasis_number(),vehicleDetails.getEngine_number(),vehicleDetails.getVehicle_value(),vehiclePictureList_post);
+                vehiclesList_post.add(vehicle);
+
+                Log.i("policyLoop",vehicleDetails.getPolicy_type());
+
+
+            }
+
+            VehiclePostHead vehiclePostHead=new VehiclePostHead(persona,vehiclesList_post,total_quoteprice,
+                    pin_txt_m5.getText().toString(),modeofPaymentString,userPreferences.getUserId());
+
+            Log.i("policyPostPix1",vehiclePictureList_post.toString());
+            Log.i("policyPostVec1",vehiclesList_post.toString());
+
+            sendPolicy(vehiclePostHead);
+
+
+        }else if (userPreferences.getMotorPtype().equals("Individual")){
+
+            Persona persona=new Persona(personal_details.get(0).getFirst_name(),personal_details.get(0).getLast_name(),personal_details.get(0).getEmail(),personal_details.get(0).getGender(),personal_details.get(0).getPhone(),personal_details.get(0).getResident_address(),
+                    "null","null",personal_details.get(0).getPicture(),"null","null","null","null","null",
+                    "null","1","null",personal_details.get(0).getMailing_address(),"null",
+                    "null","null"
+                    );
+
+            for(int i=0;i<picture_results.size();i++) {
+
+                VehiclePictures vehiclePictures=picture_results.get(i);
+                vehiclePictureList_post.add(vehiclePictures.getFront_view());
+                vehiclePictureList_post.add(vehiclePictures.getBack_view());
+                vehiclePictureList_post.add(vehiclePictures.getLeft_view());
+                vehiclePictureList_post.add(vehiclePictures.getRight_view());
+
+                Log.i("mypix",vehiclePictures.getRight_view());
+
+            }
+
+
+            for(int i=0;i<results.size();i++) {
+                VehicleDetails vehicleDetails=results.get(i);
+                vehiclesList_post.add(new Vehicle(vehicleDetails.getPeriod(),vehicleDetails.getPolicy_type(),vehicleDetails.getEnhanced_third_party(),
+                        vehicleDetails.getPrivate_policy(),vehicleDetails.getMotor_cycle_policy(),vehicleDetails.getVehicle_make(),
+                        vehicleDetails.getBody_type(),vehicleDetails.getYear(),"null",vehicleDetails.getRegistration_number(),
+                        vehicleDetails.getChasis_number(),vehicleDetails.getEngine_number(),vehicleDetails.getVehicle_value(),vehiclePictureList_post));
+
+
+            }
+
+           /* VehiclePostHead vehiclePostHead=new VehiclePostHead(persona,vehiclesList_post,total_quoteprice,
+                    pin_txt_m5.getText().toString(),modeofPaymentString,userPreferences.getUserId());*/
+
+               // Log.i("policyPost2",vehiclePostHead.toString());
+            //sendPolicy(vehiclePostHead);
+
+
+        }
 
 
         asyncVehiclePolicy(primaryKey);
-       // asyncVehicleList(primaryKey);
+        showMessage("Proceeding to Payment");
 
-        showMessage("Vehicle Record Deleted");
+    }
 
 
+    private void sendPolicy(VehiclePostHead vehiclehead){
 
-        /*Fragment quoteBuyFragment6 = new QuoteBuyFragment6();
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_quote_form_container, quoteBuyFragment6);
-        ft.commit();*/
+
+        //get client and call object for request
+        ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
+        Log.i("TokenP", userPreferences.getUserToken());
+
+        Call<ResponseBody> call=client.vehicle_policy("Token "+userPreferences.getUserToken(),vehiclehead);
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.i("ResponseCode", String.valueOf(response.code()));
+
+
+                try {
+                    if (!response.isSuccessful()) {
+
+                        try{
+                            APIError apiError= ErrorUtils.parseError(response);
+
+                            showMessage("Invalid Entry: "+apiError.getErrors());
+                            Log.i("Invalid EntryK",apiError.getErrors().toString());
+                            Log.i("Invalid Entry",response.errorBody().toString());
+
+                        }catch (Exception e){
+                            Log.i("InvalidEntry",e.getMessage());
+                            Log.i("ResponseError",response.errorBody().string());
+                            showMessage("Failed to Register"+e.getMessage());
+                            btn_layout3.setVisibility(View.VISIBLE);
+                            progressbar.setVisibility(View.GONE);
+
+                        }
+                        btn_layout3.setVisibility(View.VISIBLE);
+                        progressbar.setVisibility(View.GONE);
+                        return;
+                    }
+                    
+                    String p_response=response.body().string();
+                    Log.i("policyResponse", p_response);
+
+                    showMessage("Submit Successful, Proceed to Payment");
+
+                    btn_layout3.setVisibility(View.VISIBLE);
+                    progressbar.setVisibility(View.GONE);
+                    /*if (user_email != null) {
+                        Intent intent = new Intent(SignUp.this, SignIn.class);
+                        intent.putExtra(Constant.USER_EMAIL, user_email);
+                        startActivity(intent);
+                        SignUp.this.finish();
+
+                    } else {
+                        showMessage("Error: " + response.body());
+                    }*/
+                }catch (Exception e){
+                    showMessage("Submission Error: " + e.getMessage());
+                    Log.i("policyResponse", e.getMessage());
+                }
+
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                showMessage("Submission Failed "+t.getMessage());
+                Log.i("GEtError",t.getMessage());
+            }
+        });
+
 
 
 
@@ -331,6 +555,14 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
                 if(vehicleDetails!=null){
                     realm.beginTransaction();
                     vehicleDetails.deleteAllFromRealm();
+                    realm.commitTransaction();
+                }else {
+                    showMessage("Error in deletion");
+                }
+                RealmResults<VehiclePictures> vehiclePictures=realm.where(VehiclePictures.class).findAll();
+                if(vehiclePictures!=null){
+                    realm.beginTransaction();
+                    vehiclePictures.deleteAllFromRealm();
                     realm.commitTransaction();
                 }else {
                     showMessage("Error in deletion");

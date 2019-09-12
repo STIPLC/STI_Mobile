@@ -179,7 +179,7 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
 
 
         if(userPreferences.getMotorPtype().equals("Corporate")){
-            String corperate="Comapany Name: "+personal_detail_allriskss.get(0).getCompany_name()+"\n"+"\n"+"Phone Number: "+personal_detail_allriskss.get(0).getPhone()+"\n"+
+            String corperate="Company Name: "+personal_detail_allriskss.get(0).getCompany_name()+"\n"+"\n"+"Phone Number: "+personal_detail_allriskss.get(0).getPhone()+"\n"+
                     "Office Address: "+personal_detail_allriskss.get(0).getOffice_address()+"\n"+"Contact Person: "+personal_detail_allriskss.get(0).getContact_person()+"\n"+
                     "Phone Number: "+personal_detail_allriskss.get(0).getPhone()+"\n"+"Email Address: "+personal_detail_allriskss.get(0).getEmail()+"\n"+"Mailing Address: "+personal_detail_allriskss.get(0).getMailing_addr()+"\n"+
                     "Total Premium: "+total_quoteprice;
@@ -264,9 +264,6 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
         recycler_vehicles.setLayoutManager(linearLayoutManager);
         recycler_vehicles.setAdapter(itemListAdapter);
 
-
-
-
         dialog.setContentView(view);
         dialog.show();
     }
@@ -282,11 +279,6 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
        // asyncVehicleList(primaryKey);
 
         showMessage("AllRisk Insurance Record Deleted");
-
-
-
-
-
     }
 
     //To Delete vehicle

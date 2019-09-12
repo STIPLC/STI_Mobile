@@ -188,7 +188,6 @@
 
     <string-array name="mode_of_payment">
         <item> Mode of Payment </item>
-        <item> Wallet </item>
         <item> PayStack </item>
 
     </string-array>

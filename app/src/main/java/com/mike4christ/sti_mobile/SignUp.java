@@ -1,6 +1,7 @@
 package com.mike4christ.sti_mobile;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import android.content.Intent;
 import android.graphics.Paint;
@@ -37,7 +38,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener{
 
     /** ButterKnife Code **/
     @BindView(R.id.layout_signUp)
-    FrameLayout mLayoutSignUp;
+    CoordinatorLayout mLayoutSignUp;
     @BindView(R.id.inputLayoutFirstName)
     TextInputLayout mInputLayoutFirstName;
     @BindView(R.id.firstname_editxt)

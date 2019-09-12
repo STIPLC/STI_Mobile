@@ -8,7 +8,7 @@ import static java.util.UUID.randomUUID;
 
 public class VehicleDetails extends RealmObject {
 
-    public String period;
+    String period;
     String startDate;
     String policy_type;
     String enhanced_third_party;
@@ -32,7 +32,7 @@ public class VehicleDetails extends RealmObject {
 
     }
 
-    RealmList<VehiclePictures> vehiclePictures;
+    VehiclePictures vehiclePictures;
 
     @PrimaryKey
     public String id=randomUUID().toString();
@@ -176,11 +176,11 @@ public class VehicleDetails extends RealmObject {
         this.vehicle_value = vehicle_value;
     }
 
-    public RealmList<VehiclePictures> getVehiclePictures() {
+    public VehiclePictures getVehiclePictures() {
         return vehiclePictures;
     }
 
-    public void setVehiclePictures(RealmList<VehiclePictures> vehiclePictures) {
+    public void setVehiclePictures(VehiclePictures vehiclePictures) {
         this.vehiclePictures = vehiclePictures;
     }
 }

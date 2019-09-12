@@ -80,28 +80,6 @@ private Context context;
     }
 
 
-
-  /*  //To Delete Record
-    private void asyncRemoveRecord(final String id){
-        AsyncTask<Void,Void,Void>remoteItem =new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-
-                realm=Realm.getDefaultInstance();
-
-                Monthly monthly=realm.where(Monthly.class).equalTo("id",id).findFirst();
-                if(monthly !=null){
-                    realm.beginTransaction();
-                    monthly.deleteFromRealm();
-                    realm.commitTransaction();
-                }
-                realm.close();
-                return null;
-            }
-        };
-        remoteItem.execute();
-    }
-*/
     public class MyViewHolder extends
             RecyclerView.ViewHolder {
 

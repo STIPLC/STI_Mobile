@@ -1103,6 +1103,7 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
                             personal_detail.setTin_number(userPreferences.getMotorITinNumber());
                             personal_detail.setOffice_address(userPreferences.getMotorIOff_addr());
                             personal_detail.setContact_person(userPreferences.getMotorIContPerson());
+                            personal_detail.setPicture(userPreferences.getMotorIPersonal_image());
                             //Vehicle List
                             VehicleDetails vehicleDetails=new VehicleDetails();
                             vehicleDetails.setPeriod("");
@@ -1129,9 +1130,7 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
                             vehiclePictures.setLeft_view(leftview_img_url);
                             vehiclePictures.setRight_view(rightview_img_url);
 
-                            RealmList<VehiclePictures>vehiclePicturesList=new RealmList<>();
-                            vehiclePicturesList.add(vehiclePictures);
-                            vehicleDetails.setVehiclePictures(vehiclePicturesList);
+                            vehicleDetails.setVehiclePictures(vehiclePictures);
 
                             RealmList<VehicleDetails>vehicleDetailsList=new RealmList<>();
                             vehicleDetailsList.add(vehicleDetails);
@@ -1178,9 +1177,7 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
                                 vehiclePictures.setLeft_view(leftview_img_url);
                                 vehiclePictures.setRight_view(rightview_img_url);
 
-                            RealmList<VehiclePictures>vehiclePicturesList=new RealmList<>();
-                            vehiclePicturesList.add(vehiclePictures);
-                            vehicleDetails.setVehiclePictures(vehiclePicturesList);
+                            vehicleDetails.setVehiclePictures(vehiclePictures);
 
                             RealmList<VehicleDetails>vehicleDetailsList=new RealmList<>();
                             vehicleDetailsList.add(vehicleDetails);
@@ -1192,7 +1189,7 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
 
                             vehiclePolicy.getPersonal_info().add(personal_detail2);
 
-                            showMessage(primaryKey);
+                           // showMessage(primaryKey);
 
 
 
@@ -1253,6 +1250,7 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
         personal_detail.setTin_number(userPreferences.getMotorITinNumber());
         personal_detail.setOffice_address(userPreferences.getMotorIOff_addr());
         personal_detail.setContact_person(userPreferences.getMotorIContPerson());
+        personal_detail.setPicture(userPreferences.getMotorIPersonal_image());
         //Vehicle List
         VehicleDetails vehicleDetails=new VehicleDetails();
         vehicleDetails.setPeriod("");
@@ -1279,9 +1277,7 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
             vehiclePictures.setLeft_view(leftview_img_url);
             vehiclePictures.setRight_view(rightview_img_url);
 
-        RealmList<VehiclePictures>vehiclePicturesList=new RealmList<>();
-        vehiclePicturesList.add(vehiclePictures);
-        vehicleDetails.setVehiclePictures(vehiclePicturesList);
+        vehicleDetails.setVehiclePictures(vehiclePictures);
 
 
         RealmList<VehicleDetails>vehicleDetailsList=new RealmList<>();
