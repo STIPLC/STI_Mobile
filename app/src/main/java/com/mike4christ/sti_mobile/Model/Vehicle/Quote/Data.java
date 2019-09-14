@@ -14,7 +14,6 @@ public class Data implements Serializable
     @SerializedName("vehicle_value")
     @Expose
     private String vehicleValue;
-    private final static long serialVersionUID = 8575967250047763141L;
 
     public String getPrice() {
         return price;

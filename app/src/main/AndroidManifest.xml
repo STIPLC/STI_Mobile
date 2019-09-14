@@ -158,6 +158,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".activity.PolicyPaymentActivity" />
 
         <uses-library
             android:name="org.apache.http.legacy"

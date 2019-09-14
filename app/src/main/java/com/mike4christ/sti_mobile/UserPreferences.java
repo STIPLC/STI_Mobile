@@ -1130,6 +1130,26 @@ public class UserPreferences {
         return sharedPreferences.getString(Constant.ALLRISK_ITEM_VALUE, "");
     }
 
+    public void setAllRiskItemImei(String imei) {
+        editor.putString(Constant.ALLRISK_ITEM_IMEI, imei);
+        editor.apply();
+    }
+
+    public String getAllRiskItemImei() {
+        return sharedPreferences.getString(Constant.ALLRISK_ITEM_IMEI, "");
+    }
+
+    public void setAllRiskItemReceipt(String receipt) {
+        editor.putString(Constant.ALLRISK_ITEM_RECEIPT, receipt);
+        editor.apply();
+    }
+
+    public String getAllRiskItemReceipt() {
+        return sharedPreferences.getString(Constant.ALLRISK_ITEM_RECEIPT, "");
+    }
+
+
+
     
     public void setTempAllRiskQuotePrice(int quotePrice) {
         editor.putInt(Constant.ALLRISK_QUOTE_PRICE, quotePrice);

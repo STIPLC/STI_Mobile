@@ -89,8 +89,6 @@ public class MotorInsureFragment3 extends Fragment implements View.OnClickListen
             p_amount = getArguments().getString(PREMIUM_AMOUNT);
 
 
-
-
         }
     }
 
@@ -112,9 +110,6 @@ public class MotorInsureFragment3 extends Fragment implements View.OnClickListen
             String format = p_amount + ".00";
             amount.setText(format);
         }
-
-
-
 
         setViewActions();
 
@@ -160,13 +155,9 @@ public class MotorInsureFragment3 extends Fragment implements View.OnClickListen
 
         btn_layout3.setVisibility(View.GONE);
         progressbar.setVisibility(View.VISIBLE);
-
-
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_motor_form_container, MotorInsureFragment4.newInstance(userPreferences.getMotorVehicleMake(),p_amount), MotorInsureFragment4.class.getSimpleName());
         ft.commit();
-
-
 
     }
 

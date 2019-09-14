@@ -22,8 +22,13 @@ import com.google.android.material.snackbar.Snackbar;
 
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.mike4christ.sti_mobile.Model.Errors.APIError;
+import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
+import com.mike4christ.sti_mobile.Model.ServiceGenerator;
+import com.mike4christ.sti_mobile.Model.Vehicle.Quote.QouteHead;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.shuhart.stepview.StepView;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -31,6 +36,9 @@ import java.util.Calendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class EticFragment2 extends Fragment implements View.OnClickListener{
@@ -94,7 +102,7 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
 
     String disabilityString,startDateStrg;
     DatePickerDialog datePickerDialog1;
-
+    UserPreferences userPreferences;
 
 
 
@@ -137,6 +145,7 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_etic2, container, false);
         ButterKnife.bind(this,view);
+        userPreferences = new UserPreferences(getContext());
         //        mStepView next registration step
 
         mStepView.go(currentStep, true);
@@ -308,7 +317,7 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
         mProgressbar2E2.setVisibility(View.VISIBLE);
 
         try {
-            UserPreferences userPreferences = new UserPreferences(getContext());
+
 
             //Temporal save and go to next Operation
 
@@ -321,10 +330,7 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
             userPreferences.setEticIArrivalPlc(mArrivalPlaceTxtE2.getText().toString());
             userPreferences.setEticICountryOfVisit(mCountryVisitAddrE2.getText().toString());
 
-
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_etic_form_container, EticFragment3.newInstance("Premium","8000"), EticFragment3.class.getSimpleName());
-            ft.commit();
+            sendEticData();
 
         }catch (Exception e){
             Log.i("Form Error",e.getMessage());
@@ -333,6 +339,72 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
             showMessage("Error: " + e.getMessage());
         }
     }
+
+    private void sendEticData(){
+
+
+        //get client and call object for request
+        ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
+        Call<QouteHead> call=client.etic_quote("Token "+userPreferences.getUserToken(),mArrivalPlaceTxtE2.getText().toString());
+
+        call.enqueue(new Callback<QouteHead>() {
+            @Override
+            public void onResponse(Call<QouteHead> call, Response<QouteHead> response) {
+                Log.i("ResponseCode", String.valueOf(response.code()));
+
+
+                try {
+                    if (!response.isSuccessful()) {
+
+                        try{
+                            APIError apiError= ErrorUtils.parseError(response);
+
+                            showMessage("Invalid Entry: "+apiError.getErrors());
+                            Log.i("Invalid EntryK",apiError.getErrors().toString());
+                            Log.i("Invalid Entry",response.errorBody().toString());
+
+                        }catch (Exception e){
+                            Log.i("InvalidEntry",e.getMessage());
+                            Log.i("ResponseError",response.errorBody().string());
+                            showMessage("Failed to Fetch Quote"+e.getMessage());
+                            mBtnLayout2E2.setVisibility(View.VISIBLE);
+                            mProgressbar2E2.setVisibility(View.GONE);
+
+                        }
+                        mBtnLayout2E2.setVisibility(View.VISIBLE);
+                        mProgressbar2E2.setVisibility(View.GONE);
+                        return;
+                    }
+
+                    String quote_price=response.body().getData().getPrice();
+                    Log.i("quote_price",quote_price);
+                    showMessage("Successfully Fetched Quote");
+                    mBtnLayout2E2.setVisibility(View.VISIBLE);
+                    mProgressbar2E2.setVisibility(View.GONE);
+
+
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.replace(R.id.fragment_etic_form_container, EticFragment3.newInstance(mArrivalPlaceTxtE2.getText().toString(),quote_price), EticFragment3.class.getSimpleName());
+                    ft.commit();
+                }catch (Exception e){
+                    Log.i("policyResponse", e.getMessage());
+                    mBtnLayout2E2.setVisibility(View.VISIBLE);
+                    mProgressbar2E2.setVisibility(View.GONE);
+                }
+
+            }
+            @Override
+            public void onFailure(Call<QouteHead> call, Throwable t) {
+                showMessage("Submission Failed "+t.getMessage());
+                Log.i("GEtError",t.getMessage());
+                mBtnLayout2E2.setVisibility(View.VISIBLE);
+                mProgressbar2E2.setVisibility(View.GONE);
+            }
+        });
+
+    }
+
+
 
 
     private void showMessage(String s) {

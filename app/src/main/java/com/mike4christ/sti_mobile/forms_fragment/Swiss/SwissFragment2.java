@@ -32,9 +32,16 @@ import com.google.android.material.snackbar.Snackbar;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.mike4christ.sti_mobile.BuildConfig;
+import com.mike4christ.sti_mobile.Model.Errors.APIError;
+import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
+import com.mike4christ.sti_mobile.Model.ServiceGenerator;
+import com.mike4christ.sti_mobile.Model.Vehicle.Quote.PostVehicleData;
+import com.mike4christ.sti_mobile.Model.Vehicle.Quote.QouteHead;
 import com.mike4christ.sti_mobile.NetworkConnection;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.forms_fragment.MotorInsurance.MotorInsureFragment3;
+import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.shuhart.stepview.StepView;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -50,6 +57,9 @@ import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class SwissFragment2 extends Fragment implements View.OnClickListener{
@@ -121,6 +131,8 @@ public class SwissFragment2 extends Fragment implements View.OnClickListener{
     DatePickerDialog datePickerDialog1;
 
     String maritalString,genderString,benefitString;
+    UserPreferences userPreferences;
+    String quote_price;
 
     public SwissFragment2() {
         // Required empty public constructor
@@ -160,6 +172,7 @@ public class SwissFragment2 extends Fragment implements View.OnClickListener{
         View view=inflater.inflate(R.layout.fragment_swiss2, container, false);
         ButterKnife.bind(this,view);
         //        mStepView next registration step
+        userPreferences=new UserPreferences(getContext());
         
 
         mStepView.go(currentStep, true);
@@ -280,8 +293,6 @@ public class SwissFragment2 extends Fragment implements View.OnClickListener{
                                        int position, long id) {
                 String benefitTypeString = (String) parent.getItemAtPosition(position);
 
-
-
             }
 
             @Override
@@ -296,7 +307,6 @@ public class SwissFragment2 extends Fragment implements View.OnClickListener{
 
     //seting onclicks listeners
     private void setViewActions() {
-
         mVNextBtn2S2.setOnClickListener(this);
         mVBackBtn2S2.setOnClickListener(this);
         mUploadPassportBtnS2.setOnClickListener(this);
@@ -655,7 +665,6 @@ public class SwissFragment2 extends Fragment implements View.OnClickListener{
         mProgressbar2S2.setVisibility(View.VISIBLE);
 
         try {
-            UserPreferences userPreferences = new UserPreferences(getContext());
 
             //Temporal save and go to next Operation
 
@@ -668,10 +677,9 @@ public class SwissFragment2 extends Fragment implements View.OnClickListener{
             userPreferences.setSwissIAddEmail(mEmailEditxtS2.getText().toString());
             userPreferences.setSwissIAddDisability(mDisableEditxtS2.getText().toString());
 
-           // Fragment quoteBuyFragment3 = new SwissInsureFragment3();
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_swiss_form_container, SwissFragment3.newInstance("Eligible","8000"), SwissFragment3.class.getSimpleName());
-            ft.commit();
+
+            sendSwissData();
+
 
         }catch (Exception e){
             Log.i("Form Error",e.getMessage());
@@ -679,6 +687,70 @@ public class SwissFragment2 extends Fragment implements View.OnClickListener{
             mVNextBtn2S2.setVisibility(View.VISIBLE);
             showMessage("Error: " + e.getMessage());
         }
+    }
+
+
+
+    private void sendSwissData(){
+
+
+        //get client and call object for request
+        ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
+
+
+        Call<QouteHead> call=client.swiss_quote("Token "+userPreferences.getUserToken(),mDobEditxtS2.getText().toString());
+
+        call.enqueue(new Callback<QouteHead>() {
+            @Override
+            public void onResponse(Call<QouteHead> call, Response<QouteHead> response) {
+                Log.i("ResponseCode", String.valueOf(response.code()));
+
+
+                try {
+                    if (!response.isSuccessful()) {
+
+                        try{
+                            APIError apiError= ErrorUtils.parseError(response);
+
+                            showMessage("Invalid Entry: "+apiError.getErrors());
+                            Log.i("Invalid EntryK",apiError.getErrors().toString());
+                            Log.i("Invalid Entry",response.errorBody().toString());
+
+                        }catch (Exception e){
+                            Log.i("InvalidEntry",e.getMessage());
+                            Log.i("ResponseError",response.errorBody().string());
+                            showMessage("Failed to Fetch Quote"+e.getMessage());
+                            mBtnLayout2S2.setVisibility(View.VISIBLE);
+                            mProgressbar2S2.setVisibility(View.GONE);
+
+                        }
+                        mBtnLayout2S2.setVisibility(View.VISIBLE);
+                        mProgressbar2S2.setVisibility(View.GONE);
+                        return;
+                    }
+
+                    quote_price=response.body().getData().getPrice();
+                    Log.i("quote_price",quote_price);
+                    showMessage("Successfully Fetched Quote");
+                    mBtnLayout2S2.setVisibility(View.VISIBLE);
+                    mProgressbar2S2.setVisibility(View.GONE);
+
+                    // Fragment quoteBuyFragment3 = new SwissInsureFragment3();
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.replace(R.id.fragment_swiss_form_container, SwissFragment3.newInstance("",quote_price), SwissFragment3.class.getSimpleName());
+                    ft.commit();
+                }catch (Exception e){
+                    Log.i("policyResponse", e.getMessage());
+                }
+
+            }
+            @Override
+            public void onFailure(Call<QouteHead> call, Throwable t) {
+                showMessage("Submission Failed "+t.getMessage());
+                Log.i("GEtError",t.getMessage());
+            }
+        });
+
     }
 
 

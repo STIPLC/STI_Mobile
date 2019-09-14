@@ -1,7 +1,9 @@
 package com.mike4christ.sti_mobile.forms_fragment.Marine;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,14 +26,36 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
+import com.mike4christ.sti_mobile.Constant;
+import com.mike4christ.sti_mobile.Model.Errors.APIError;
+import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
 import com.mike4christ.sti_mobile.Model.Marine.CargoDetail;
+import com.mike4christ.sti_mobile.Model.Marine.FormSuccessDetail.BuyQuoteFormGetHead_Marine;
+import com.mike4christ.sti_mobile.Model.Marine.FormSuccessDetail.Policy;
 import com.mike4christ.sti_mobile.Model.Marine.MarinePolicy;
+import com.mike4christ.sti_mobile.Model.Marine.MarinePost.Cargo;
+import com.mike4christ.sti_mobile.Model.Marine.MarinePost.MarinePersona;
+import com.mike4christ.sti_mobile.Model.Marine.MarinePost.MarinePostHead;
 import com.mike4christ.sti_mobile.Model.Marine.Personal_Detail_marine;
+
+import com.mike4christ.sti_mobile.Model.ServiceGenerator;
+import com.mike4christ.sti_mobile.Model.Vehicle.FormSuccessDetail.BuyQuoteFormGetHead;
+import com.mike4christ.sti_mobile.Model.Vehicle.VehicleDetails;
+import com.mike4christ.sti_mobile.Model.Vehicle.VehiclePictures;
+import com.mike4christ.sti_mobile.Model.Vehicle.VehiclePost.Persona;
+import com.mike4christ.sti_mobile.Model.Vehicle.VehiclePost.Vehicle;
+import com.mike4christ.sti_mobile.Model.Vehicle.VehiclePost.VehiclePostHead;
+import com.mike4christ.sti_mobile.NetworkConnection;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
 import com.mike4christ.sti_mobile.adapter.CargoListAdapter;
+import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.shuhart.stepview.StepView;
 import com.wang.avi.AVLoadingIndicatorView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,6 +63,9 @@ import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class MarineFragment4 extends Fragment implements View.OnClickListener{
@@ -75,15 +102,28 @@ public class MarineFragment4 extends Fragment implements View.OnClickListener{
     Button mVNextBtn4M4;
     @BindView(R.id.progressbar4_m4)
     AVLoadingIndicatorView mProgressbar4M4;
-   
-
-
-
 
 
     private  int currentStep=3;
     Realm realm;
     CargoListAdapter cargoListAdapter;
+
+    String modeofPaymentString;
+    UserPreferences userPreferences;
+    MarinePolicy marinePolicy;
+    RealmList<Personal_Detail_marine> personal_detail_marines;
+    //Cargo return policy
+    List<Policy> policy;
+
+    String total_quoteprice;
+
+    List<Cargo> cargoList_post=new ArrayList<Cargo>();
+    List<String> cargoPictureList_post=new ArrayList<>();
+
+
+    NetworkConnection networkConnection=new NetworkConnection();
+    String policy_num="";
+    String total_price="";
 
 
 
@@ -128,6 +168,7 @@ public class MarineFragment4 extends Fragment implements View.OnClickListener{
         ButterKnife.bind(this,view);
         //  mStepView next registration step
         mStepView.go(currentStep, true);
+        userPreferences=new UserPreferences(getContext());
         realm= Realm.getDefaultInstance();
 
 
@@ -168,15 +209,14 @@ public class MarineFragment4 extends Fragment implements View.OnClickListener{
 
     }
     private void init(){
-
-        UserPreferences userPreferences=new UserPreferences(getContext());
+        
 
         //retrieve data for personal detail first
         MarinePolicy marinePolicy;
 
         marinePolicy=realm.where(MarinePolicy.class).equalTo("id",primaryKey).findFirst();
-        String total_quoteprice=marinePolicy.getQuote_price();
-        RealmList<Personal_Detail_marine> personal_detail_marines=marinePolicy.getPersonal_detail_marines();
+        total_quoteprice=marinePolicy.getQuote_price();
+        personal_detail_marines=marinePolicy.getPersonal_detail_marines();
 
 
 
@@ -219,8 +259,9 @@ public class MarineFragment4 extends Fragment implements View.OnClickListener{
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.v_next_btn4_m4:
-//                send quote to client and sti
-                mSubmit();
+//                send quote to payment after validate pin
+                ValidateForm();
+               
                 break;
 
             case R.id.v_back_btn4_m4:
@@ -236,6 +277,36 @@ public class MarineFragment4 extends Fragment implements View.OnClickListener{
         }
     }
 
+
+    private void ValidateForm() {
+
+        if (networkConnection.isNetworkConnected(getContext())) {
+            boolean isValid = true;
+
+            if (mPinTxtM4.getText().toString().isEmpty()) {
+                mInputLayoutPinM4.setError("Pin is required!");
+                isValid = false;
+            } else {
+                mInputLayoutPinM4.setErrorEnabled(false);
+            }
+            //Prefix Spinner
+            modeofPaymentString = mModeOfPaymentSpinnerM4.getSelectedItem().toString();
+            if (modeofPaymentString.equals("Mode of Payment")) {
+                showMessage("Select your mode of payment");
+                isValid = false;
+            }
+
+            if (isValid) {
+
+                //Post Request to Api
+
+                mSubmit();
+            }
+
+            return;
+        }
+        showMessage("No Internet connection discovered!");
+    }
 
     @OnClick(R.id.fabShowCargoes)
     public void showBottomVehicleList() {
@@ -279,12 +350,160 @@ public class MarineFragment4 extends Fragment implements View.OnClickListener{
         mProgressbar4M4.setVisibility(View.VISIBLE);
 
 
+        //retrieve data
+        final RealmResults<CargoDetail> results;
+
+        //String title;
+        results=realm.where(CargoDetail.class).findAll();
+        
+
+        Log.i("cargos_result",results.toString());
+
+
+
+        if(userPreferences.getMotorPtype().equals("Corporate")){
+
+            MarinePersona marinePersona=new MarinePersona("null","null",personal_detail_marines.get(0).getEmail(),"null",personal_detail_marines.get(0).getPhone(),"null",
+                    "null","null","null","null","null","null","null","null",
+                    "null","2",personal_detail_marines.get(0).getCompany_name(),"null",personal_detail_marines.get(0).getTin_number(),
+                    personal_detail_marines.get(0).getOffice_address(),personal_detail_marines.get(0).getContact_person());
+            
+
+            for(int i=0;i<results.size();i++) {
+                cargoPictureList_post.add("null");
+                CargoDetail cargoDetail=results.get(i);
+                Cargo cargo=new Cargo("null","null",cargoDetail.getDesc_goods(),
+                        cargoDetail.getPfi_number(),cargoDetail.getPfi_date(),cargoDetail.getQuantity(),
+                        cargoDetail.getValue(),cargoDetail.getConversion_rate(),cargoDetail.getLoading_port(),cargoDetail.getDischarge_port(),
+                        cargoDetail.getConveyance_mode(),"null",cargoPictureList_post);
+
+                cargoList_post.add(cargo);
+
+                Log.i("cargoDetailLoop",cargoDetail.getPfi_number());
+
+            }
+
+            MarinePostHead marinePostHead=new MarinePostHead(marinePersona,cargoList_post,total_quoteprice,
+                    mPinTxtM4.getText().toString(),modeofPaymentString,userPreferences.getUserId());
+
+            sendPolicy(marinePostHead);
+
+
+        }else if (userPreferences.getMotorPtype().equals("Individual")){
+
+            MarinePersona marinePersona=new MarinePersona(personal_detail_marines.get(0).getFirst_name(),personal_detail_marines.get(0).getLast_name(),personal_detail_marines.get(0).getEmail(),personal_detail_marines.get(0).getGender(),personal_detail_marines.get(0).getPhone(),personal_detail_marines.get(0).getResident_address(),
+                    "null","null","null","null","null","null","null","null",
+                    "null","1","null",personal_detail_marines.get(0).getMailing_address(),"null",
+                    "null","null");
+
+            for(int i=0;i<results.size();i++) {
+                cargoPictureList_post.add("null");
+                CargoDetail cargoDetail=results.get(i);
+                Cargo cargo=new Cargo("null","null",cargoDetail.getDesc_goods(),
+                        cargoDetail.getPfi_number(),cargoDetail.getPfi_date(),cargoDetail.getQuantity(),
+                        cargoDetail.getValue(),cargoDetail.getConversion_rate(),cargoDetail.getLoading_port(),cargoDetail.getDischarge_port(),
+                        cargoDetail.getConveyance_mode(),"null",cargoPictureList_post);
+
+                cargoList_post.add(cargo);
+
+                Log.i("cargoDetailLoop",cargoDetail.getPfi_number());
+
+            }
+            MarinePostHead marinePostHead=new MarinePostHead(marinePersona,cargoList_post,total_quoteprice,
+                    mPinTxtM4.getText().toString(),modeofPaymentString,userPreferences.getUserId());
+
+            sendPolicy(marinePostHead);
+
+
+        }
+
+
+
+
 
         asyncMarinePolicy(primaryKey);
         // asyncVehicleList(primaryKey);
 
-        showMessage("Marine Isured Record Deleted");
 
+
+    }
+
+    private void sendPolicy( MarinePostHead marinePostHead){
+
+
+        //get client and call object for request
+        ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
+        Log.i("TokenP", userPreferences.getUserToken());
+
+        Call<BuyQuoteFormGetHead_Marine> call=client.marine_policy("Token "+userPreferences.getUserToken(),marinePostHead);
+
+        call.enqueue(new Callback<BuyQuoteFormGetHead_Marine>() {
+            @Override
+            public void onResponse(Call<BuyQuoteFormGetHead_Marine> call, Response<BuyQuoteFormGetHead_Marine> response) {
+                Log.i("ResponseCode", String.valueOf(response.code()));
+
+
+                try {
+                    if (!response.isSuccessful()) {
+
+                        try{
+                            APIError apiError= ErrorUtils.parseError(response);
+
+                            showMessage("Invalid Entry: "+apiError.getErrors());
+                            Log.i("Invalid EntryK",apiError.getErrors().toString());
+                            Log.i("Invalid Entry",response.errorBody().toString());
+
+                        }catch (Exception e){
+                            Log.i("InvalidEntry",e.getMessage());
+                            Log.i("ResponseError",response.errorBody().string());
+                            showMessage("Failed to Register"+e.getMessage());
+                            mBtnLayout4M4.setVisibility(View.VISIBLE);
+                            mProgressbar4M4.setVisibility(View.GONE);
+
+                        }
+                        mBtnLayout4M4.setVisibility(View.VISIBLE);
+                        mProgressbar4M4.setVisibility(View.GONE);
+                        return;
+                    }
+
+                    policy=response.body().getData().getPolicy();
+                    for(int i=0;i<policy.size();i++){
+                        policy_num=policy_num.concat("\n"+policy.get(i).getPolicyNumber());
+                    }
+
+                    total_price= String.valueOf(response.body().getData().getTotalPrice());
+
+                    Log.i("policyNum", policy_num);
+                    Log.i("totalPrice", total_price);
+
+                    showMessage("Submit Successful, Proceed to Payment");
+                    userPreferences.setTempMarineQuotePrice(0);
+
+                    mBtnLayout4M4.setVisibility(View.VISIBLE);
+                    mProgressbar4M4.setVisibility(View.GONE);
+                    if (total_price != null) {
+
+                        Intent intent = new Intent(getContext(), PolicyPaymentActivity.class);
+                        intent.putExtra(Constant.TOTAL_PRICE, total_price);
+                        intent.putExtra(Constant.POLICY_NUM, policy_num);
+                        startActivity(intent);
+                        getActivity().finish();
+
+                    } else {
+                        showMessage("Error: " + response.body());
+                    }
+                }catch (Exception e){
+                    showMessage("Submission Error: " + e.getMessage());
+                    Log.i("policyResponse", e.getMessage());
+                }
+
+            }
+            @Override
+            public void onFailure(Call<BuyQuoteFormGetHead_Marine> call, Throwable t) {
+                showMessage("Submission Failed "+t.getMessage());
+                Log.i("GEtError",t.getMessage());
+            }
+        });
 
     }
 
@@ -303,10 +522,10 @@ public class MarineFragment4 extends Fragment implements View.OnClickListener{
                     realm.commitTransaction();
                 }
 
-                RealmResults<CargoDetail> vehicleDetails=realm.where(CargoDetail.class).findAll();
-                if(vehicleDetails!=null){
+                RealmResults<CargoDetail> cargoDetails=realm.where(CargoDetail.class).findAll();
+                if(cargoDetails!=null){
                     realm.beginTransaction();
-                    vehicleDetails.deleteAllFromRealm();
+                    cargoDetails.deleteAllFromRealm();
                     realm.commitTransaction();
                 }else {
                     showMessage("Error in deletion");

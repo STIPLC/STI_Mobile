@@ -135,6 +135,27 @@
                             />
                     </com.google.android.material.textfield.TextInputLayout>
 
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/inputLayoutItemImei_a2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="visible"
+                        >
+
+                        <EditText
+                            android:id="@+id/item_imei_a2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/size_three"
+                            android:background="@drawable/rounded_bg"
+                            android:hint="Item IMEI if Applicable"
+                            android:importantForAutofill="noExcludeDescendants"
+                            android:inputType="text"
+                            android:padding="@dimen/size_ten"
+                            tools:targetApi="o"
+                            />
+                    </com.google.android.material.textfield.TextInputLayout>
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/inputLayoutItemValue_a2"
                         android:layout_width="match_parent"
@@ -156,6 +177,19 @@
                             />
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <Button
+                        android:id="@+id/upload_receipt_btn2_a2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/rounded_bg"
+                        android:drawableEnd="@drawable/ic_camera_alt_black_24dp"
+                        android:padding="@dimen/size_ten"
+                        android:text="Upload Receipt"
+                        android:layout_marginTop="@dimen/size_ten"
+                        android:textColor="@android:color/darker_gray"
+                        android:layout_marginBottom="@dimen/size_ten"
+                        android:visibility="visible"
+                        />
 
                     <LinearLayout
                         android:id="@+id/btn_layout2_a2"

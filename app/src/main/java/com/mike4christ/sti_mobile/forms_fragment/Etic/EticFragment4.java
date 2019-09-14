@@ -1,6 +1,7 @@
 package com.mike4christ.sti_mobile.forms_fragment.Etic;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -8,6 +9,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,12 +32,27 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
+import com.mike4christ.sti_mobile.Constant;
+import com.mike4christ.sti_mobile.Model.Errors.APIError;
+import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
 import com.mike4christ.sti_mobile.Model.Etic.EticPolicy;
+import com.mike4christ.sti_mobile.Model.Etic.EticPost.EticPersona;
+import com.mike4christ.sti_mobile.Model.Etic.EticPost.EticPostHead;
+import com.mike4christ.sti_mobile.Model.Etic.EticPost.Trip;
+import com.mike4christ.sti_mobile.Model.Etic.FormSuccessDetail.BuyQuoteFormGetHead_Etic;
+import com.mike4christ.sti_mobile.Model.Etic.FormSuccessDetail.Policy;
 import com.mike4christ.sti_mobile.Model.Etic.Personal_Detail_etic;
 import com.mike4christ.sti_mobile.Model.Etic.Travel_Info;
+import com.mike4christ.sti_mobile.Model.ServiceGenerator;
+import com.mike4christ.sti_mobile.NetworkConnection;
 import com.mike4christ.sti_mobile.R;
+import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
 import com.mike4christ.sti_mobile.adapter.travel_infoListAdapter;
+import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.wang.avi.AVLoadingIndicatorView;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,6 +60,9 @@ import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 class EticFragment4 extends Fragment implements View.OnClickListener{
     // TODO: Rename parameter arguments, choose names that match
@@ -85,7 +105,18 @@ class EticFragment4 extends Fragment implements View.OnClickListener{
     Realm realm;
     travel_infoListAdapter travelListAdapter;
 
+    String modeofPaymentString;
+    RealmList<Personal_Detail_etic> personal_detail_etics;
+    Trip trip;
+    String total_quotepric ;
+    String policy_num="";
+    String total_price="";
+    //All Risk return policy
+    List<Policy> policy;
 
+
+    NetworkConnection networkConnection=new NetworkConnection();
+    UserPreferences userPreferences;
 
 
     public EticFragment4() {
@@ -128,6 +159,8 @@ class EticFragment4 extends Fragment implements View.OnClickListener{
         ButterKnife.bind(this,view);
         //  mStepView next registration step
         mStepView.go(currentStep, true);
+        userPreferences=new UserPreferences(getContext());
+        
         realm= Realm.getDefaultInstance();
 
         init();
@@ -172,15 +205,15 @@ class EticFragment4 extends Fragment implements View.OnClickListener{
         EticPolicy eticPolicy;
 
         eticPolicy=realm.where(EticPolicy.class).equalTo("id",primaryKey).findFirst();
-        String total_quoteprice=eticPolicy.getQuote_price();
-        RealmList<Personal_Detail_etic> personal_detail_etics=eticPolicy.getPersonal_detail_etic();
+        total_quotepric=eticPolicy.getQuote_price();
+        personal_detail_etics=eticPolicy.getPersonal_detail_etic();
 
 
         
             String individual="Prefix: "+personal_detail_etics.get(0).getPrefix()+"\n"+"First Name: "+personal_detail_etics.get(0).getFirst_name()+"\n"+
                     "Last Name: "+personal_detail_etics.get(0).getLast_name()+"\n"+"Phone Number: "+personal_detail_etics.get(0).getPhone()+"\n"+
                     "Gender: "+personal_detail_etics.get(0).getResident_address()+"\n"+"Mailing Address: "+personal_detail_etics.get(0).getMailing_addr()+"\n"+
-                    "Premium: "+total_quoteprice;
+                    "Premium: "+total_quotepric;
             mPersonalInfoTxtE4.setText(individual);
             
 
@@ -203,7 +236,7 @@ class EticFragment4 extends Fragment implements View.OnClickListener{
         switch (view.getId()) {
             case R.id.v_next_btn4_e4:
 //                send quote to client and sti
-                mSubmit();
+                ValidateForm();
                 break;
 
             case R.id.v_back_btn4_e4:
@@ -218,6 +251,37 @@ class EticFragment4 extends Fragment implements View.OnClickListener{
                 break;
         }
     }
+
+    private void ValidateForm() {
+
+        if (networkConnection.isNetworkConnected(getContext())) {
+            boolean isValid = true;
+
+            if (mPinTxtE4.getText().toString().isEmpty()) {
+                mInputLayoutPinE4.setError("Pin is required!");
+                isValid = false;
+            } else {
+                mInputLayoutPinE4.setErrorEnabled(false);
+            }
+            //Prefix Spinner
+            modeofPaymentString = mModeOfPaymentSpinnerE4.getSelectedItem().toString();
+            if (modeofPaymentString.equals("Mode of Payment")) {
+                showMessage("Select your mode of payment");
+                isValid = false;
+            }
+
+            if (isValid) {
+
+                //Post Request to Api
+
+                mSubmit();
+            }
+
+            return;
+        }
+        showMessage("No Internet connection discovered!");
+    }
+
 
 
     @OnClick(R.id.fabShowTranspDetail_e4)
@@ -249,11 +313,7 @@ class EticFragment4 extends Fragment implements View.OnClickListener{
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getActivity().getBaseContext(),RecyclerView.VERTICAL,false);
         recycler_vehicles.setLayoutManager(linearLayoutManager);
         recycler_vehicles.setAdapter(travelListAdapter);
-
-        /*RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getBaseContext());
-        recycler_note.setLayoutManager(mLayoutManager);
-        recycler_note.setItemAnimator(new DefaultItemAnimator());
-        recycler_note.setAdapter(adapter);*/
+        
 
 
         dialog.setContentView(view);
@@ -266,15 +326,120 @@ class EticFragment4 extends Fragment implements View.OnClickListener{
         mProgressbar4M4.setVisibility(View.VISIBLE);
 
 
+        //retrieve data
+        final RealmResults<Travel_Info> results;
+
+        //String title;
+        results=realm.where(Travel_Info.class).findAll();
+
+
+        EticPersona eticPersona =new EticPersona(personal_detail_etics.get(0).getPrefix(),personal_detail_etics.get(0).getFirst_name(),personal_detail_etics.get(0).getLast_name(),personal_detail_etics.get(0).getEmail(),
+                "null",personal_detail_etics.get(0).getPhone(),personal_detail_etics.get(0).getGender(),personal_detail_etics.get(0).getResident_address(),
+                "null","null","null","null","null",personal_detail_etics.get(0).getPicture(),
+                personal_detail_etics.get(0).getNext_of_kin(),personal_detail_etics.get(0).getNext_of_kin_address(),personal_detail_etics.get(0).getNext_of_kin_phone(),"null");
+
+        for(int i=0;i<results.size();i++) {
+            Travel_Info travel_info=results.get(i);
+            trip=new Trip(travel_info.getTrip_duration(),travel_info.getTravel_mode(),travel_info.getDisability(),travel_info.getDisability_details(),
+                    travel_info.getPlace_departure(),travel_info.getPlace_arrival(),travel_info.getAddress_country_of_visit());
+
+            Log.i("policyItemLoop",travel_info.getPlace_departure());
+
+        }
+
+        EticPostHead eticPostHead=new EticPostHead(eticPersona,modeofPaymentString,total_quotepric,mPinTxtE4.getText().toString(),trip);
+
+
+        sendPolicy(eticPostHead);
+        
+        
+        
 
         asyncEticPolicy(primaryKey);
-       // asyncVehicleList(primaryKey);
-
-        showMessage("Vehicle Record Deleted");
         
+    }
+
+    private void sendPolicy(EticPostHead eticPostHead){
+
+
+        //get client and call object for request
+        ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
+
+        Call<BuyQuoteFormGetHead_Etic> call=client.etic_policy("Token "+userPreferences.getUserToken(),eticPostHead);
+
+        call.enqueue(new Callback<BuyQuoteFormGetHead_Etic>() {
+            @Override
+            public void onResponse(Call<BuyQuoteFormGetHead_Etic> call, Response<BuyQuoteFormGetHead_Etic> response) {
+                Log.i("ResponseCode", String.valueOf(response.code()));
+
+
+                try {
+                    if (!response.isSuccessful()) {
+
+                        try{
+                            APIError apiError= ErrorUtils.parseError(response);
+
+                            showMessage("Invalid Entry: "+apiError.getErrors());
+                            Log.i("Invalid EntryK",apiError.getErrors().toString());
+                            Log.i("Invalid Entry",response.errorBody().toString());
+
+                        }catch (Exception e){
+                            Log.i("InvalidEntry",e.getMessage());
+                            Log.i("ResponseError",response.errorBody().string());
+                            showMessage("Failed to Register"+e.getMessage());
+                            mBtnLayout4E4.setVisibility(View.VISIBLE);
+                            mProgressbar4M4.setVisibility(View.GONE);
+
+                        }
+                        mBtnLayout4E4.setVisibility(View.VISIBLE);
+                        mProgressbar4M4.setVisibility(View.GONE);
+                        return;
+                    }
+
+                    policy=response.body().getData().getPolicy();
+                    for(int i=0;i<policy.size();i++){
+                        policy_num=policy_num.concat("\n"+policy.get(i).getPolicyNumber());
+                    }
+
+                    total_price= String.valueOf(response.body().getData().getTotalPrice());
+
+                    Log.i("policyNum", policy_num);
+                    Log.i("totalPrice", total_price);
+
+                    showMessage("Submit Successful, Proceed to Payment");
+                    userPreferences.setTempEticQuotePrice(0);
+
+                    mBtnLayout4E4.setVisibility(View.VISIBLE);
+                    mProgressbar4M4.setVisibility(View.GONE);
+                    if (total_price != null) {
+
+                        Intent intent = new Intent(getContext(), PolicyPaymentActivity.class);
+                        intent.putExtra(Constant.TOTAL_PRICE, total_price);
+                        intent.putExtra(Constant.POLICY_NUM, policy_num);
+                        startActivity(intent);
+                        getActivity().finish();
+
+                    } else {
+                        showMessage("Error: " + response.body());
+                    }
+                }catch (Exception e){
+                    showMessage("Submission Error: " + e.getMessage());
+                    Log.i("policyResponse", e.getMessage());
+                }
+
+            }
+            @Override
+            public void onFailure(Call<BuyQuoteFormGetHead_Etic> call, Throwable t) {
+                showMessage("Submission Failed "+t.getMessage());
+                Log.i("GEtError",t.getMessage());
+            }
+        });
+
+
 
 
     }
+
 
     //To Delete vehicle
     private void asyncEticPolicy(final String id){
@@ -305,30 +470,6 @@ class EticFragment4 extends Fragment implements View.OnClickListener{
         };
         remoteItem.execute();
     }
-
-    /*//To Delete vehicle
-    private void asyncVehicleList(final String id){
-        AsyncTask<Void,Void,Void> remoteItem =new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-
-                realm=Realm.getDefaultInstance();
-
-                EticPolicy expenses=realm.where(EticPolicy.class).equalTo("id",id).findFirst();
-                if(expenses !=null){
-                    realm.beginTransaction();
-                    expenses.deleteFromRealm();
-                    realm.commitTransaction();
-                }
-                realm.close();
-                return null;
-            }
-        };
-        remoteItem.execute();
-    }
-*/
-
-
 
 
 

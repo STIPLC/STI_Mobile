@@ -29,8 +29,18 @@ import com.cloudinary.android.callback.UploadCallback;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.mike4christ.sti_mobile.BuildConfig;
+import com.mike4christ.sti_mobile.Constant;
+import com.mike4christ.sti_mobile.Model.Claim.ClaimPost;
+import com.mike4christ.sti_mobile.Model.Errors.APIError;
+import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
+import com.mike4christ.sti_mobile.Model.Etic.EticPost.EticPostHead;
+import com.mike4christ.sti_mobile.Model.Etic.FormSuccessDetail.BuyQuoteFormGetHead_Etic;
+import com.mike4christ.sti_mobile.Model.ServiceGenerator;
 import com.mike4christ.sti_mobile.NetworkConnection;
 import com.mike4christ.sti_mobile.R;
+import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
+import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import java.io.File;
@@ -39,11 +49,16 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class SubFragment_Claim extends Fragment implements View.OnClickListener{
@@ -113,6 +128,8 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
 
     Uri damage_img_uri;
     String damage_img_url;
+    List<String> claimPictureList_post=new ArrayList<>();
+    UserPreferences userPreferences;
 
 
     public SubFragment_Claim() {
@@ -152,6 +169,7 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_sub_claim, container, false);
         ButterKnife.bind(this,view);
+        userPreferences=new UserPreferences(getContext());
 
 
         ArrayList<String> policies = new ArrayList<String>(
@@ -953,7 +971,6 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
 
                             setPin();
 
-
                     }
                 });
                 snackbar.show();
@@ -983,6 +1000,21 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
             stiEstTypeString = mStiEstSpinner.getSelectedItem().toString();
             if (stiEstTypeString.equals("Should STI Provide Estimate")) {
                 showMessage("Don't forget to Select Yes or No for STI estimate");
+                isValid = false;
+            }
+
+            if (estimate_img_url==null) {
+                showMessage("Please upload an estimate as image");
+                isValid = false;
+            }
+
+            if (otherdoc_img_url==null) {
+                showMessage("Please try to upload One related Document image");
+                isValid = false;
+            }
+
+            if (damage_img_url==null) {
+                showMessage("Please upload damaged image");
                 isValid = false;
             }
 
@@ -1037,17 +1069,89 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
         mProceed.setVisibility(View.GONE);
         mProgressbar1S1.setVisibility(View.VISIBLE);
 
-        try {
-            //Post Request for claims
+
+        claimPictureList_post.add(estimate_img_url);
+        claimPictureList_post.add(damage_img_url);
+        claimPictureList_post.add(otherdoc_img_url);
+
+        ClaimPost claimPost=new ClaimPost(mDescclaimEditxtS1.getText().toString(),claimTypeString,"Paid",policyTypeString,
+                Integer.parseInt(mLossdeEditxtS1.getText().toString()),Integer.parseInt(mEstCostEditxtS1.getText().toString()),claimPictureList_post,mPinEditxt.getText().toString());
+
+        sendClaimData(claimPost);
 
 
 
-        }catch (Exception e){
-            Log.i("Form Error",e.getMessage());
-            mProgressbar1S1.setVisibility(View.GONE);
-            mProceed.setVisibility(View.VISIBLE);
-            showMessage("Error: " + e.getMessage());
-        }
+
+    }
+
+    private void sendClaimData(ClaimPost claimPost){
+
+
+        //get client and call object for request
+        ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
+
+        Call<ResponseBody> call=client.claim("Token "+userPreferences.getUserToken(),claimPost);
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.i("ResponseCode", String.valueOf(response.code()));
+
+                if(response.code()==406){
+                    showMessage("Error! Wrong Policy Number provided!");
+                    mProceed.setVisibility(View.VISIBLE);
+                    mProgressbar1S1.setVisibility(View.GONE);
+                    return;
+                }
+
+
+                try {
+                    if (!response.isSuccessful()) {
+
+                        try{
+                            APIError apiError= ErrorUtils.parseError(response);
+
+                            showMessage("Invalid Entry: "+apiError.getErrors());
+                            Log.i("Invalid EntryK",apiError.getErrors().toString());
+                            Log.i("Invalid Entry",response.errorBody().toString());
+
+                        }catch (Exception e){
+                            Log.i("InvalidEntry",e.getMessage());
+                            Log.i("ResponseError",response.errorBody().string());
+                            showMessage("Failed to Register"+e.getMessage());
+                            mProceed.setVisibility(View.VISIBLE);
+                            mProgressbar1S1.setVisibility(View.GONE);
+
+                        }
+                        mProceed.setVisibility(View.VISIBLE);
+                        mProgressbar1S1.setVisibility(View.GONE);
+                        return;
+                    }
+
+                    String claim_response=response.body().string();
+                    showMessage("Claim Successfully Submitted");
+                    Log.i("claim_response",claim_response);
+
+
+                }catch (Exception e){
+                    showMessage("Submission Error: " + e.getMessage());
+                    Log.i("policyResponse", e.getMessage());
+                    mProceed.setVisibility(View.VISIBLE);
+                    mProgressbar1S1.setVisibility(View.GONE);
+                }
+
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                showMessage("Submission Failed "+t.getMessage());
+                mProceed.setVisibility(View.VISIBLE);
+                mProgressbar1S1.setVisibility(View.GONE);
+                Log.i("GEtError",t.getMessage());
+            }
+        });
+
+
+
 
     }
 

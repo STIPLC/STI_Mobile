@@ -189,7 +189,7 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
                             personal_detail_marine.setTrade(userPreferences.getMarineITinNumber());
                             personal_detail_marine.setOffice_address(userPreferences.getMarineIOff_addr());
                             personal_detail_marine.setContact_person(userPreferences.getMarineIContPerson());
-                            //Vehicle List
+                            //Cargo List
                             CargoDetail cargoDetail=new CargoDetail();
 
                             cargoDetail.setPfi_number(userPreferences.getMarineIProfInvNO());
@@ -217,10 +217,10 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
                             final Personal_Detail_marine personal_detail_marine1=realm.copyToRealm(personal_detail_marine);
 
                             MarinePolicy marinePolicy=realm.createObject(MarinePolicy.class,primaryKey);
-                            marinePolicy.setAgent_id("1");
+                            marinePolicy.setAgent_id(userPreferences.getUserId());
                             marinePolicy.setQuote_price(String.valueOf(userPreferences.getTempMarineQuotePrice()));
                             marinePolicy.setPayment_source("paystack");
-                            marinePolicy.setPin("11234");
+                            marinePolicy.setPin("0000");
 
                             Log.i("Primary1",primaryKey);
 
@@ -232,7 +232,7 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
 
 
 
-                            //Vehicle List
+                            //Cargo List
                             CargoDetail cargoDetail=new CargoDetail();
                             cargoDetail.setPfi_number(userPreferences.getMarineIProfInvNO());
                             cargoDetail.setPfi_date(userPreferences.getMarineIDateProfInv());

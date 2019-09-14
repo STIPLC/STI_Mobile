@@ -18,6 +18,9 @@ public class Personal_Detail_etic extends RealmObject {
     String next_of_kin_phone;
     String next_of_kin_address;
     String prefix;
+
+
+    String picture;
     RealmList<Travel_Info> travel_infos;
 
 
@@ -115,6 +118,15 @@ public class Personal_Detail_etic extends RealmObject {
 
     public void setPrefix(String prefix) {
         this.prefix = prefix;
+    }
+
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
     }
 
     public RealmList<Travel_Info> getTravel_infos() {

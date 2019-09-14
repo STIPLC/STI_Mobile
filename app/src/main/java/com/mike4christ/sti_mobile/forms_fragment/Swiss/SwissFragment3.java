@@ -207,10 +207,10 @@ public class SwissFragment3 extends Fragment implements View.OnClickListener{
                             final Personal_Detail_swiss personal_detail_swiss1=realm.copyToRealm(personal_detail_swiss);
 
                             SwissInsured swissInsured=realm.createObject(SwissInsured.class,primaryKey);
-                            swissInsured.setAgent_id("1");
+                            swissInsured.setAgent_id(userPreferences.getUserId());
                             swissInsured.setQuote_price(String.valueOf(userPreferences.getTempSwissQuotePrice()));
                             swissInsured.setPayment_source("paystack");
-                            swissInsured.setPin("11234");
+                            swissInsured.setPin("0000");
 
                             Log.i("Primary1",primaryKey);
 

@@ -133,8 +133,6 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
             mAmountA3.setText(format);
         }
 
-
-
         setViewActions();
 
         return  view;
@@ -204,6 +202,9 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
                             itemDetail.setItem(userPreferences.getAllRiskItemType());
                             itemDetail.setSerial(userPreferences.getAllRiskSerialNo());
                             itemDetail.setValue(userPreferences.getAllRiskItemValue());
+                            itemDetail.setReceipt(userPreferences.getAllRiskItemReceipt());
+                            itemDetail.setDesc_item(userPreferences.getAllRiskItemDesc());
+                            itemDetail.setImei(userPreferences.getAllRiskItemImei());
 
                             RealmList<ItemDetail>itemDetailList=new RealmList<>();
                             itemDetailList.add(itemDetail);
@@ -213,10 +214,10 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
                                     final Personal_Detail_allrisk personal_detail_allrisk1=realm.copyToRealm(personal_detail_allrisk);
 
                                     AllriskPolicy allriskPolicy=realm.createObject(AllriskPolicy.class,primaryKey);
-                                    allriskPolicy.setAgent_id("1");
+                                    allriskPolicy.setAgent_id(userPreferences.getUserId());
                                     allriskPolicy.setQuote_price(String.valueOf(userPreferences.getTempAllRiskQuotePrice()));
                                     allriskPolicy.setPayment_source("paystack");
-                                    allriskPolicy.setPin("11234");
+                                    allriskPolicy.setPin("0000");
 
                                     Log.i("Primary1",primaryKey);
 
@@ -234,6 +235,9 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
                             itemDetail.setItem(userPreferences.getAllRiskItemType());
                             itemDetail.setSerial(userPreferences.getAllRiskSerialNo());
                             itemDetail.setValue(userPreferences.getAllRiskItemValue());
+                            itemDetail.setReceipt(userPreferences.getAllRiskItemReceipt());
+                            itemDetail.setDesc_item(userPreferences.getAllRiskItemDesc());
+                            itemDetail.setImei(userPreferences.getAllRiskItemImei());
 
                             RealmList<ItemDetail>itemDetailList=new RealmList<>();
                             itemDetailList.add(itemDetail);
@@ -243,10 +247,10 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
                             final Personal_Detail_allrisk personal_detail_allrisk1=realm.copyToRealm(personal_detail_allrisk);
 
                             AllriskPolicy allriskPolicy=realm.createObject(AllriskPolicy.class,primaryKey);
-                            allriskPolicy.setAgent_id("1");
+                            allriskPolicy.setAgent_id(userPreferences.getUserId());
                             allriskPolicy.setQuote_price(String.valueOf(userPreferences.getTempAllRiskQuotePrice()));
                             allriskPolicy.setPayment_source("paystack");
-                            allriskPolicy.setPin("11234");
+                            allriskPolicy.setPin("0000");
 
                             Log.i("Primary1",primaryKey);
 
@@ -305,6 +309,9 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
         itemDetail.setItem(userPreferences.getAllRiskItemType());
         itemDetail.setSerial(userPreferences.getAllRiskSerialNo());
         itemDetail.setValue(userPreferences.getAllRiskItemValue());
+        itemDetail.setReceipt(userPreferences.getAllRiskItemReceipt());
+        itemDetail.setDesc_item(userPreferences.getAllRiskItemDesc());
+        itemDetail.setImei(userPreferences.getAllRiskItemImei());
 
         RealmList<ItemDetail>itemDetailList=new RealmList<>();
         itemDetailList.add(itemDetail);

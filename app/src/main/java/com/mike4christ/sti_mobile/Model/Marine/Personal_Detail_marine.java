@@ -31,8 +31,6 @@ public class Personal_Detail_marine extends RealmObject {
 
     }
 
-
-
     public String getFirst_name() {
         return first_name;
     }

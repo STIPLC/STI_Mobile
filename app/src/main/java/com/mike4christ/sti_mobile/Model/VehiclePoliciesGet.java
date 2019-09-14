@@ -77,7 +77,6 @@ public class VehiclePoliciesGet implements Serializable
     @SerializedName("id")
     @Expose
     private Integer id;
-    private final static long serialVersionUID = -7439936226075171321L;
 
     public Integer getCustomerId() {
         return customerId;

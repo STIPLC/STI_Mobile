@@ -1,7 +1,9 @@
 package com.mike4christ.sti_mobile.forms_fragment.Swiss;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,14 +25,32 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
+import com.mike4christ.sti_mobile.Constant;
+import com.mike4christ.sti_mobile.Model.AllRisk.AllRiskPost.AllRiskPostHead;
+import com.mike4christ.sti_mobile.Model.AllRisk.FormSuccessDetail.BuyQuoteFormGetHead_AllRisk;
+import com.mike4christ.sti_mobile.Model.Errors.APIError;
+import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
+import com.mike4christ.sti_mobile.Model.ServiceGenerator;
 import com.mike4christ.sti_mobile.Model.Swiss.AdditionInsured;
+import com.mike4christ.sti_mobile.Model.Swiss.FormSuccessDetail.BuyQuoteFormGetHead_Swiss;
+import com.mike4christ.sti_mobile.Model.Swiss.FormSuccessDetail.Policy;
 import com.mike4christ.sti_mobile.Model.Swiss.Personal_Detail_swiss;
 import com.mike4christ.sti_mobile.Model.Swiss.SwissInsured;
+import com.mike4christ.sti_mobile.Model.Swiss.SwissPost.AdditionalInsuredPost;
+import com.mike4christ.sti_mobile.Model.Swiss.SwissPost.Swiss;
+import com.mike4christ.sti_mobile.Model.Swiss.SwissPost.SwissPersona;
+import com.mike4christ.sti_mobile.Model.Swiss.SwissPost.SwissPostHead;
+import com.mike4christ.sti_mobile.NetworkConnection;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
 import com.mike4christ.sti_mobile.adapter.AddInsuredListAdapter;
+import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.shuhart.stepview.StepView;
 import com.wang.avi.AVLoadingIndicatorView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,6 +58,9 @@ import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 class SwissFragment4 extends Fragment implements View.OnClickListener{
     // TODO: Rename parameter arguments, choose names that match
@@ -83,6 +106,22 @@ class SwissFragment4 extends Fragment implements View.OnClickListener{
     Realm realm;
     AddInsuredListAdapter addInsureListAdapter;
 
+    String modeofPaymentString;
+    UserPreferences userPreferences;
+    SwissInsured swissInsured;
+    RealmList<Personal_Detail_swiss> personal_detail_swisses;
+    //Swiss return policy
+    List<Policy> policy;
+
+    String total_quoteprice;
+
+    List<AdditionalInsuredPost> additionaList_post=new ArrayList<AdditionalInsuredPost>();
+
+    NetworkConnection networkConnection=new NetworkConnection();
+    Swiss swiss;
+    String policy_num="";
+    String total_price="";
+
 
 
 
@@ -126,6 +165,7 @@ class SwissFragment4 extends Fragment implements View.OnClickListener{
         ButterKnife.bind(this,view);
         //  mStepView next registration step
         mStepView.go(currentStep, true);
+        userPreferences=new UserPreferences(getContext());
         realm= Realm.getDefaultInstance();
 
 
@@ -173,8 +213,8 @@ class SwissFragment4 extends Fragment implements View.OnClickListener{
         SwissInsured swissInsured;
 
         swissInsured=realm.where(SwissInsured.class).equalTo("id",primaryKey).findFirst();
-        String total_quoteprice=swissInsured.getQuote_price();
-        RealmList<Personal_Detail_swiss> personal_detail_swisses=swissInsured.getPersonal_detail_swisses();
+        total_quoteprice=swissInsured.getQuote_price();
+        personal_detail_swisses=swissInsured.getPersonal_detail_swisses();
 
 
             String insurer="Prefix: "+personal_detail_swisses.get(0).getPrefix()+"\n"+"First Name: "+personal_detail_swisses.get(0).getFirst_name()+"\n"+
@@ -206,7 +246,7 @@ class SwissFragment4 extends Fragment implements View.OnClickListener{
         switch (view.getId()) {
             case R.id.v_next_btn4_s4:
 //                send quote to client and sti
-                mSubmit();
+                ValidateForm();
                 break;
 
             case R.id.v_back_btn4_s4:
@@ -221,6 +261,8 @@ class SwissFragment4 extends Fragment implements View.OnClickListener{
                 break;
         }
     }
+
+
 
 
     @OnClick(R.id.fabShowAddInsure_s4)
@@ -264,24 +306,163 @@ class SwissFragment4 extends Fragment implements View.OnClickListener{
         dialog.show();
     }
 
+    private void ValidateForm() {
+
+        if (networkConnection.isNetworkConnected(getContext())) {
+            boolean isValid = true;
+
+            if (pin_txt_s4.getText().toString().isEmpty()) {
+                inputLayoutPin_s4.setError("Pin is required!");
+                isValid = false;
+            } else {
+                inputLayoutPin_s4.setErrorEnabled(false);
+            }
+            //Prefix Spinner
+            modeofPaymentString = modeOfPayment_spinner_s4.getSelectedItem().toString();
+            if (modeofPaymentString.equals("Mode of Payment")) {
+                showMessage("Select your mode of payment");
+                isValid = false;
+            }
+
+            if (isValid) {
+
+                //Post Request to Api
+
+                mSubmit();
+            }
+
+            return;
+        }
+        showMessage("No Internet connection discovered!");
+    }
+
     private void mSubmit() {
 
         mBtnLayout4S4.setVisibility(View.GONE);
         mProgressbar4S4.setVisibility(View.VISIBLE);
 
+//retrieve data
+        final RealmResults<AdditionInsured> results;
+
+        //String title;
+        results=realm.where(AdditionInsured.class).findAll();
+
+        for(int i=0;i<results.size();i++) {
+            AdditionInsured additionInsured=results.get(i);
+            AdditionalInsuredPost additionalInsuredPost=new AdditionalInsuredPost(additionInsured.getFirst_name(),additionInsured.getLast_name(),
+                    additionInsured.getEmail(),additionInsured.getGender(),additionInsured.getPhone(),additionInsured.getDate_of_birth(),
+                    additionInsured.getMarital_status(),"null",additionInsured.getDisability());
+            additionaList_post.add(additionalInsuredPost);
+
+            Log.i("policyItemLoop",additionInsured.getMarital_status());
+
+        }
+
+            SwissPersona swissPersona =new SwissPersona(personal_detail_swisses.get(0).getFirst_name(),personal_detail_swisses.get(0).getLast_name(),personal_detail_swisses.get(0).getEmail(),personal_detail_swisses.get(0).getGender(),personal_detail_swisses.get(0).getDate_of_birth()
+                    ,"null",personal_detail_swisses.get(0).getPhone(),personal_detail_swisses.get(0).getResident_address(),
+                    personal_detail_swisses.get(0).getMarital_status(),"",personal_detail_swisses.get(0).getNext_of_kin(),personal_detail_swisses.get(0).getNext_of_kin_phone(),personal_detail_swisses.get(0).getNext_of_kin_address()
+                    ,personal_detail_swisses.get(0).getDisability(),additionaList_post);
+
+            swiss=new Swiss("12 month");
+
+            SwissPostHead swissPostHead=new SwissPostHead(swissPersona,swiss,total_quoteprice, pin_txt_s4.getText().toString()
+                   ,modeofPaymentString,userPreferences.getUserId());
+
+
+            sendPolicy(swissPostHead);
 
 
         asyncSwissInsured(primaryKey);
-       // asyncVehicleList(primaryKey);
 
-        showMessage("Swis-F Record Deleted");
+    }
+
+    private void sendPolicy(SwissPostHead swissPostHead){
 
 
-        
+        //get client and call object for request
+        ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
+
+        Call<BuyQuoteFormGetHead_Swiss> call=client.swiss_policy("Token "+userPreferences.getUserToken(),swissPostHead);
+
+        call.enqueue(new Callback<BuyQuoteFormGetHead_Swiss>() {
+            @Override
+            public void onResponse(Call<BuyQuoteFormGetHead_Swiss> call, Response<BuyQuoteFormGetHead_Swiss> response) {
+                Log.i("ResponseCode", String.valueOf(response.code()));
+
+
+                try {
+                    if (!response.isSuccessful()) {
+
+                        try{
+                            APIError apiError= ErrorUtils.parseError(response);
+
+                            showMessage("Invalid Entry: "+apiError.getErrors());
+                            Log.i("Invalid EntryK",apiError.getErrors().toString());
+                            Log.i("Invalid Entry",response.errorBody().toString());
+
+                        }catch (Exception e){
+                            Log.i("InvalidEntry",e.getMessage());
+                            Log.i("ResponseError",response.errorBody().string());
+                            showMessage("Failed to Register"+e.getMessage());
+                            mBtnLayout4S4.setVisibility(View.VISIBLE);
+                            mProgressbar4S4.setVisibility(View.GONE);
+
+                        }
+                        mBtnLayout4S4.setVisibility(View.VISIBLE);
+                        mProgressbar4S4.setVisibility(View.GONE);
+                        return;
+                    }
+
+                    policy=response.body().getData().getPolicy();
+                    for(int i=0;i<policy.size();i++){
+                        policy_num=policy_num.concat("\n"+policy.get(i).getPolicyNumber());
+                    }
+
+                    total_price= String.valueOf(response.body().getData().getTotalPrice());
+
+                    Log.i("policyNum", policy_num);
+                    Log.i("totalPrice", total_price);
+
+                    showMessage("Submit Successful, Proceed to Payment");
+                    userPreferences.setTempAllRiskQuotePrice(0);
+
+                    mBtnLayout4S4.setVisibility(View.VISIBLE);
+                    mProgressbar4S4.setVisibility(View.GONE);
+                    if (total_price != null) {
+
+                        Intent intent = new Intent(getContext(), PolicyPaymentActivity.class);
+                        intent.putExtra(Constant.TOTAL_PRICE, total_price);
+                        intent.putExtra(Constant.POLICY_NUM, policy_num);
+                        startActivity(intent);
+                        getActivity().finish();
+
+                    } else {
+                        showMessage("Error: " + response.body());
+                        mBtnLayout4S4.setVisibility(View.VISIBLE);
+                        mProgressbar4S4.setVisibility(View.GONE);
+                    }
+                }catch (Exception e){
+                    showMessage("Submission Error: " + e.getMessage());
+                    Log.i("policyResponse", e.getMessage());
+                    mBtnLayout4S4.setVisibility(View.VISIBLE);
+                    mProgressbar4S4.setVisibility(View.GONE);
+                }
+
+            }
+            @Override
+            public void onFailure(Call<BuyQuoteFormGetHead_Swiss> call, Throwable t) {
+                showMessage("Submission Failed "+t.getMessage());
+                Log.i("GEtError",t.getMessage());
+                mBtnLayout4S4.setVisibility(View.VISIBLE);
+                mProgressbar4S4.setVisibility(View.GONE);
+            }
+        });
+
 
 
 
     }
+
 
     //To Delete vehicle
     private void asyncSwissInsured(final String id){

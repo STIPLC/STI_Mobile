@@ -1140,10 +1140,10 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
                                     final Personal_detail personal_detail1=realm.copyToRealm(personal_detail);
 
                                     VehiclePolicy vehiclePolicy=realm.createObject(VehiclePolicy.class,primaryKey);
-                                    vehiclePolicy.setAgent_id("1");
+                                    vehiclePolicy.setAgent_id(userPreferences.getUserId());
                                     vehiclePolicy.setQuote_price(String.valueOf(userPreferences.getTempQuotePrice()));
                                     vehiclePolicy.setPayment_source("paystack");
-                                    vehiclePolicy.setPin("11234");
+                                    vehiclePolicy.setPin("0000");
 
                                     Log.i("Primary1",primaryKey);
 
@@ -1295,10 +1295,10 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
                 final Personal_detail personal_detail1=realm.copyToRealm(personal_detail);
 
                 VehiclePolicy vehiclePolicy=realm.createObject(VehiclePolicy.class,primaryKey);
-                vehiclePolicy.setAgent_id("1");
+                vehiclePolicy.setAgent_id(userPreferences.getUserId());
                 vehiclePolicy.setQuote_price(String.valueOf(userPreferences.getTempQuotePrice()));
                 vehiclePolicy.setPayment_source("paystack");
-                vehiclePolicy.setPin("11234");
+                vehiclePolicy.setPin("0000");
 
                 vehiclePolicy.getPersonal_info().add(personal_detail1);
 

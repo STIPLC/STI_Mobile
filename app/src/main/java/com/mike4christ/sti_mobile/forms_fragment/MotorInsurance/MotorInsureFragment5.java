@@ -26,10 +26,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.mike4christ.sti_mobile.Constant;
-import com.mike4christ.sti_mobile.Model.Auth.RegisterObj;
-import com.mike4christ.sti_mobile.Model.Auth.UserDataHead;
 import com.mike4christ.sti_mobile.Model.Errors.APIError;
 import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
+import com.mike4christ.sti_mobile.Model.Vehicle.FormSuccessDetail.BuyQuoteFormGetHead;
+import com.mike4christ.sti_mobile.Model.Vehicle.FormSuccessDetail.Policy;
 import com.mike4christ.sti_mobile.Model.ServiceGenerator;
 import com.mike4christ.sti_mobile.Model.Vehicle.Personal_detail;
 import com.mike4christ.sti_mobile.Model.Vehicle.VehicleDetails;
@@ -40,16 +40,14 @@ import com.mike4christ.sti_mobile.Model.Vehicle.VehiclePost.Vehicle;
 import com.mike4christ.sti_mobile.Model.Vehicle.VehiclePost.VehiclePostHead;
 import com.mike4christ.sti_mobile.NetworkConnection;
 import com.mike4christ.sti_mobile.R;
-import com.mike4christ.sti_mobile.SignIn;
-import com.mike4christ.sti_mobile.SignUp;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
 import com.mike4christ.sti_mobile.adapter.VehiclesListAdapter;
 import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.shuhart.stepview.StepView;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -58,12 +56,9 @@ import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static com.mike4christ.sti_mobile.SignUp.isValidEmailAddress;
 
 class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
     // TODO: Rename parameter arguments, choose names that match
@@ -114,6 +109,8 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
     UserPreferences userPreferences;
     VehiclePolicy vehiclePolicy;
     RealmList<Personal_detail> personal_details;
+    //VEhicle return policy
+    List<Policy> policy;
 
     String total_quoteprice;
 
@@ -122,6 +119,8 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
     List<String> vehiclePictureList_post=new ArrayList<>();
 
     NetworkConnection networkConnection=new NetworkConnection();
+    String policy_num="";
+    String total_price="";
 
 
 
@@ -166,6 +165,7 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
         ButterKnife.bind(this,view);
         //  stepView next registration step
         stepView.go(currentStep, true);
+        userPreferences=new UserPreferences(getContext());
         realm= Realm.getDefaultInstance();
 
 
@@ -209,7 +209,7 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
 
     private void init(){
 
-        userPreferences=new UserPreferences(getContext());
+
 
         //retrieve data for personal detail first
 
@@ -379,8 +379,8 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
         if(userPreferences.getMotorPtype().equals("Corporate")){
 
             Persona persona=new Persona("null","null",personal_details.get(0).getEmail(),"null",personal_details.get(0).getPhone(),"null",
-                    "null","null",personal_details.get(0).getPicture(),"null","null","null","null",personal_details.get(0).getCompany_name(),
-                    personal_details.get(0).getOffice_address(),"2",personal_details.get(0).getCompany_name(),"null",personal_details.get(0).getTin_number(),
+                    "null","null",personal_details.get(0).getPicture(),"null","null","null","null","null",
+                    "null","2",personal_details.get(0).getCompany_name(),"null",personal_details.get(0).getTin_number(),
                     personal_details.get(0).getOffice_address(),personal_details.get(0).getContact_person());
 
             for(int i=0;i<results.size();i++) {
@@ -404,7 +404,6 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
                 vehiclesList_post.add(vehicle);
 
                 Log.i("policyLoop",vehicleDetails.getPolicy_type());
-
 
             }
 
@@ -447,19 +446,17 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
 
 
             }
+            VehiclePostHead vehiclePostHead=new VehiclePostHead(persona,vehiclesList_post,total_quoteprice,
+                    pin_txt_m5.getText().toString(),modeofPaymentString,userPreferences.getUserId());
 
-           /* VehiclePostHead vehiclePostHead=new VehiclePostHead(persona,vehiclesList_post,total_quoteprice,
-                    pin_txt_m5.getText().toString(),modeofPaymentString,userPreferences.getUserId());*/
-
-               // Log.i("policyPost2",vehiclePostHead.toString());
-            //sendPolicy(vehiclePostHead);
+                Log.i("policyPost2",vehiclePostHead.toString());
+            sendPolicy(vehiclePostHead);
 
 
         }
 
 
         asyncVehiclePolicy(primaryKey);
-        showMessage("Proceeding to Payment");
 
     }
 
@@ -471,11 +468,11 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
         ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
         Log.i("TokenP", userPreferences.getUserToken());
 
-        Call<ResponseBody> call=client.vehicle_policy("Token "+userPreferences.getUserToken(),vehiclehead);
+        Call<BuyQuoteFormGetHead> call=client.vehicle_policy("Token "+userPreferences.getUserToken(),vehiclehead);
 
-        call.enqueue(new Callback<ResponseBody>() {
+        call.enqueue(new Callback<BuyQuoteFormGetHead>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<BuyQuoteFormGetHead> call, Response<BuyQuoteFormGetHead> response) {
                 Log.i("ResponseCode", String.valueOf(response.code()));
 
 
@@ -502,22 +499,32 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
                         return;
                     }
                     
-                    String p_response=response.body().string();
-                    Log.i("policyResponse", p_response);
+                    policy=response.body().getData().getPolicy();
+                    for(int i=0;i<policy.size();i++){
+                        policy_num=policy_num.concat("\n"+policy.get(i).getPolicyNumber());
+                    }
+
+                    total_price= String.valueOf(response.body().getData().getTotalPrice());
+
+                    Log.i("policyNum", policy_num);
+                    Log.i("totalPrice", total_price);
 
                     showMessage("Submit Successful, Proceed to Payment");
+                    userPreferences.setTempQuotePrice(0);
 
                     btn_layout3.setVisibility(View.VISIBLE);
                     progressbar.setVisibility(View.GONE);
-                    /*if (user_email != null) {
-                        Intent intent = new Intent(SignUp.this, SignIn.class);
-                        intent.putExtra(Constant.USER_EMAIL, user_email);
+                    if (total_price != null) {
+
+                        Intent intent = new Intent(getContext(), PolicyPaymentActivity.class);
+                        intent.putExtra(Constant.TOTAL_PRICE, total_price);
+                        intent.putExtra(Constant.POLICY_NUM, policy_num);
                         startActivity(intent);
-                        SignUp.this.finish();
+                        getActivity().finish();
 
                     } else {
                         showMessage("Error: " + response.body());
-                    }*/
+                    }
                 }catch (Exception e){
                     showMessage("Submission Error: " + e.getMessage());
                     Log.i("policyResponse", e.getMessage());
@@ -525,7 +532,7 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
 
             }
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<BuyQuoteFormGetHead> call, Throwable t) {
                 showMessage("Submission Failed "+t.getMessage());
                 Log.i("GEtError",t.getMessage());
             }

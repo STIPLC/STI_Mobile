@@ -33,9 +33,15 @@ import com.google.android.material.snackbar.Snackbar;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.mike4christ.sti_mobile.BuildConfig;
+import com.mike4christ.sti_mobile.Model.Errors.APIError;
+import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
+import com.mike4christ.sti_mobile.Model.ServiceGenerator;
+import com.mike4christ.sti_mobile.Model.Vehicle.Quote.QouteHead;
 import com.mike4christ.sti_mobile.NetworkConnection;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.forms_fragment.Etic.EticFragment3;
+import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.shuhart.stepview.StepView;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -48,6 +54,9 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class MarineFragment2 extends Fragment implements View.OnClickListener{
@@ -128,6 +137,7 @@ public class MarineFragment2 extends Fragment implements View.OnClickListener{
 
     Uri doc_img_uri;
     String doc_img_url;
+    UserPreferences userPreferences;
 
 
 
@@ -170,6 +180,7 @@ public class MarineFragment2 extends Fragment implements View.OnClickListener{
         View view=inflater.inflate(R.layout.fragment_marine2, container, false);
         ButterKnife.bind(this,view);
         //        mStepView next registration step
+        userPreferences = new UserPreferences(getContext());
 
         mStepView.go(currentStep, true);
 
@@ -633,7 +644,7 @@ public class MarineFragment2 extends Fragment implements View.OnClickListener{
         mProgressbar2M2.setVisibility(View.VISIBLE);
 
         try {
-            UserPreferences userPreferences = new UserPreferences(getContext());
+
 
             //Temporal save and go to next Operation
 
@@ -649,14 +660,8 @@ public class MarineFragment2 extends Fragment implements View.OnClickListener{
             userPreferences.setMarineIPortOfLoading(mPortofloadTxtM2.getText().toString());
             userPreferences.setMarineIPortOfDischarge(mPortdischargeTxtM2.getText().toString());
             userPreferences.setMarineIProfImage(doc_img_url);
+            sendMarineData();
 
-
-
-
-           // Fragment quoteBuyFragment3 = new MarineInsureFragment3();
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_marine_form_container, MarineFragment3.newInstance("Premium","4000"), MarineFragment3.class.getSimpleName());
-            ft.commit();
 
         }catch (Exception e){
             Log.i("Form Error",e.getMessage());
@@ -665,6 +670,72 @@ public class MarineFragment2 extends Fragment implements View.OnClickListener{
             showMessage("Error: " + e.getMessage());
         }
     }
+
+    private void sendMarineData(){
+
+
+        //get client and call object for request
+        ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
+        Call<QouteHead> call=client.marine_quote("Token "+userPreferences.getUserToken(),mTotalAmtTxtM2.getText().toString(), Double.parseDouble(mCoversionRateTxtM2.getText().toString()));
+
+        call.enqueue(new Callback<QouteHead>() {
+            @Override
+            public void onResponse(Call<QouteHead> call, Response<QouteHead> response) {
+                Log.i("ResponseCode", String.valueOf(response.code()));
+
+
+                try {
+                    if (!response.isSuccessful()) {
+
+                        try{
+                            APIError apiError= ErrorUtils.parseError(response);
+
+                            showMessage("Invalid Entry: "+apiError.getErrors());
+                            Log.i("Invalid EntryK",apiError.getErrors().toString());
+                            Log.i("Invalid Entry",response.errorBody().toString());
+
+                        }catch (Exception e){
+                            Log.i("InvalidEntry",e.getMessage());
+                            Log.i("ResponseError",response.errorBody().string());
+                            showMessage("Failed to Fetch Quote"+e.getMessage());
+                            mBtnLayout2M2.setVisibility(View.VISIBLE);
+                            mProgressbar2M2.setVisibility(View.GONE);
+
+                        }
+                        mBtnLayout2M2.setVisibility(View.VISIBLE);
+                        mProgressbar2M2.setVisibility(View.GONE);
+                        return;
+                    }
+
+                    String quote_price=response.body().getData().getPrice();
+                    Log.i("quote_price",quote_price);
+                    showMessage("Successfully Fetched Quote");
+                    mBtnLayout2M2.setVisibility(View.VISIBLE);
+                    mProgressbar2M2.setVisibility(View.GONE);
+
+
+                    // Fragment quoteBuyFragment3 = new MarineInsureFragment3();
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.replace(R.id.fragment_marine_form_container, MarineFragment3.newInstance("Premium",quote_price), MarineFragment3.class.getSimpleName());
+                    ft.commit();
+                }catch (Exception e){
+                    Log.i("policyResponse", e.getMessage());
+                    mBtnLayout2M2.setVisibility(View.VISIBLE);
+                    mProgressbar2M2.setVisibility(View.GONE);
+                }
+
+            }
+            @Override
+            public void onFailure(Call<QouteHead> call, Throwable t) {
+                showMessage("Submission Failed "+t.getMessage());
+                Log.i("GEtError",t.getMessage());
+                mBtnLayout2M2.setVisibility(View.VISIBLE);
+                mProgressbar2M2.setVisibility(View.GONE);
+            }
+        });
+
+    }
+
 
 
     private void showMessage(String s) {

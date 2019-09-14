@@ -24,6 +24,8 @@ import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
 import com.mike4christ.sti_mobile.Model.ServiceGenerator;
 import com.mike4christ.sti_mobile.Model.Vehicle.BrandType.VehicleBrandType;
 import com.mike4christ.sti_mobile.Model.Vehicle.BrandType.VehicleTypeData;
+import com.mike4christ.sti_mobile.Model.Vehicle.Quote.PostVehicleData;
+import com.mike4christ.sti_mobile.Model.Vehicle.Quote.QouteHead;
 import com.mike4christ.sti_mobile.Model.Vehicle.VehicleBrand.VehicleData;
 import com.mike4christ.sti_mobile.Model.Vehicle.VehicleBrand.Vehicles_Brand;
 import com.mike4christ.sti_mobile.R;
@@ -119,6 +121,7 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
     ArrayList<String> vehiclesBrandSpinnerList=new ArrayList<>();
 
     int vehicleId;
+    UserPreferences userPreferences;
 
   //Button
     @BindView(R.id.v_next_btn1)
@@ -135,11 +138,13 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
     @BindView(R.id.progressbar)
     AVLoadingIndicatorView progressbar;
 
+
     String polyTypeString,privateTypeString,prEnhanceString,commerTypeString;
     String motorCycleTypeString,vehicleMakeString,vehicleTypeString,vehincleBodyString,startDateStrg;
     ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
 
     DatePickerDialog datePickerDialog1;
+    String quote_price;
     public MotorInsureFragment2() {
         // Required empty public constructor
     }
@@ -180,6 +185,7 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
         //        stepView next registration step
 
         inputLayoutMotorCyValue.setClickable(false);
+        userPreferences = new UserPreferences(getContext());
 
         stepView.go(currentStep, true);
 
@@ -678,6 +684,7 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
 
         //Private Spinner
         privateTypeString = private_type_spinner.getSelectedItem().toString();
+
         if (privateTypeString.equals("Select Cover")&&private_type_spinner.isClickable()) {
             showMessage("Select your Private Category");
             isValid = false;
@@ -685,6 +692,7 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
 
         //Commercial Spinner
         commerTypeString = commercial_type_spinner.getSelectedItem().toString();
+
         if (commerTypeString.equals("Select Cover")&&commercial_type_spinner.isClickable()) {
             showMessage("Select your Commercial Category");
             isValid = false;
@@ -692,6 +700,7 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
 
         //Motor Cycle Spinner
         motorCycleTypeString = motor_cycle_type_spinner.getSelectedItem().toString();
+
         if (motorCycleTypeString.equals("Select Motor Cycle Policy")&&motor_cycle_type_spinner.isClickable()) {
             showMessage("Select your Motor Cycle Category");
             isValid = false;
@@ -727,12 +736,75 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
 
     }
 
+    private void sendVehicleData(PostVehicleData postVehicleData){
+
+
+        //get client and call object for request
+        ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
+
+
+        Call<QouteHead> call=client.vehicle_quote("Token "+userPreferences.getUserToken(),postVehicleData);
+
+        call.enqueue(new Callback<QouteHead>() {
+            @Override
+            public void onResponse(Call<QouteHead> call, Response<QouteHead> response) {
+                Log.i("ResponseCode", String.valueOf(response.code()));
+
+
+                try {
+                    if (!response.isSuccessful()) {
+
+                        try{
+                            APIError apiError= ErrorUtils.parseError(response);
+
+                            showMessage("Invalid Entry: "+apiError.getErrors());
+                            Log.i("Invalid EntryK",apiError.getErrors().toString());
+                            Log.i("Invalid Entry",response.errorBody().toString());
+
+                        }catch (Exception e){
+                            Log.i("InvalidEntry",e.getMessage());
+                            Log.i("ResponseError",response.errorBody().string());
+                            showMessage("Failed to Fetch Quote"+e.getMessage());
+                            btn_layout2.setVisibility(View.VISIBLE);
+                            progressbar.setVisibility(View.GONE);
+
+                        }
+                        btn_layout2.setVisibility(View.VISIBLE);
+                        progressbar.setVisibility(View.GONE);
+                        return;
+                    }
+
+                    quote_price=response.body().getData().getPrice();
+                    Log.i("quote_price",quote_price);
+                    showMessage("Successfully Fetched Quote");
+                    btn_layout2.setVisibility(View.VISIBLE);
+                    progressbar.setVisibility(View.GONE);
+
+                    // Fragment quoteBuyFragment3 = new MotorInsureFragment3();
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.replace(R.id.fragment_motor_form_container, MotorInsureFragment3.newInstance(userPreferences.getMotorVehicleMake(),quote_price), MotorInsureFragment3.class.getSimpleName());
+                    ft.commit();
+                }catch (Exception e){
+                    Log.i("policyResponse", e.getMessage());
+                }
+
+            }
+            @Override
+            public void onFailure(Call<QouteHead> call, Throwable t) {
+                showMessage("Submission Failed "+t.getMessage());
+                Log.i("GEtError",t.getMessage());
+            }
+        });
+
+    }
+
+
     private void initFragment() {
         btn_layout2.setVisibility(View.GONE);
         progressbar.setVisibility(View.VISIBLE);
 
         try {
-            UserPreferences userPreferences = new UserPreferences(getContext());
+
 
             //Temporal save and go to next Operation
 
@@ -753,12 +825,60 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
             userPreferences.setMotorCycleValue(motor_cycle_value.getText().toString());
 
 
+            if(private_type_spinner.isClickable()) {
+                switch (privateTypeString) {
+                    case "3rd Party Only":
+                        privateTypeString = "third_party_only";
+                        break;
+                    case "3rd Party Fire and theft":
+                        privateTypeString = "third_party_fire_theft";
+                        break;
+                    case "Comprehensive":
+                        privateTypeString = "comprehensive";
+                        break;
+                }
+
+                    PostVehicleData postVehicleData = new PostVehicleData(vehicle_value.getText().toString(), polyTypeString,
+                            privateTypeString, privateTypeString, vehicleTypeString);
+                    Log.i("type", privateTypeString);
+                    sendVehicleData(postVehicleData);
+                 if(privateTypeString.equals("3rd Party Only")){
+
+                }
+
+            }else if(commercial_type_spinner.isClickable()){
+
+                switch (commerTypeString) {
+                    case "3rd Party Only":
+                        commerTypeString = "third_party_only";
+                        break;
+                    case "Comprehensive":
+                        commerTypeString = "comprehensive";
+                        break;
+                }
+
+                PostVehicleData postVehicleData = new PostVehicleData(vehicle_value.getText().toString(), polyTypeString,
+                        commerTypeString, commerTypeString, vehicleTypeString);
+                Log.i("type",commerTypeString);
+                sendVehicleData(postVehicleData);
+            }else if(motor_cycle_type_spinner.isClickable()){
+
+                switch (motorCycleTypeString) {
+                    case "3rd Party Only":
+                        motorCycleTypeString = "third_party_only";
+                        break;
+                    case "Comprehensive":
+                        motorCycleTypeString = "comprehensive";
+                        break;
+                }
+
+                PostVehicleData postVehicleData = new PostVehicleData(vehicle_value.getText().toString(), polyTypeString,
+                        motorCycleTypeString, motorCycleTypeString, vehicleTypeString);
+                Log.i("type",motorCycleTypeString);
+                sendVehicleData(postVehicleData);
+            }
 
 
-           // Fragment quoteBuyFragment3 = new MotorInsureFragment3();
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_motor_form_container, MotorInsureFragment3.newInstance(userPreferences.getMotorVehicleMake(),"8000"), MotorInsureFragment3.class.getSimpleName());
-            ft.commit();
 
         }catch (Exception e){
             Log.i("Form Error",e.getMessage());
@@ -772,8 +892,6 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
     private void showMessage(String s) {
         Snackbar.make(qb_form_layout2, s, Snackbar.LENGTH_LONG).show();
     }
-
-
 
     private void showDatePicker() {
         //Get current date

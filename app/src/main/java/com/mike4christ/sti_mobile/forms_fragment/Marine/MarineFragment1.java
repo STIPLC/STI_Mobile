@@ -275,7 +275,7 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
                     //De-Visualizing the individual form
                     mPrefixSpinnerM1.setVisibility(View.GONE);
                     mPrefixSpinnerM1.setClickable(false);
-                    mFirstnameEditxtM1.setVisibility(View.GONE);
+                    mInputLayoutFirstNameM1.setVisibility(View.GONE);
                     mFirstnameEditxtM1.setClickable(false);
                     mInputLayoutLastNameM1.setVisibility(View.GONE);
                     mLastnameEditxtM1.setClickable(false);
@@ -302,7 +302,7 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
 
                     //De-Visualizing the individual form
                     mPrefixSpinnerM1.setVisibility(View.GONE);
-                    mFirstnameEditxtM1.setVisibility(View.GONE);
+                    mInputLayoutFirstNameM1.setVisibility(View.GONE);
                     mInputLayoutLastNameM1.setVisibility(View.GONE);
                     mGenderSpinnerM1.setVisibility(View.GONE);
                     mInputLayoutResAddrM1.setVisibility(View.GONE);
@@ -330,7 +330,7 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
                 //De-Visualizing the individual form
                 mTypeSpinnerM1.getItemAtPosition(0);
                 mPrefixSpinnerM1.setVisibility(View.GONE);
-                mFirstnameEditxtM1.setVisibility(View.GONE);
+                mInputLayoutFirstNameM1.setVisibility(View.GONE);
                 mInputLayoutLastNameM1.setVisibility(View.GONE);
                 mGenderSpinnerM1.setVisibility(View.GONE);
                 mInputLayoutResAddrM1.setVisibility(View.GONE);

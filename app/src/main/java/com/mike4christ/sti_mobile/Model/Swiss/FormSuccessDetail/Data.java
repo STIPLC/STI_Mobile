@@ -1,4 +1,4 @@
-package com.mike4christ.sti_mobile.Model.FormDetail;
+package com.mike4christ.sti_mobile.Model.Swiss.FormSuccessDetail;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -20,14 +20,14 @@ public class Data implements Serializable
     private List<Wallet> wallet = null;
     @SerializedName("transactions")
     @Expose
-    private List<Transaction> transactions = null;
+    private Transaction transactions;
     @SerializedName("unit_price")
     @Expose
     private String unitPrice;
     @SerializedName("total_price")
     @Expose
     private Integer totalPrice;
-   
+
 
     public List<Policy> getPolicy() {
         return policy;
@@ -53,11 +53,11 @@ public class Data implements Serializable
         this.wallet = wallet;
     }
 
-    public List<Transaction> getTransactions() {
+    public Transaction getTransactions() {
         return transactions;
     }
 
-    public void setTransactions(List<Transaction> transactions) {
+    public void setTransactions(Transaction transactions) {
         this.transactions = transactions;
     }
 
@@ -78,6 +78,3 @@ public class Data implements Serializable
     }
 
 }
-
-
-

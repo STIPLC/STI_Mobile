@@ -1,4 +1,4 @@
-package com.mike4christ.sti_mobile.Model.FormDetail;
+package com.mike4christ.sti_mobile.Model.Swiss.FormSuccessDetail;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -14,9 +14,6 @@ public class CustomerDetails implements Serializable
     @SerializedName("last_name")
     @Expose
     private String lastName;
-    @SerializedName("company_name")
-    @Expose
-    private Object companyName;
     @SerializedName("email")
     @Expose
     private String email;
@@ -26,9 +23,6 @@ public class CustomerDetails implements Serializable
     @SerializedName("gender")
     @Expose
     private String gender;
-    @SerializedName("business")
-    @Expose
-    private Object business;
     @SerializedName("address")
     @Expose
     private String address;
@@ -50,36 +44,9 @@ public class CustomerDetails implements Serializable
     @SerializedName("next_of_kin_phone")
     @Expose
     private String nextOfKinPhone;
-    @SerializedName("identification_means")
-    @Expose
-    private String identificationMeans;
-    @SerializedName("employer")
-    @Expose
-    private String employer;
-    @SerializedName("employer_address")
-    @Expose
-    private String employerAddress;
-    @SerializedName("customer_type")
-    @Expose
-    private String customerType;
-    @SerializedName("contact_person")
-    @Expose
-    private Object contactPerson;
-    @SerializedName("tin_number")
-    @Expose
-    private Object tinNumber;
-    @SerializedName("mailing_address")
-    @Expose
-    private Object mailingAddress;
-    @SerializedName("office_address")
-    @Expose
-    private Object officeAddress;
     @SerializedName("user_id")
     @Expose
     private Integer userId;
-    @SerializedName("profession")
-    @Expose
-    private Object profession;
     @SerializedName("updated_at")
     @Expose
     private String updatedAt;
@@ -89,7 +56,7 @@ public class CustomerDetails implements Serializable
     @SerializedName("id")
     @Expose
     private Integer id;
-    private final static long serialVersionUID = -766185792532770696L;
+
 
     public String getFirstName() {
         return firstName;
@@ -105,14 +72,6 @@ public class CustomerDetails implements Serializable
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public Object getCompanyName() {
-        return companyName;
-    }
-
-    public void setCompanyName(Object companyName) {
-        this.companyName = companyName;
     }
 
     public String getEmail() {
@@ -137,14 +96,6 @@ public class CustomerDetails implements Serializable
 
     public void setGender(String gender) {
         this.gender = gender;
-    }
-
-    public Object getBusiness() {
-        return business;
-    }
-
-    public void setBusiness(Object business) {
-        this.business = business;
     }
 
     public String getAddress() {
@@ -203,84 +154,12 @@ public class CustomerDetails implements Serializable
         this.nextOfKinPhone = nextOfKinPhone;
     }
 
-    public String getIdentificationMeans() {
-        return identificationMeans;
-    }
-
-    public void setIdentificationMeans(String identificationMeans) {
-        this.identificationMeans = identificationMeans;
-    }
-
-    public String getEmployer() {
-        return employer;
-    }
-
-    public void setEmployer(String employer) {
-        this.employer = employer;
-    }
-
-    public String getEmployerAddress() {
-        return employerAddress;
-    }
-
-    public void setEmployerAddress(String employerAddress) {
-        this.employerAddress = employerAddress;
-    }
-
-    public String getCustomerType() {
-        return customerType;
-    }
-
-    public void setCustomerType(String customerType) {
-        this.customerType = customerType;
-    }
-
-    public Object getContactPerson() {
-        return contactPerson;
-    }
-
-    public void setContactPerson(Object contactPerson) {
-        this.contactPerson = contactPerson;
-    }
-
-    public Object getTinNumber() {
-        return tinNumber;
-    }
-
-    public void setTinNumber(Object tinNumber) {
-        this.tinNumber = tinNumber;
-    }
-
-    public Object getMailingAddress() {
-        return mailingAddress;
-    }
-
-    public void setMailingAddress(Object mailingAddress) {
-        this.mailingAddress = mailingAddress;
-    }
-
-    public Object getOfficeAddress() {
-        return officeAddress;
-    }
-
-    public void setOfficeAddress(Object officeAddress) {
-        this.officeAddress = officeAddress;
-    }
-
     public Integer getUserId() {
         return userId;
     }
 
     public void setUserId(Integer userId) {
         this.userId = userId;
-    }
-
-    public Object getProfession() {
-        return profession;
-    }
-
-    public void setProfession(Object profession) {
-        this.profession = profession;
     }
 
     public String getUpdatedAt() {

@@ -1,11 +1,11 @@
-package com.mike4christ.sti_mobile.Model.FormDetail;
+package com.mike4christ.sti_mobile.Model.Marine.FormSuccessDetail;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class Wallet implements Serializable
+public class Wallet  implements Serializable
 {
 
     @SerializedName("id")
@@ -26,7 +26,6 @@ public class Wallet implements Serializable
     @SerializedName("previous_balance")
     @Expose
     private String previousBalance;
-    private final static long serialVersionUID = -5909291483551887123L;
 
     public Integer getId() {
         return id;

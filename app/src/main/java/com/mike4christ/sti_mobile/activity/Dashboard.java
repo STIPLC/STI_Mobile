@@ -32,6 +32,7 @@ import com.mike4christ.sti_mobile.forms_fragment.Claim.SubFragment_Claim;
 import com.mike4christ.sti_mobile.fragment.DashboardFragment;
 import com.mike4christ.sti_mobile.fragment.ProfileFragment;
 import com.mike4christ.sti_mobile.fragment.QuoteBuyFragment;
+import com.mike4christ.sti_mobile.fragment.TransactionHistoryFragment;
 
 
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -230,15 +231,17 @@ LinearLayout mContentDashLayout;
             startActivity(new Intent(Dashboard.this, FindUs.class));
 
 
-        } else if (id == R.id.payment_history) {
-            /*fragment = new PayHistoryFragment();
-            showFragment(fragment);*/
+        } else if (id == R.id.transaction_history) {
+
+            fragment = new TransactionHistoryFragment();
+            showFragment(fragment);
+
         } else if (id == R.id.make_claim) {
 
             startActivity(new Intent(Dashboard.this, Claim.class));
 
 
-        } else if (id == R.id.manage_wallet) {
+        } else if (id == R.id.track_claim) {
 
         }
         else if (id == R.id.val_motor_insured) {
@@ -254,7 +257,7 @@ LinearLayout mContentDashLayout;
 
         }
         else if (id == R.id.log_out) {
-
+            finish();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

@@ -1,11 +1,11 @@
-package com.mike4christ.sti_mobile.Model.FormDetail;
+package com.mike4christ.sti_mobile.Model.Marine.FormSuccessDetail;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class BuyQuoteFormGetHead implements Serializable
+public class BuyQuoteFormGetHead_Marine implements Serializable
 {
 
     @SerializedName("status")

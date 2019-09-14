@@ -20,6 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -93,9 +94,9 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/size_three"
                             android:background="@drawable/rounded_bg"
-                            android:hint="Date of Loss"
+                            android:hint="Estimate Loss (e.g 1000)"
                             android:importantForAutofill="noExcludeDescendants"
-                            android:inputType="date"
+                            android:inputType="number"
                             android:padding="@dimen/size_ten"
                             tools:targetApi="o"
                             />
@@ -125,9 +126,9 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/size_three"
                             android:background="@drawable/rounded_bg"
-                            android:hint="Estimate Cost"
+                            android:hint="Estimate Cost (e.g 1500)"
                             android:importantForAutofill="noExcludeDescendants"
-                            android:inputType="text"
+                            android:inputType="number"
                             android:padding="@dimen/size_ten"
                             tools:targetApi="o"
                             />

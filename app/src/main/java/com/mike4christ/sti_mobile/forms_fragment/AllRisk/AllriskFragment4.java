@@ -1,7 +1,9 @@
 package com.mike4christ.sti_mobile.forms_fragment.AllRisk;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,14 +26,29 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
+import com.mike4christ.sti_mobile.Constant;
+import com.mike4christ.sti_mobile.Model.AllRisk.AllRiskPost.AllRiskPostHead;
+import com.mike4christ.sti_mobile.Model.AllRisk.AllRiskPost.Item;
+import com.mike4christ.sti_mobile.Model.AllRisk.AllRiskPost.AllriskPersona;
 import com.mike4christ.sti_mobile.Model.AllRisk.AllriskPolicy;
+import com.mike4christ.sti_mobile.Model.AllRisk.FormSuccessDetail.BuyQuoteFormGetHead_AllRisk;
+import com.mike4christ.sti_mobile.Model.AllRisk.FormSuccessDetail.Policy;
 import com.mike4christ.sti_mobile.Model.AllRisk.ItemDetail;
 import com.mike4christ.sti_mobile.Model.AllRisk.Personal_Detail_allrisk;
+import com.mike4christ.sti_mobile.Model.Errors.APIError;
+import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
+import com.mike4christ.sti_mobile.Model.ServiceGenerator;
+import com.mike4christ.sti_mobile.NetworkConnection;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
 import com.mike4christ.sti_mobile.adapter.ItemListAdapter;
+import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.shuhart.stepview.StepView;
 import com.wang.avi.AVLoadingIndicatorView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,6 +56,9 @@ import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 class AllriskFragment4 extends Fragment implements View.OnClickListener{
     // TODO: Rename parameter arguments, choose names that match
@@ -80,6 +100,25 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
     private  int currentStep=3;
     Realm realm;
     ItemListAdapter itemListAdapter;
+    UserPreferences userPreferences;
+    
+    String modeofPaymentString;
+  
+
+   
+    AllriskPolicy allriskPolicy;
+    
+    RealmList<Personal_Detail_allrisk> personal_detail_allriskss;
+    //All Risk return policy
+    List<Policy> policy;
+
+    String total_quoteprice;
+
+    List<Item> itemList_post=new ArrayList<Item>();
+
+    NetworkConnection networkConnection=new NetworkConnection();
+    String policy_num="";
+    String total_price="";
 
 
 
@@ -124,6 +163,7 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
         ButterKnife.bind(this,view);
         //  mStepView next registration step
         mStepView.go(currentStep, true);
+        userPreferences=new UserPreferences(getContext());
         realm= Realm.getDefaultInstance();
 
 
@@ -165,15 +205,11 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
     }
     private void init(){
 
-        UserPreferences userPreferences;
-        userPreferences = new UserPreferences(getContext());
 
         //retrieve data for personal detail first
-        AllriskPolicy allriskPolicy;
-
         allriskPolicy=realm.where(AllriskPolicy.class).equalTo("id",primaryKey).findFirst();
-        String total_quoteprice=allriskPolicy.getQuote_price();
-        RealmList<Personal_Detail_allrisk> personal_detail_allriskss=allriskPolicy.getPersonal_detail_allrisks();
+        total_quoteprice=allriskPolicy.getQuote_price();
+        personal_detail_allriskss=allriskPolicy.getPersonal_detail_allrisks();
 
 
 
@@ -216,7 +252,7 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
         switch (view.getId()) {
             case R.id.v_next_btn4_a4:
 //                send quote to client and sti
-                mSubmit();
+                ValidateForm();
                 break;
 
             case R.id.v_back_btn4_a4:
@@ -231,6 +267,8 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
                 break;
         }
     }
+    
+    
 
 
     @OnClick(R.id.fabShowItemInfo_a4)
@@ -268,18 +306,184 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
         dialog.show();
     }
 
+    private void ValidateForm() {
+
+        if (networkConnection.isNetworkConnected(getContext())) {
+            boolean isValid = true;
+
+            if (mPinTxtA4.getText().toString().isEmpty()) {
+                mInputLayoutPinA4.setError("Pin is required!");
+                isValid = false;
+            } else {
+                mInputLayoutPinA4.setErrorEnabled(false);
+            }
+            //Prefix Spinner
+            modeofPaymentString = mModeOfPaymentSpinnerA4.getSelectedItem().toString();
+            if (modeofPaymentString.equals("Mode of Payment")) {
+                showMessage("Select your mode of payment");
+                isValid = false;
+            }
+
+            if (isValid) {
+
+                //Post Request to Api
+
+                mSubmit();
+            }
+
+            return;
+        }
+        showMessage("No Internet connection discovered!");
+    }
+
+
     private void mSubmit() {
 
         mBtnLayout4A4.setVisibility(View.GONE);
         mProgressbar4A4.setVisibility(View.VISIBLE);
 
+        //retrieve data
+        final RealmResults<ItemDetail> results;
+
+        //String title;
+        results=realm.where(ItemDetail.class).findAll();
+
+
+        if(userPreferences.getAllRiskPtype().equals("Corporate")){
+
+            AllriskPersona allriskPersona =new AllriskPersona("2","null","null","null",personal_detail_allriskss.get(0).getCompany_name(),personal_detail_allriskss.get(0).getEmail(),
+                    "null",personal_detail_allriskss.get(0).getPhone(),"null","null",personal_detail_allriskss.get(0).getOffice_address(),personal_detail_allriskss.get(0).getMailing_addr(),
+                    "null",personal_detail_allriskss.get(0).getContact_person(),personal_detail_allriskss.get(0).getPicture());
+
+            for(int i=0;i<results.size();i++) {
+                ItemDetail itemsDetails=results.get(i);
+                Item item=new Item(itemsDetails.getItem(),itemsDetails.getValue(),itemsDetails.getStartDate(),
+                        itemsDetails.getReceipt(),itemsDetails.getSerial(),itemsDetails.getImei());
+                itemList_post.add(item);
+
+                Log.i("policyItemLoop",itemsDetails.getItem());
+
+            }
+
+            AllRiskPostHead allriskPostHead=new AllRiskPostHead(allriskPersona,modeofPaymentString,total_quoteprice,
+                    mPinTxtA4.getText().toString(),results.size(),itemList_post);
+
+
+            sendPolicy(allriskPostHead);
+
+
+        }else if (userPreferences.getAllRiskPtype().equals("Individual")){
+
+            AllriskPersona allriskPersona =new AllriskPersona("1",personal_detail_allriskss.get(0).getPrefix(),personal_detail_allriskss.get(0).getFirst_name(),personal_detail_allriskss.get(0).getLast_name()
+                    ,"null",personal_detail_allriskss.get(0).getEmail(),
+                    "null",personal_detail_allriskss.get(0).getPhone(),personal_detail_allriskss.get(0).getGender(),personal_detail_allriskss.get(0).getResident_address(),"null",personal_detail_allriskss.get(0).getMailing_addr(),
+                    personal_detail_allriskss.get(0).getNext_of_kin(),"null",personal_detail_allriskss.get(0).getPicture());
+
+            for(int i=0;i<results.size();i++) {
+                ItemDetail itemsDetails=results.get(i);
+                Item item=new Item(itemsDetails.getItem(),itemsDetails.getValue(),itemsDetails.getStartDate(),
+                        itemsDetails.getReceipt(),itemsDetails.getSerial(),itemsDetails.getImei());
+                itemList_post.add(item);
+
+                Log.i("policyItemLoop",itemsDetails.getItem());
+
+            }
+
+            AllRiskPostHead allriskPostHead=new AllRiskPostHead(allriskPersona,modeofPaymentString,total_quoteprice,
+                    mPinTxtA4.getText().toString(),results.size(),itemList_post);
+
+
+            sendPolicy(allriskPostHead);
+
+
+        }
 
 
         asyncAllriskPolicy(primaryKey);
-       // asyncVehicleList(primaryKey);
-
-        showMessage("AllRisk Insurance Record Deleted");
+        
     }
+
+    private void sendPolicy(AllRiskPostHead allRiskPostHead){
+
+
+        //get client and call object for request
+        ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
+
+        Call<BuyQuoteFormGetHead_AllRisk> call=client.allrisk_policy("Token "+userPreferences.getUserToken(),allRiskPostHead);
+
+        call.enqueue(new Callback<BuyQuoteFormGetHead_AllRisk>() {
+            @Override
+            public void onResponse(Call<BuyQuoteFormGetHead_AllRisk> call, Response<BuyQuoteFormGetHead_AllRisk> response) {
+                Log.i("ResponseCode", String.valueOf(response.code()));
+
+
+                try {
+                    if (!response.isSuccessful()) {
+
+                        try{
+                            APIError apiError= ErrorUtils.parseError(response);
+
+                            showMessage("Invalid Entry: "+apiError.getErrors());
+                            Log.i("Invalid EntryK",apiError.getErrors().toString());
+                            Log.i("Invalid Entry",response.errorBody().toString());
+
+                        }catch (Exception e){
+                            Log.i("InvalidEntry",e.getMessage());
+                            Log.i("ResponseError",response.errorBody().string());
+                            showMessage("Failed to Register"+e.getMessage());
+                            mBtnLayout4A4.setVisibility(View.VISIBLE);
+                            mProgressbar4A4.setVisibility(View.GONE);
+
+                        }
+                        mBtnLayout4A4.setVisibility(View.VISIBLE);
+                        mProgressbar4A4.setVisibility(View.GONE);
+                        return;
+                    }
+
+                    policy=response.body().getData().getPolicy();
+                    for(int i=0;i<policy.size();i++){
+                        policy_num=policy_num.concat("\n"+policy.get(i).getPolicyNumber());
+                    }
+
+                    total_price= String.valueOf(response.body().getData().getTotalPrice());
+
+                    Log.i("policyNum", policy_num);
+                    Log.i("totalPrice", total_price);
+
+                    showMessage("Submit Successful, Proceed to Payment");
+                    userPreferences.setTempAllRiskQuotePrice(0);
+
+                    mBtnLayout4A4.setVisibility(View.VISIBLE);
+                    mProgressbar4A4.setVisibility(View.GONE);
+                    if (total_price != null) {
+
+                        Intent intent = new Intent(getContext(), PolicyPaymentActivity.class);
+                        intent.putExtra(Constant.TOTAL_PRICE, total_price);
+                        intent.putExtra(Constant.POLICY_NUM, policy_num);
+                        startActivity(intent);
+                        getActivity().finish();
+
+                    } else {
+                        showMessage("Error: " + response.body());
+                    }
+                }catch (Exception e){
+                    showMessage("Submission Error: " + e.getMessage());
+                    Log.i("policyResponse", e.getMessage());
+                }
+
+            }
+            @Override
+            public void onFailure(Call<BuyQuoteFormGetHead_AllRisk> call, Throwable t) {
+                showMessage("Submission Failed "+t.getMessage());
+                Log.i("GEtError",t.getMessage());
+            }
+        });
+
+
+
+
+    }
+
 
     //To Delete vehicle
     private void asyncAllriskPolicy(final String id){
@@ -310,31 +514,6 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
         };
         remoteItem.execute();
     }
-
-    /*//To Delete vehicle
-    private void asyncVehicleList(final String id){
-        AsyncTask<Void,Void,Void> remoteItem =new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-
-                realm=Realm.getDefaultInstance();
-
-                AllriskPolicy expenses=realm.where(AllriskPolicy.class).equalTo("id",id).findFirst();
-                if(expenses !=null){
-                    realm.beginTransaction();
-                    expenses.deleteFromRealm();
-                    realm.commitTransaction();
-                }
-                realm.close();
-                return null;
-            }
-        };
-        remoteItem.execute();
-    }
-*/
-
-
-
 
 
     private void showMessage(String s) {

@@ -1,4 +1,9 @@
-package com.mike4christ.sti_mobile.Model.FormDetail;
+package com.mike4christ.sti_mobile.Model.Marine.FormSuccessDetail;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
 
 public class Policy implements Serializable
 {
@@ -15,45 +20,45 @@ public class Policy implements Serializable
     @SerializedName("policy_type")
     @Expose
     private String policyType;
-    @SerializedName("enhanced_third_party")
+    @SerializedName("description")
     @Expose
-    private String enhancedThirdParty;
-    @SerializedName("private_commercial")
+    private String description;
+    @SerializedName("pfi_number")
     @Expose
-    private String privateCommercial;
-    @SerializedName("motor_cycle_policy")
+    private String pfiNumber;
+    @SerializedName("pfi_date")
     @Expose
-    private Object motorCyclePolicy;
-    @SerializedName("make")
+    private String pfiDate;
+    @SerializedName("quantity")
     @Expose
-    private String make;
-    @SerializedName("body_type")
+    private String quantity;
+    @SerializedName("value")
     @Expose
-    private String bodyType;
-    @SerializedName("year")
+    private String value;
+    @SerializedName("conversion_rate")
     @Expose
-    private String year;
-    @SerializedName("registration_number")
+    private String conversionRate;
+    @SerializedName("loading_port")
     @Expose
-    private String registrationNumber;
-    @SerializedName("chasis_number")
+    private String loadingPort;
+    @SerializedName("discharge_port")
     @Expose
-    private String chasisNumber;
-    @SerializedName("engine_number")
+    private String dischargePort;
+    @SerializedName("conveyance_mode")
     @Expose
-    private String engineNumber;
-    @SerializedName("vehicle_value")
-    @Expose
-    private String vehicleValue;
+    private String conveyanceMode;
     @SerializedName("price")
     @Expose
-    private Object price;
+    private String price;
     @SerializedName("start")
     @Expose
-    private Object start;
+    private String start;
     @SerializedName("end")
     @Expose
     private String end;
+    @SerializedName("payment_reference")
+    @Expose
+    private String paymentReference;
     @SerializedName("payment_status")
     @Expose
     private String paymentStatus;
@@ -72,7 +77,7 @@ public class Policy implements Serializable
     @SerializedName("id")
     @Expose
     private Integer id;
-    private final static long serialVersionUID = -7439936226075171321L;
+    private final static long serialVersionUID = 2981020963989651372L;
 
     public Integer getCustomerId() {
         return customerId;
@@ -106,99 +111,91 @@ public class Policy implements Serializable
         this.policyType = policyType;
     }
 
-    public String getEnhancedThirdParty() {
-        return enhancedThirdParty;
+    public String getDescription() {
+        return description;
     }
 
-    public void setEnhancedThirdParty(String enhancedThirdParty) {
-        this.enhancedThirdParty = enhancedThirdParty;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getPrivateCommercial() {
-        return privateCommercial;
+    public String getPfiNumber() {
+        return pfiNumber;
     }
 
-    public void setPrivateCommercial(String privateCommercial) {
-        this.privateCommercial = privateCommercial;
+    public void setPfiNumber(String pfiNumber) {
+        this.pfiNumber = pfiNumber;
     }
 
-    public Object getMotorCyclePolicy() {
-        return motorCyclePolicy;
+    public String getPfiDate() {
+        return pfiDate;
     }
 
-    public void setMotorCyclePolicy(Object motorCyclePolicy) {
-        this.motorCyclePolicy = motorCyclePolicy;
+    public void setPfiDate(String pfiDate) {
+        this.pfiDate = pfiDate;
     }
 
-    public String getMake() {
-        return make;
+    public String getQuantity() {
+        return quantity;
     }
 
-    public void setMake(String make) {
-        this.make = make;
+    public void setQuantity(String quantity) {
+        this.quantity = quantity;
     }
 
-    public String getBodyType() {
-        return bodyType;
+    public String getValue() {
+        return value;
     }
 
-    public void setBodyType(String bodyType) {
-        this.bodyType = bodyType;
+    public void setValue(String value) {
+        this.value = value;
     }
 
-    public String getYear() {
-        return year;
+    public String getConversionRate() {
+        return conversionRate;
     }
 
-    public void setYear(String year) {
-        this.year = year;
+    public void setConversionRate(String conversionRate) {
+        this.conversionRate = conversionRate;
     }
 
-    public String getRegistrationNumber() {
-        return registrationNumber;
+    public String getLoadingPort() {
+        return loadingPort;
     }
 
-    public void setRegistrationNumber(String registrationNumber) {
-        this.registrationNumber = registrationNumber;
+    public void setLoadingPort(String loadingPort) {
+        this.loadingPort = loadingPort;
     }
 
-    public String getChasisNumber() {
-        return chasisNumber;
+    public String getDischargePort() {
+        return dischargePort;
     }
 
-    public void setChasisNumber(String chasisNumber) {
-        this.chasisNumber = chasisNumber;
+    public void setDischargePort(String dischargePort) {
+        this.dischargePort = dischargePort;
     }
 
-    public String getEngineNumber() {
-        return engineNumber;
+    public String getConveyanceMode() {
+        return conveyanceMode;
     }
 
-    public void setEngineNumber(String engineNumber) {
-        this.engineNumber = engineNumber;
+    public void setConveyanceMode(String conveyanceMode) {
+        this.conveyanceMode = conveyanceMode;
     }
 
-    public String getVehicleValue() {
-        return vehicleValue;
-    }
-
-    public void setVehicleValue(String vehicleValue) {
-        this.vehicleValue = vehicleValue;
-    }
-
-    public Object getPrice() {
+    public String getPrice() {
         return price;
     }
 
-    public void setPrice(Object price) {
+    public void setPrice(String price) {
         this.price = price;
     }
 
-    public Object getStart() {
+    public String getStart() {
         return start;
     }
 
-    public void setStart(Object start) {
+    public void setStart(String start) {
         this.start = start;
     }
 
@@ -208,6 +205,14 @@ public class Policy implements Serializable
 
     public void setEnd(String end) {
         this.end = end;
+    }
+
+    public String getPaymentReference() {
+        return paymentReference;
+    }
+
+    public void setPaymentReference(String paymentReference) {
+        this.paymentReference = paymentReference;
     }
 
     public String getPaymentStatus() {

@@ -192,6 +192,7 @@ public class EticFragment3 extends Fragment implements View.OnClickListener{
                 personal_detail_etic.setNext_of_kin(userPreferences.getEticINextKin());
                 personal_detail_etic.setMailing_addr(userPreferences.getEticIMailingAddr());
                 personal_detail_etic.setEmail(userPreferences.getEticIEmail());
+                personal_detail_etic.setPicture(userPreferences.getEticIPersonalImage());
                 
                 //Additional Insured List
                 Travel_Info travel_info=new Travel_Info();
@@ -213,10 +214,10 @@ public class EticFragment3 extends Fragment implements View.OnClickListener{
                 final Personal_Detail_etic personal_detail_etic1=realm.copyToRealm(personal_detail_etic);
 
                 EticPolicy eticPolicy=realm.createObject(EticPolicy.class,primaryKey);
-                eticPolicy.setAgent_id("1");
+                eticPolicy.setAgent_id(userPreferences.getUserId());
                 eticPolicy.setQuote_price(String.valueOf(userPreferences.getTempEticQuotePrice()));
                 eticPolicy.setPayment_source("paystack");
-                eticPolicy.setPin("11234");
+                eticPolicy.setPin("0000");
 
                 Log.i("Primary1",primaryKey);
 

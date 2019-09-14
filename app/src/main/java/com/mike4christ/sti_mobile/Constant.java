@@ -29,6 +29,10 @@ public class Constant {
     public static final String BVN = "bvn";
     public static final String PASSWORD = "password";
 
+    //PAYMENT
+    public static final String TOTAL_PRICE = "total_price";
+    public static final String POLICY_NUM = "policy_number";
+
     public static final String ROLE = "role";
     public static final String PROFILE_PIC = "profile_pic";
 
@@ -192,6 +196,8 @@ public class Constant {
     public static final String ALLRISK_START_DATE = "allrisk_start_date";
     public static final String ALLRISK_SERIAL_NO = "allrisk_serial_no";
     public static final String ALLRISK_ITEM_VALUE = "allrisk_item_value";
+    public static final String ALLRISK_ITEM_IMEI = "allrisk_item_imei";
+    public static final String ALLRISK_ITEM_RECEIPT = "allrisk_item_receipt";
 
 
     //Quote Price
