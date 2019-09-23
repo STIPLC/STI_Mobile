@@ -60,7 +60,6 @@ public class CustomerDetails implements Serializable
         @SerializedName("id")
         @Expose
         private Integer id;
-        private final static long serialVersionUID = -150392035578765619L;
 
         public String getTitle() {
         return title;

@@ -44,6 +44,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="private"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     />
@@ -72,6 +74,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Acura"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     />
@@ -90,7 +94,7 @@
 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Departure Place: "
+                    android:text="Departure \nPlace: "
                     android:layout_margin="6dp"
                     android:textSize="@dimen/size_twenty"
                     android:textColor="@color/colorGrey"
@@ -100,6 +104,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="XML"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     />
@@ -117,7 +123,7 @@
 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Arrival Place: "
+                    android:text="Arrival \nPlace: "
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     android:textColor="@color/colorGrey"
@@ -127,6 +133,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="438h86"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     />
@@ -144,7 +152,7 @@
 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Country of Visit Address: "
+                    android:text="Country of \nVisit Address: "
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     android:textColor="@color/colorGrey"
@@ -154,6 +162,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Good"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     />

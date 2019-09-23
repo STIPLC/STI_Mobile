@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.mike4christ.sti_mobile.Constant;
 import com.mike4christ.sti_mobile.R;
+import com.mike4christ.sti_mobile.UserPreferences;
 import com.mike4christ.sti_mobile.forms_fragment.Marine.MarineFragment1;
 
 import butterknife.BindView;
@@ -30,6 +31,7 @@ public class MarineForm extends AppCompatActivity {
 
 
     Fragment fragment;
+    UserPreferences userPreferences;
 
     String title="";
 
@@ -38,6 +40,7 @@ public class MarineForm extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_marine_form);
         ButterKnife.bind(this);
+        userPreferences=new UserPreferences(this);
 
         Intent intent = getIntent();
         title=intent.getStringExtra(Constant.CARD_OPTION_TITLE);
@@ -65,6 +68,7 @@ public class MarineForm extends AppCompatActivity {
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        userPreferences.setTempMarineQuotePrice("0.0");
         finish();
         return super.onOptionsItemSelected(item);
     }

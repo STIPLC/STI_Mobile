@@ -262,10 +262,6 @@ class OtherInsureFragment4 extends Fragment implements View.OnClickListener{
         recycler_vehicles.setLayoutManager(linearLayoutManager);
         recycler_vehicles.setAdapter(otherinsureListAdapter);
 
-        /*RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getBaseContext());
-        recycler_note.setLayoutManager(mLayoutManager);
-        recycler_note.setItemAnimator(new DefaultItemAnimator());
-        recycler_note.setAdapter(adapter);*/
 
 
         dialog.setContentView(view);

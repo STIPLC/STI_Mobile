@@ -30,9 +30,14 @@ import com.google.android.material.snackbar.Snackbar;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.mike4christ.sti_mobile.BuildConfig;
+import com.mike4christ.sti_mobile.Model.Errors.APIError;
+import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
+import com.mike4christ.sti_mobile.Model.ServiceGenerator;
+import com.mike4christ.sti_mobile.Model.Swiss.QouteHeadSwiss;
 import com.mike4christ.sti_mobile.NetworkConnection;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.shuhart.stepview.StepView;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -46,6 +51,9 @@ import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class SwissFragment1 extends Fragment implements View.OnClickListener{
@@ -68,6 +76,8 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
 
     @BindView(R.id.benefit_spinner_s1)
     Spinner mBenefitSpinnerS;
+    @BindView(R.id.state_spinner)
+    Spinner state_spinner;
 
     @BindView(R.id.inputLayoutFirstName_s1)
     TextInputLayout mInputLayoutFirstNameS1;
@@ -101,8 +111,7 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
     TextInputLayout mInputLayoutPhoneNextKinS1;
     @BindView(R.id.phone_Nextkin_editxt_s1)
     EditText mPhoneNextkinEditxtS1;
-    @BindView(R.id.inputLayoutDateofBirth_s1)
-    TextInputLayout mInputLayoutDateofBirthS1;
+
     @BindView(R.id.dob_editxt_s)
     EditText mDobEditxtS;
     @BindView(R.id.inputLayoutDisability_s1)
@@ -117,7 +126,7 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
     AVLoadingIndicatorView mProgressbar1S1;
    
 
-    String maritalString,genderString,prifixString,benefitString,DobString,cameraFilePath;
+    String maritalString,genderString,prifixString,benefitString,DobString,cameraFilePath,stateString;
     DatePickerDialog datePickerDialog1;
     private int currentStep = 0;
 
@@ -127,6 +136,7 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
 
     Uri personal_info_img_uri;
     String personal_img_url;
+    UserPreferences userPreferences;
 
 
     public SwissFragment1() {
@@ -168,6 +178,7 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
         ButterKnife.bind(this,view);
 
         mStepView.go(currentStep, true);
+        userPreferences=new UserPreferences(getContext());
 
 
 
@@ -179,6 +190,7 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
         benfitSpinner();
         setViewActions();
         showDatePicker();
+        stateSpinner();
 
         return  view;
     }
@@ -240,6 +252,38 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
 
 
     }
+
+    private void stateSpinner() {
+        // Create an ArrayAdapter using the string array and a default spinner
+        ArrayAdapter<CharSequence> staticAdapter = ArrayAdapter
+                .createFromResource(getContext(), R.array.state_array,
+                        android.R.layout.simple_spinner_item);
+
+        // Specify the layout to use when the list of choices appears
+        staticAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Apply the adapter to the spinner
+        state_spinner.setAdapter(staticAdapter);
+
+        state_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                String stateText = (String) parent.getItemAtPosition(position);
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+                state_spinner.getItemAtPosition(0);
+
+            }
+        });
+
+    }
+
 
     private void maritaltypeSpinner() {
         // Create an ArrayAdapter using the string array and a default spinner
@@ -647,10 +691,8 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
             }
 
             if (mDobEditxtS.getText().toString().isEmpty()) {
-                mInputLayoutDateofBirthS1.setError("Date of Birth is required");
+                showMessage("Date of Birth is required");
                 isValid = false;
-            } else {
-                mInputLayoutDateofBirthS1.setErrorEnabled(false);
             }
             if (mDisabiltyEditxtS1.getText().toString().isEmpty()) {
                 mInputLayoutDisabilityS1.setError("If No, Enter No");
@@ -671,7 +713,15 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
                 showMessage("Select Marital Status");
                 isValid = false;
             }
-            //Prefix Spinner
+
+            //State Spinner
+            stateString = state_spinner.getSelectedItem().toString();
+            if (stateString.equals("Geographical Location")&&state_spinner.isClickable()) {
+                showMessage("Select your Geographical Location");
+                isValid = false;
+            }
+
+        //Prefix Spinner
             prifixString = mPrefixSpinnerS.getSelectedItem().toString();
             if (prifixString.equals("Select Prefix")) {
                 showMessage("Select your Prefix e.g Mr.");
@@ -713,7 +763,9 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
             userPreferences.setSwissIPrefix(prifixString);
             userPreferences.setSwissIFirstName(mFirstnameEditxtS1.getText().toString());
             userPreferences.setSwissILastName(mLastnameEditxtS1.getText().toString());
+            userPreferences.setSwissIEmail(userPreferences.getEmail());
             userPreferences.setSwissIGender(genderString);
+            userPreferences.setSwissIState(stateString);
             userPreferences.setSwissIResAdrr(mResidentsAddrEditxtS1.getText().toString());
             userPreferences.setSwissINextKin(mNextKinEditxtS1.getText().toString());
             userPreferences.setSwissINextKinAddr(mNextKinEditxtAddrS1.getText().toString());
@@ -725,10 +777,9 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
 
             if (currentStep < mStepView.getStepCount() - 1) {
                 currentStep++;
-                Fragment swissFragment2 = new SwissFragment2();
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_swiss_form_container, swissFragment2);
-                ft.commit();
+
+
+               sendSwissData();
                 mStepView.go(currentStep, true);
             } else {
                 mStepView.done(true);
@@ -767,11 +818,104 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
                     return;
                 }
                 int monthofYear=monthOfYear+1;
-                DobString = dayOfMonth + "-" + monthofYear + "-" + year;
+                DobString = year + "-" + monthofYear + "-" + dayOfMonth;
                 mDobEditxtS.setText(DobString);
                 datePickerDialog1.dismiss();
             }
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+    }
+
+
+
+    private void sendSwissData(){
+
+        //get client and call object for request
+        ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
+
+
+        Call<QouteHeadSwiss> call=client.swiss_quote("Token "+userPreferences.getUserToken(),mDobEditxtS.getText().toString());
+
+        call.enqueue(new Callback<QouteHeadSwiss>() {
+            @Override
+            public void onResponse(Call<QouteHeadSwiss> call, Response<QouteHeadSwiss> response) {
+                Log.i("ResponseCode", String.valueOf(response.code()));
+
+                if(response.code()==400){
+                    showMessage("Check your internet connection");
+                    mNextBtn1S1.setVisibility(View.VISIBLE);
+                    mProgressbar1S1.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==429){
+                    showMessage("Too many requests on database");
+                    mNextBtn1S1.setVisibility(View.VISIBLE);
+                    mProgressbar1S1.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==500){
+                    showMessage("Server Error");
+                    mNextBtn1S1.setVisibility(View.VISIBLE);
+                    mProgressbar1S1.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==401){
+                    showMessage("Unauthorized access, please try login again");
+                    mNextBtn1S1.setVisibility(View.VISIBLE);
+                    mProgressbar1S1.setVisibility(View.GONE);
+                    return;
+                }
+                try {
+                    if (!response.isSuccessful()) {
+
+                        try{
+                            APIError apiError= ErrorUtils.parseError(response);
+
+                            showMessage("Invalid Entry: "+apiError.getErrors());
+                            Log.i("Invalid EntryK",apiError.getErrors().toString());
+                            Log.i("Invalid Entry",response.errorBody().toString());
+
+                        }catch (Exception e){
+                            Log.i("InvalidEntry",e.getMessage());
+                            Log.i("ResponseError",response.errorBody().string());
+                            showMessage("Failed to Fetch Quote"+e.getMessage());
+                            mNextBtn1S1.setVisibility(View.VISIBLE);
+                            mProgressbar1S1.setVisibility(View.GONE);
+
+                        }
+                        mNextBtn1S1.setVisibility(View.VISIBLE);
+                        mProgressbar1S1.setVisibility(View.GONE);
+                        return;
+                    }
+
+                    String quote_price=response.body().getData().getPrice();
+                    String category=response.body().getData().getCategory();
+                    userPreferences.setSwissIPersonal_QuotePrice(Integer.parseInt(quote_price));
+                    userPreferences.setSwissIPersonal_Category(category);
+
+
+
+                    Log.i("quote_price",quote_price);
+                    showMessage("Successfully Fetched Quote");
+                    mNextBtn1S1.setVisibility(View.VISIBLE);
+                    mProgressbar1S1.setVisibility(View.GONE);
+
+                    Fragment swissFragment2 = new SwissFragment2();
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.replace(R.id.fragment_swiss_form_container, swissFragment2);
+                    ft.commit();
+                }catch (Exception e){
+                    Log.i("policyResponse", e.getMessage());
+                    mNextBtn1S1.setVisibility(View.VISIBLE);
+                    mProgressbar1S1.setVisibility(View.GONE);
+                }
+
+            }
+            @Override
+            public void onFailure(Call<QouteHeadSwiss> call, Throwable t) {
+                showMessage("Submission Failed "+t.getMessage());
+                Log.i("GEtError",t.getMessage());
+                mNextBtn1S1.setVisibility(View.VISIBLE);
+                mProgressbar1S1.setVisibility(View.GONE);
+            }
+        });
+
     }
 
 

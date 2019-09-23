@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 
 import androidx.appcompat.app.AlertDialog;
@@ -60,12 +61,16 @@ public class OtherInsureFragment1 extends Fragment implements View.OnClickListen
     
     @BindView(R.id.qb_form_layout1)
     FrameLayout mQbFormLayout1;
+    @BindView(R.id.reviewed_checked)
+    RadioButton reviewed_checked;
     @BindView(R.id.step_view)
     StepView mStepView;
     @BindView(R.id.type_spinner_o1)
     Spinner mTypeSpinnerO1;
     @BindView(R.id.prefix_spinner_o1)
     Spinner mPrefixSpinnerO1;
+    @BindView(R.id.state_spinner)
+    Spinner state_spinner;
     @BindView(R.id.inputLayoutCompanyName_o1)
     TextInputLayout mInputLayoutCompanyNameO1;
     @BindView(R.id.companyname_editxt_o1)
@@ -120,7 +125,7 @@ public class OtherInsureFragment1 extends Fragment implements View.OnClickListen
     AVLoadingIndicatorView mProgressbar1O1;
     
 
-    String typeString,genderString,prifixString,cameraFilePath;
+    String typeString,genderString,prifixString,cameraFilePath,stateString;
     private int currentStep = 0;
 
     int PICK_IMAGE_PASSPORT = 1;
@@ -177,6 +182,7 @@ public class OtherInsureFragment1 extends Fragment implements View.OnClickListen
 
         mTypeSpinnerO1();
         mPrefixSpinnerO1();
+        stateSpinner();
         mGenderSpinnerO1();
         setViewActions();
 
@@ -266,7 +272,7 @@ public class OtherInsureFragment1 extends Fragment implements View.OnClickListen
                     //De-Visualizing the individual form
                     mPrefixSpinnerO1.setVisibility(View.GONE);
                     mPrefixSpinnerO1.setClickable(false);
-                    mFirstnameEditxtO1.setVisibility(View.GONE);
+                    mInputLayoutFirstNameO1.setVisibility(View.GONE);
                     mFirstnameEditxtO1.setClickable(false);
                     mInputLayoutLastNameO1.setVisibility(View.GONE);
                     mLastnameEditxtO1.setClickable(false);
@@ -324,7 +330,7 @@ public class OtherInsureFragment1 extends Fragment implements View.OnClickListen
                 //De-Visualizing the individual form
                 mTypeSpinnerO1.getItemAtPosition(0);
                 mPrefixSpinnerO1.setVisibility(View.GONE);
-                mFirstnameEditxtO1.setVisibility(View.GONE);
+                mInputLayoutFirstNameO1.setVisibility(View.GONE);
                 mInputLayoutLastNameO1.setVisibility(View.GONE);
                 mGenderSpinnerO1.setVisibility(View.GONE);
                 mInputLayoutResAddrO1.setVisibility(View.GONE);
@@ -374,6 +380,36 @@ public class OtherInsureFragment1 extends Fragment implements View.OnClickListen
             public void onNothingSelected(AdapterView<?> parent) {
                 mPrefixSpinnerO1.getItemAtPosition(0);
 
+
+            }
+        });
+
+    }
+
+    private void stateSpinner() {
+        // Create an ArrayAdapter using the string array and a default spinner
+        ArrayAdapter<CharSequence> staticAdapter = ArrayAdapter
+                .createFromResource(getContext(), R.array.state_array,
+                        android.R.layout.simple_spinner_item);
+
+        // Specify the layout to use when the list of choices appears
+        staticAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Apply the adapter to the spinner
+        state_spinner.setAdapter(staticAdapter);
+
+        state_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                String stateText = (String) parent.getItemAtPosition(position);
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                state_spinner.getItemAtPosition(0);
 
             }
         });
@@ -740,7 +776,10 @@ public class OtherInsureFragment1 extends Fragment implements View.OnClickListen
         } else {
             mInputLayoutResAddrO1.setErrorEnabled(false);
         }
-
+        if (!reviewed_checked.isChecked()) {
+            showMessage("Please checked below point, to accept you review");
+            isValid = false;
+        }
 
         //Tyepe Spinner
         typeString = mTypeSpinnerO1.getSelectedItem().toString();
@@ -798,6 +837,7 @@ public class OtherInsureFragment1 extends Fragment implements View.OnClickListen
             userPreferences.setOtherIFirstName(mFirstnameEditxtO1.getText().toString());
             userPreferences.setOtherILastName(mLastnameEditxtO1.getText().toString());
             userPreferences.setOtherIGender(genderString);
+            userPreferences.setOtherIState(stateString);
             userPreferences.setOtherIResAdrr(mResidentsAddrEditxtO1.getText().toString());
             userPreferences.setOtherIPhoneNum(mPhoneNoEditxtO1.getText().toString());
             userPreferences.setOtherIEmail(mEmailEditxtO1.getText().toString());

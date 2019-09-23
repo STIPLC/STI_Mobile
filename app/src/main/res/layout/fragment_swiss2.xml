@@ -103,17 +103,14 @@
                             />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/inputLayoutDateofBirth_s2"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        >
+
 
                         <EditText
                             android:id="@+id/dob_editxt_s2"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/size_three"
+                            android:layout_marginTop="@dimen/size_five"
+                            android:layout_marginBottom="@dimen/size_two"
                             android:background="@drawable/rounded_bg"
                             android:hint="Date of Birth"
                             android:importantForAutofill="noExcludeDescendants"
@@ -121,7 +118,7 @@
                             android:padding="@dimen/size_ten"
                             tools:targetApi="o"
                             />
-                    </com.google.android.material.textfield.TextInputLayout>
+
 
                     <Spinner
                         android:id="@+id/gender_spinner_s2"
@@ -223,13 +220,13 @@
                         android:layout_marginBottom="@dimen/size_ten"
                         android:visibility="visible"
                         />
-                    <TextView
+                    <!--<TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textColor="@color/colorPrimary"
                         android:text="I have review and agreed to the disclosure and the privacy policy"
                         android:textStyle="italic"
-                        />
+                        />-->
 
                     <LinearLayout
                         android:id="@+id/btn_layout2_s2"

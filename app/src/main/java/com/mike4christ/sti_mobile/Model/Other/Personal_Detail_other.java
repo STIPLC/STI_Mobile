@@ -24,6 +24,7 @@ public class Personal_Detail_other extends RealmObject {
     String contact_person;
     String office_address;
     String picture;
+    String state;
 
 
 
@@ -135,6 +136,13 @@ public class Personal_Detail_other extends RealmObject {
 
     public void setContact_person(String contact_person) {
         this.contact_person = contact_person;
+    }
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     public String getOffice_address() {

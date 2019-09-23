@@ -10,13 +10,12 @@ public class VehicleDetails extends RealmObject {
 
     String period;
     String startDate;
-    String policy_type;
+
+
+    String private_com_type;
     String enhanced_third_party;
 
-    String private_policy;
-    //I will notify kazeem for changes
-    String commercial_policy;
-    String motor_cycle_policy;
+    String policy_select_type;
     String vehicle_make;
     String vehicle_type;
     String body_type;
@@ -63,12 +62,20 @@ public class VehicleDetails extends RealmObject {
         this.startDate = startDate;
     }
 
-    public String getPolicy_type() {
-        return policy_type;
+    public String getPrivate_com_type() {
+        return private_com_type;
     }
 
-    public void setPolicy_type(String policy_type) {
-        this.policy_type = policy_type;
+    public void setPrivate_com_type(String private_com_type) {
+        this.private_com_type = private_com_type;
+    }
+
+    public String getPolicy_select_type() {
+        return policy_select_type;
+    }
+
+    public void setPolicy_select_type(String policy_select_type) {
+        this.policy_select_type = policy_select_type;
     }
 
     public String getEnhanced_third_party() {
@@ -79,30 +86,6 @@ public class VehicleDetails extends RealmObject {
         this.enhanced_third_party = enhanced_third_party;
     }
 
-    public String getPrivate_policy() {
-        return private_policy;
-    }
-
-    public void setPrivate_policy(String private_policy) {
-        this.private_policy = private_policy;
-    }
-
-    public String getCommercial_policy() {
-        return commercial_policy;
-    }
-
-    public void setCommercial_policy(String commercial_policy) {
-        this.commercial_policy = commercial_policy;
-    }
-
-
-    public String getMotor_cycle_policy() {
-        return motor_cycle_policy;
-    }
-
-    public void setMotor_cycle_policy(String motor_cycle_policy) {
-        this.motor_cycle_policy = motor_cycle_policy;
-    }
 
     public String getVehicle_make() {
         return vehicle_make;

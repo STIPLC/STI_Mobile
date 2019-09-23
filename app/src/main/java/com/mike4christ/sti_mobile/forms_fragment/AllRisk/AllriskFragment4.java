@@ -258,7 +258,8 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
             case R.id.v_back_btn4_a4:
 
                 mStepView.go(1, true);
-
+                userPreferences.setTempAllRiskQuotePrice("0.0");
+                asyncAllriskPolicy(primaryKey);
                 Fragment allriskFragment2 = new AllriskFragment2();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_allrisk_form_container, allriskFragment2);
@@ -399,7 +400,7 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
         }
 
 
-        asyncAllriskPolicy(primaryKey);
+
         
     }
 
@@ -415,7 +416,19 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
             @Override
             public void onResponse(Call<BuyQuoteFormGetHead_AllRisk> call, Response<BuyQuoteFormGetHead_AllRisk> response) {
                 Log.i("ResponseCode", String.valueOf(response.code()));
-
+                if(response.code()==400){
+                    showMessage("Check your internet connection");
+                    return;
+                }else if(response.code()==429){
+                    showMessage("Too many requests on database");
+                    return;
+                }else if(response.code()==500){
+                    showMessage("Server Error");
+                    return;
+                }else if(response.code()==401){
+                    showMessage("Unauthorized access, please try login again");
+                    return;
+                }
 
                 try {
                     if (!response.isSuccessful()) {
@@ -445,37 +458,65 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
                         policy_num=policy_num.concat("\n"+policy.get(i).getPolicyNumber());
                     }
 
-                    total_price= String.valueOf(response.body().getData().getTotalPrice());
+                    total_price= String.valueOf(response.body().getData().getUnitPrice());
+                    String ref= response.body().getData().getTransactions().get(0).getReference();
 
                     Log.i("policyNum", policy_num);
                     Log.i("totalPrice", total_price);
+                    Log.i("ref", ref);
 
                     showMessage("Submit Successful, Proceed to Payment");
-                    userPreferences.setTempAllRiskQuotePrice(0);
+                    userPreferences.setTempAllRiskQuotePrice("0.0");
 
                     mBtnLayout4A4.setVisibility(View.VISIBLE);
                     mProgressbar4A4.setVisibility(View.GONE);
                     if (total_price != null) {
-
+                        asyncAllriskPolicy(primaryKey);
                         Intent intent = new Intent(getContext(), PolicyPaymentActivity.class);
                         intent.putExtra(Constant.TOTAL_PRICE, total_price);
                         intent.putExtra(Constant.POLICY_NUM, policy_num);
+                        intent.putExtra(Constant.POLICY_TYPE, "all_risk");
+                        intent.putExtra(Constant.REF, ref);
                         startActivity(intent);
                         getActivity().finish();
 
                     } else {
                         showMessage("Error: " + response.body());
+                        mBtnLayout4A4.setVisibility(View.VISIBLE);
+                        mProgressbar4A4.setVisibility(View.GONE);
+                        userPreferences.setTempAllRiskQuotePrice("0.0");
+                        asyncAllriskPolicy(primaryKey);
+                        Fragment allriskFragment2 = new AllriskFragment2();
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.replace(R.id.fragment_allrisk_form_container, allriskFragment2);
+                        ft.commit();
                     }
                 }catch (Exception e){
                     showMessage("Submission Error: " + e.getMessage());
                     Log.i("policyResponse", e.getMessage());
+                    userPreferences.setTempAllRiskQuotePrice("0.0");
+                    asyncAllriskPolicy(primaryKey);
+                    Fragment allriskFragment2 = new AllriskFragment2();
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.replace(R.id.fragment_allrisk_form_container, allriskFragment2);
+                    ft.commit();
+                    mBtnLayout4A4.setVisibility(View.VISIBLE);
+                    mProgressbar4A4.setVisibility(View.GONE);
                 }
 
             }
             @Override
             public void onFailure(Call<BuyQuoteFormGetHead_AllRisk> call, Throwable t) {
                 showMessage("Submission Failed "+t.getMessage());
-                Log.i("GEtError",t.getMessage());
+                Log.i("GetError",t.getMessage());
+                asyncAllriskPolicy(primaryKey);
+                userPreferences.setTempAllRiskQuotePrice("0.0");
+                Fragment allriskFragment2 = new AllriskFragment2();
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_allrisk_form_container, allriskFragment2);
+                ft.commit();
+                mBtnLayout4A4.setVisibility(View.VISIBLE);
+                mProgressbar4A4.setVisibility(View.GONE);
             }
         });
 

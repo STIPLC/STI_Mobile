@@ -33,10 +33,12 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String CARGO = "cargo";
     private static final String PREMIUM_AMOUNT = "amount_marine";
+    //private static final String SUM_INSURED = "sum_insured";
 
     // TODO: Rename and change types of parameters
     private String cargo;
     public String p_amount;
+   // public String sum_insured;
 
 
     @BindView(R.id.qb_form_layout3)
@@ -47,6 +49,8 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
     TextView mPremiumTxt;
     @BindView(R.id.amount_m3)
     TextView mAmountM3;
+
+
     @BindView(R.id.btn_layout3_m3)
     LinearLayout mBtnLayout3M3;
     @BindView(R.id.v_back_btn3_m3)
@@ -55,8 +59,8 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
     Button mVNextBtn3M3;
     @BindView(R.id.progressbar3_m3)
     AVLoadingIndicatorView mProgressbar3M3;
-    @BindView(R.id.fabAddCargo_m3)
-    FloatingActionButton mFabAddCargoM3;
+  /*  @BindView(R.id.fabAddCargo_m3)
+    FloatingActionButton mFabAddCargoM3;*/
 
     private  int currentStep=2;
 
@@ -65,6 +69,7 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
 
     MarinePolicy id=new MarinePolicy();
     String primaryKey=id.getId();
+    UserPreferences userPreferences;
 
     public MarineFragment3() {
         // Required empty public constructor
@@ -84,6 +89,7 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
         Bundle args = new Bundle();
         args.putString(CARGO, param1);
         args.putString(PREMIUM_AMOUNT, param2);
+        //args.putString(SUM_INSURED, param3);
         fragment.setArguments(args);
         return fragment;
     }
@@ -97,12 +103,14 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
             cargo = getArguments().getString(CARGO);
 
 
-            int oldquote=userPreferences.getTempMarineQuotePrice();
+            double oldquote=Double.valueOf(userPreferences.getTempMarineQuotePrice());
             p_amount=getArguments().getString(PREMIUM_AMOUNT);
 
-            int newquote= Integer.parseInt(getArguments().getString(PREMIUM_AMOUNT));
-            int total_quote=oldquote+newquote;
-            userPreferences.setTempMarineQuotePrice(total_quote);
+
+            double newquote= Double.valueOf(getArguments().getString(PREMIUM_AMOUNT));
+            double total_quote=oldquote+newquote;
+
+            userPreferences.setTempMarineQuotePrice(String.valueOf(total_quote));
 
 
         }
@@ -116,6 +124,7 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
         ButterKnife.bind(this,view);
         //        mStepView next registration step
         mStepView.go(currentStep, true);
+        userPreferences=new UserPreferences(getContext());
 
 
         //instancial Realm db
@@ -127,7 +136,7 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
             String format = p_amount + ".00";
             mAmountM3.setText(format);
         }else {
-            String format = p_amount + ".00";
+            String format = p_amount ;
             mAmountM3.setText(format);
         }
 
@@ -146,7 +155,7 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
 
         mVNextBtn3M3.setOnClickListener(this);
         mVBackBtn3M3.setOnClickListener(this);
-        mFabAddCargoM3.setOnClickListener(this);
+       // mFabAddCargoM3.setOnClickListener(this);
 
     }
 
@@ -161,8 +170,8 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
                 mailClientAndSt();
                 break;
 
-            case R.id.fabAddCargo_m3:
-                UserPreferences userPreferences=new UserPreferences(getContext());
+           /* case R.id.fabAddCargo_m3:
+
 
 
                 realm.executeTransaction(new Realm.Transaction() {
@@ -187,6 +196,7 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
                             personal_detail_marine.setMailing_address(userPreferences.getMarineIMailingAddr());
                             personal_detail_marine.setTin_number(userPreferences.getMarineITinNumber());
                             personal_detail_marine.setTrade(userPreferences.getMarineITinNumber());
+                            personal_detail_marine.setState(userPreferences.getMarineIState());
                             personal_detail_marine.setOffice_address(userPreferences.getMarineIOff_addr());
                             personal_detail_marine.setContact_person(userPreferences.getMarineIContPerson());
                             //Cargo List
@@ -195,15 +205,16 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
                             cargoDetail.setPfi_number(userPreferences.getMarineIProfInvNO());
                             cargoDetail.setPfi_date(userPreferences.getMarineIDateProfInv());
                             cargoDetail.setDesc_goods(userPreferences.getMarineIDescOfGoods());
-                            cargoDetail.setInterest(userPreferences.getMarineIIntetrest());
+                            cargoDetail.setStart_date_cover(userPreferences.getMarineIStartDateCover());
                             cargoDetail.setQuantity(userPreferences.getMarineIQuantity());
                             cargoDetail.setCurrency(userPreferences.getMarineICurrency());
+                            cargoDetail.setCover(userPreferences.getMarineICover());
                             cargoDetail.setValue(userPreferences.getMarineITotalAmount());
                             cargoDetail.setConversion_rate(userPreferences.getMarineINairaConvert());
                             cargoDetail.setLoading_port(userPreferences.getMarineIPortOfLoading());
                             cargoDetail.setDischarge_port(userPreferences.getMarineIPortOfDischarge());
                             cargoDetail.setConveyance_mode(userPreferences.getMarineIModeOfConvey());
-                            cargoDetail.setPicture("");
+                            cargoDetail.setPicture(userPreferences.getMarineIProfImage());
                             
 
                             RealmList<CargoDetail>cargoDetailList=new RealmList<>();
@@ -237,15 +248,16 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
                             cargoDetail.setPfi_number(userPreferences.getMarineIProfInvNO());
                             cargoDetail.setPfi_date(userPreferences.getMarineIDateProfInv());
                             cargoDetail.setDesc_goods(userPreferences.getMarineIDescOfGoods());
-                            cargoDetail.setInterest(userPreferences.getMarineIIntetrest());
+                            cargoDetail.setStart_date_cover(userPreferences.getMarineIStartDateCover());
                             cargoDetail.setQuantity(userPreferences.getMarineIQuantity());
                             cargoDetail.setCurrency(userPreferences.getMarineICurrency());
+                            cargoDetail.setCover(userPreferences.getMarineICover());
                             cargoDetail.setValue(userPreferences.getMarineITotalAmount());
                             cargoDetail.setConversion_rate(userPreferences.getMarineINairaConvert());
                             cargoDetail.setLoading_port(userPreferences.getMarineIPortOfLoading());
                             cargoDetail.setDischarge_port(userPreferences.getMarineIPortOfDischarge());
                             cargoDetail.setConveyance_mode(userPreferences.getMarineIModeOfConvey());
-                            cargoDetail.setPicture("");
+                            cargoDetail.setPicture(userPreferences.getMarineIProfImage());
 
 
                             RealmList<CargoDetail>cargoDetailList=new RealmList<>();
@@ -280,7 +292,7 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
                 ftrans.replace(R.id.fragment_marine_form_container, marineFragment2);
                 ftrans.commit();
                 break;
-
+*/
 
 
 
@@ -290,7 +302,7 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
                 }
                 mStepView.done(false);
                 mStepView.go(currentStep, true);
-
+                userPreferences.setTempMarineQuotePrice("0.0");
                 Fragment marineFragment21 = new MarineFragment2();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_marine_form_container, marineFragment21);
@@ -321,6 +333,7 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
                     personal_detail_marine.setGender(userPreferences.getMarineIGender());
                     personal_detail_marine.setMarital_status(userPreferences.getMarineIGender());
                     personal_detail_marine.setPhone(userPreferences.getMarineIPhoneNum());
+                    personal_detail_marine.setState(userPreferences.getMarineIState());
                     personal_detail_marine.setResident_address(userPreferences.getMarineIResAdrr());
                     personal_detail_marine.setCustomer_type(userPreferences.getMarinePtype());
                     personal_detail_marine.setCompany_name(userPreferences.getMarineICompanyName());
@@ -335,15 +348,16 @@ class MarineFragment3 extends Fragment implements View.OnClickListener{
                     cargoDetail.setPfi_number(userPreferences.getMarineIProfInvNO());
                     cargoDetail.setPfi_date(userPreferences.getMarineIDateProfInv());
                     cargoDetail.setDesc_goods(userPreferences.getMarineIDescOfGoods());
-                    cargoDetail.setInterest(userPreferences.getMarineIIntetrest());
+                    cargoDetail.setStart_date_cover(userPreferences.getMarineIStartDateCover());
                     cargoDetail.setQuantity(userPreferences.getMarineIQuantity());
                     cargoDetail.setCurrency(userPreferences.getMarineICurrency());
+                    cargoDetail.setCover(userPreferences.getMarineICover());
                     cargoDetail.setValue(userPreferences.getMarineITotalAmount());
                     cargoDetail.setConversion_rate(userPreferences.getMarineINairaConvert());
                     cargoDetail.setLoading_port(userPreferences.getMarineIPortOfLoading());
                     cargoDetail.setDischarge_port(userPreferences.getMarineIPortOfDischarge());
                     cargoDetail.setConveyance_mode(userPreferences.getMarineIModeOfConvey());
-                    cargoDetail.setPicture("");
+                    cargoDetail.setPicture(userPreferences.getMarineIProfImage());
 
 
                     RealmList<CargoDetail>cargoDetailList=new RealmList<>();

@@ -48,6 +48,12 @@ public class SwissFragment3 extends Fragment implements View.OnClickListener{
     TextView mEligibilityTxtS3;
     @BindView(R.id.amount_s3)
     TextView mAmountS3;
+    @BindView(R.id.eligibility_first_txt_s3)
+    TextView eligibility_first_txt_s3;
+    @BindView(R.id.amount_first_s3)
+    TextView amount_first_s3;
+    @BindView(R.id.first_person_layout)
+    LinearLayout mFirstPersonLayout;
     @BindView(R.id.btn_layout3_s3)
     LinearLayout mBtnLayout3S3;
     @BindView(R.id.v_back_btn3_s3)
@@ -66,7 +72,7 @@ public class SwissFragment3 extends Fragment implements View.OnClickListener{
 
     SwissInsured id=new SwissInsured();
     String primaryKey=id.getId();
-
+    UserPreferences userPreferences;
 
     public SwissFragment3() {
         // Required empty public constructor
@@ -98,12 +104,13 @@ public class SwissFragment3 extends Fragment implements View.OnClickListener{
         if (getArguments() != null) {
             eligibity = getArguments().getString(ELIGIBILITY);
 
-            int oldquote=userPreferences.getTempSwissQuotePrice();
+            double oldquote=Double.valueOf(userPreferences.getTempSwissQuotePrice());
             p_amount=getArguments().getString(PREMIUM_AMOUNT);
+            double firstqoute= userPreferences.getSwissIPersonal_QuotePrice();
+            double newquote= Integer.parseInt(getArguments().getString(PREMIUM_AMOUNT));
+            double total_quote=oldquote+newquote+firstqoute;
+            userPreferences.setTempSwissQuotePrice(String.valueOf(total_quote));
 
-            int newquote= Integer.parseInt(getArguments().getString(PREMIUM_AMOUNT));
-            int total_quote=oldquote+newquote;
-            userPreferences.setTempSwissQuotePrice(total_quote);
 
 
         }
@@ -117,10 +124,11 @@ public class SwissFragment3 extends Fragment implements View.OnClickListener{
         ButterKnife.bind(this,view);
         //        mStepView next registration step
         mStepView.go(currentStep, true);
-
+        userPreferences=new UserPreferences(getContext());
 
         //instancial Realm db
         realm=Realm.getDefaultInstance();
+
 
         mEligibilityTxtS3.setText(eligibity);
         if(p_amount==null){
@@ -130,6 +138,16 @@ public class SwissFragment3 extends Fragment implements View.OnClickListener{
         }else {
             String format = p_amount + ".00";
             mAmountS3.setText(format);
+
+            if(userPreferences.getSwissIPersonal_QuotePrice()!=0){
+                mFirstPersonLayout.setVisibility(View.VISIBLE);
+                String firstperson_quote= String.valueOf(userPreferences.getSwissIPersonal_QuotePrice());
+                String firstperson_category= userPreferences.getSwissIPersonal_Category();
+
+                amount_first_s3.setText(String.format("%s.00", firstperson_quote));
+                eligibility_first_txt_s3.setText(firstperson_category);
+            }
+
         }
 
 
@@ -160,9 +178,6 @@ public class SwissFragment3 extends Fragment implements View.OnClickListener{
                 break;
 
             case R.id.fabAddInsure_s3:
-                UserPreferences userPreferences=new UserPreferences(getContext());
-
-
                 realm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
@@ -175,16 +190,19 @@ public class SwissFragment3 extends Fragment implements View.OnClickListener{
                             personal_detail_swiss.setPrefix(userPreferences.getSwissIPrefix());
                             personal_detail_swiss.setFirst_name(userPreferences.getSwissIFirstName());
                             personal_detail_swiss.setLast_name(userPreferences.getSwissILastName());
+                            personal_detail_swiss.setEmail(userPreferences.getSwissIEmail());
                             personal_detail_swiss.setGender(userPreferences.getSwissIGender());
                             personal_detail_swiss.setMarital_status(userPreferences.getSwissIMaritalStatus());
                             personal_detail_swiss.setPhone(userPreferences.getSwissIPhoneNum());
                             personal_detail_swiss.setResident_address(userPreferences.getSwissIResAdrr());
                             personal_detail_swiss.setNext_of_kin(userPreferences.getSwissINextKin());
+                            personal_detail_swiss.setState(userPreferences.getSwissIState());
                             personal_detail_swiss.setNext_of_kin_address(userPreferences.getSwissINextKinAddr());
                             personal_detail_swiss.setNext_of_kin_phone(userPreferences.getSwissINextKinPhoneNum());
                             personal_detail_swiss.setDate_of_birth(userPreferences.getSwissIDob());
                             personal_detail_swiss.setDisability(userPreferences.getSwissIDisable());
                             personal_detail_swiss.setBenefit_category(userPreferences.getSwissIBenefit());
+                            personal_detail_swiss.setPicture(userPreferences.getSwissIPersonal_image());
                            
                             //Additional Insured List
                             AdditionInsured additionInsured=new AdditionInsured();
@@ -197,7 +215,7 @@ public class SwissFragment3 extends Fragment implements View.OnClickListener{
                             additionInsured.setDisability(userPreferences.getSwissIAddDisability());
                             additionInsured.setBenefit_category(userPreferences.getSwissIAddBenefitCat());
                             additionInsured.setMarital_status(userPreferences.getSwissIAddMaritalStatus());
-                            additionInsured.setPicture("");
+                            additionInsured.setPicture(userPreferences.getSwissIAddOtherImage());
                             RealmList<AdditionInsured> additionInsuredList=new RealmList<>();
                             additionInsuredList.add(additionInsured);
 
@@ -233,7 +251,7 @@ public class SwissFragment3 extends Fragment implements View.OnClickListener{
                             additionInsured.setDisability(userPreferences.getSwissIAddDisability());
                             additionInsured.setBenefit_category(userPreferences.getSwissIAddBenefitCat());
                             additionInsured.setMarital_status(userPreferences.getSwissIAddMaritalStatus());
-                            additionInsured.setPicture("");
+                            additionInsured.setPicture(userPreferences.getSwissIAddOtherImage());
 
                             RealmList<AdditionInsured>additionInsuredList=new RealmList<>();
                             additionInsuredList.add(additionInsured);
@@ -246,7 +264,7 @@ public class SwissFragment3 extends Fragment implements View.OnClickListener{
                             swissInsured.setQuote_price(String.valueOf(userPreferences.getTempSwissQuotePrice()));
 
                             swissInsured.getPersonal_detail_swisses().add(personal_detail_swiss2);
-                            showMessage(primaryKey);
+                           // showMessage(primaryKey);
 
 
 
@@ -262,7 +280,7 @@ public class SwissFragment3 extends Fragment implements View.OnClickListener{
 
                 mStepView.done(false);
                 mStepView.go(1, true);
-
+                userPreferences.setSwissIPersonal_QuotePrice(0);
                 Fragment swissFragment2 = new SwissFragment2();
                 FragmentTransaction ftrans = getFragmentManager().beginTransaction();
                 ftrans.replace(R.id.fragment_swiss_form_container, swissFragment2);
@@ -275,10 +293,11 @@ public class SwissFragment3 extends Fragment implements View.OnClickListener{
                 }
                 mStepView.done(false);
                 mStepView.go(currentStep, true);
-
-                Fragment swissFragment22 = new SwissFragment2();
+                userPreferences.setTempSwissQuotePrice("0.0");
+                userPreferences.setSwissIPersonal_QuotePrice(0);
+                Fragment swissFragment1 = new SwissFragment1();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_swiss_form_container, swissFragment22);
+                ft.replace(R.id.fragment_swiss_form_container, swissFragment1);
                 ft.commit();
                 break;
         }
@@ -301,9 +320,11 @@ public class SwissFragment3 extends Fragment implements View.OnClickListener{
                     personal_detail_swiss.setPrefix(userPreferences.getSwissIPrefix());
                     personal_detail_swiss.setFirst_name(userPreferences.getSwissIFirstName());
                     personal_detail_swiss.setLast_name(userPreferences.getSwissILastName());
+                    personal_detail_swiss.setEmail(userPreferences.getSwissIEmail());
                     personal_detail_swiss.setGender(userPreferences.getSwissIGender());
                     personal_detail_swiss.setMarital_status(userPreferences.getSwissIMaritalStatus());
                     personal_detail_swiss.setPhone(userPreferences.getSwissIPhoneNum());
+                    personal_detail_swiss.setState(userPreferences.getSwissIState());
                     personal_detail_swiss.setResident_address(userPreferences.getSwissIResAdrr());
                     personal_detail_swiss.setNext_of_kin(userPreferences.getSwissINextKin());
                     personal_detail_swiss.setNext_of_kin_address(userPreferences.getSwissINextKinAddr());
@@ -311,6 +332,7 @@ public class SwissFragment3 extends Fragment implements View.OnClickListener{
                     personal_detail_swiss.setDate_of_birth(userPreferences.getSwissIDob());
                     personal_detail_swiss.setDisability(userPreferences.getSwissIDisable());
                     personal_detail_swiss.setBenefit_category(userPreferences.getSwissIBenefit());
+                    personal_detail_swiss.setPicture(userPreferences.getSwissIPersonal_image());
 
                     //Additional Insured List
                     AdditionInsured additionInsured=new AdditionInsured();
@@ -323,7 +345,7 @@ public class SwissFragment3 extends Fragment implements View.OnClickListener{
                     additionInsured.setDisability(userPreferences.getSwissIAddDisability());
                     additionInsured.setBenefit_category(userPreferences.getSwissIAddBenefitCat());
                     additionInsured.setMarital_status(userPreferences.getSwissIAddMaritalStatus());
-                    additionInsured.setPicture("");
+                    additionInsured.setPicture(userPreferences.getSwissIAddOtherImage());
                     RealmList<AdditionInsured> additionInsuredList=new RealmList<>();
                     additionInsuredList.add(additionInsured);
 
@@ -333,10 +355,10 @@ public class SwissFragment3 extends Fragment implements View.OnClickListener{
                     final Personal_Detail_swiss personal_detail_swiss1=realm.copyToRealm(personal_detail_swiss);
 
                     SwissInsured swissInsured=realm.createObject(SwissInsured.class,primaryKey);
-                    swissInsured.setAgent_id("1");
+                    swissInsured.setAgent_id(userPreferences.getUserId());
                     swissInsured.setQuote_price(String.valueOf(userPreferences.getTempSwissQuotePrice()));
                     swissInsured.setPayment_source("paystack");
-                    swissInsured.setPin("11234");
+                    swissInsured.setPin("0000");
 
                     Log.i("Primary1",primaryKey);
 
@@ -347,7 +369,7 @@ public class SwissFragment3 extends Fragment implements View.OnClickListener{
             }
         });
 
-
+        userPreferences.setSwissIPersonal_QuotePrice(0);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_swiss_form_container, SwissFragment4.newInstance(primaryKey));
         ft.commit();

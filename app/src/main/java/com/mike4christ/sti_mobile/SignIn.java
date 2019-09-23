@@ -54,6 +54,8 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
     AVLoadingIndicatorView mAvi1;
     @BindView(R.id.register)
     TextView mRegister;
+    @BindView(R.id.forget_pass)
+    TextView mForgetPass;
     /** ButterKnife Code **/
 
     UserPreferences userPreferences;
@@ -69,6 +71,10 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
         ButterKnife.bind(this);
         mRegister.setPaintFlags(mRegister.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         mRegister.setText("Click to Register");
+
+        mForgetPass.setPaintFlags(mForgetPass.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        mForgetPass.setText("Forgot Password ?");
+
         userPreferences = new UserPreferences(this);
 
         Intent intent=getIntent();
@@ -77,6 +83,7 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
 
         mSigninBtn.setOnClickListener(this);
         mRegister.setOnClickListener(this);
+        mForgetPass.setOnClickListener(this);
     }
 
     private void setUp(){
@@ -95,6 +102,10 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
             case R.id.register:
                 startActivity(new Intent(SignIn.this,SignUp.class));
                 finish();
+                break;
+
+            case R.id.forget_pass:
+                startActivity(new Intent(SignIn.this,ForgetPassword.class));
                 break;
 
         }
@@ -167,8 +178,31 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
             call.enqueue(new Callback<UserGetObj>() {
                 @Override
                 public void onResponse(Call<UserGetObj> call, Response<UserGetObj> response) {
+                    if(response.code()==400){
+                        showMessage("Check your internet connection");
+                        return;
+                    }else if(response.code()==429){
+                        showMessage("Too many requests on database");
+                        return;
+                    }else if(response.code()==500){
+                        showMessage("Server Error");
+                        return;
+                    }else if(response.code()==401){
+                        showMessage("Unauthorized access, please try login again");
+                        return;
+                    }
+
+
                     try {
                         if (!response.isSuccessful()) {
+
+                            if(response.code()==422){
+
+                                showMessage("Invalid login credentials");
+                                mSigninBtn.setVisibility(View.VISIBLE);
+                                mAvi1.setVisibility(View.GONE);
+                                return;
+                            }
 
                             try {
                                 APIError apiError = ErrorUtils.parseError(response);

@@ -121,6 +121,7 @@ class SwissFragment4 extends Fragment implements View.OnClickListener{
     Swiss swiss;
     String policy_num="";
     String total_price="";
+    String ref="";
 
 
 
@@ -210,7 +211,7 @@ class SwissFragment4 extends Fragment implements View.OnClickListener{
         UserPreferences userPreferences=new UserPreferences(getContext());
 
         //retrieve data for personal detail first
-        SwissInsured swissInsured;
+
 
         swissInsured=realm.where(SwissInsured.class).equalTo("id",primaryKey).findFirst();
         total_quoteprice=swissInsured.getQuote_price();
@@ -221,10 +222,6 @@ class SwissFragment4 extends Fragment implements View.OnClickListener{
                     "Last Name: "+personal_detail_swisses.get(0).getLast_name()+"\n"+"Phone Number: "+personal_detail_swisses.get(0).getPhone()+"\n"+
                     "Gender: "+personal_detail_swisses.get(0).getResident_address()+"\n"+ "Total Premium: "+total_quoteprice;
             mPersonalInfoS3.setText(insurer);
-
-        
-
-
 
 
     }
@@ -252,7 +249,8 @@ class SwissFragment4 extends Fragment implements View.OnClickListener{
             case R.id.v_back_btn4_s4:
 
                 mStepView.go(1, true);
-
+                asyncSwissInsured(primaryKey);
+                userPreferences.setTempSwissQuotePrice("0.0");
                 Fragment swissFragment2 = new SwissFragment2();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_swiss_form_container, swissFragment2);
@@ -296,10 +294,6 @@ class SwissFragment4 extends Fragment implements View.OnClickListener{
         recycler_vehicles.setLayoutManager(linearLayoutManager);
         recycler_vehicles.setAdapter(addInsureListAdapter);
 
-        /*RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getBaseContext());
-        recycler_note.setLayoutManager(mLayoutManager);
-        recycler_note.setItemAnimator(new DefaultItemAnimator());
-        recycler_note.setAdapter(adapter);*/
 
 
         dialog.setContentView(view);
@@ -351,7 +345,7 @@ class SwissFragment4 extends Fragment implements View.OnClickListener{
             AdditionInsured additionInsured=results.get(i);
             AdditionalInsuredPost additionalInsuredPost=new AdditionalInsuredPost(additionInsured.getFirst_name(),additionInsured.getLast_name(),
                     additionInsured.getEmail(),additionInsured.getGender(),additionInsured.getPhone(),additionInsured.getDate_of_birth(),
-                    additionInsured.getMarital_status(),"null",additionInsured.getDisability());
+                    additionInsured.getMarital_status(),additionInsured.getPicture(),additionInsured.getDisability());
             additionaList_post.add(additionalInsuredPost);
 
             Log.i("policyItemLoop",additionInsured.getMarital_status());
@@ -359,11 +353,11 @@ class SwissFragment4 extends Fragment implements View.OnClickListener{
         }
 
             SwissPersona swissPersona =new SwissPersona(personal_detail_swisses.get(0).getFirst_name(),personal_detail_swisses.get(0).getLast_name(),personal_detail_swisses.get(0).getEmail(),personal_detail_swisses.get(0).getGender(),personal_detail_swisses.get(0).getDate_of_birth()
-                    ,"null",personal_detail_swisses.get(0).getPhone(),personal_detail_swisses.get(0).getResident_address(),
-                    personal_detail_swisses.get(0).getMarital_status(),"",personal_detail_swisses.get(0).getNext_of_kin(),personal_detail_swisses.get(0).getNext_of_kin_phone(),personal_detail_swisses.get(0).getNext_of_kin_address()
+                    ,personal_detail_swisses.get(0).getPhone(),personal_detail_swisses.get(0).getState(),"null",
+                    personal_detail_swisses.get(0).getMarital_status(),personal_detail_swisses.get(0).getPicture(),personal_detail_swisses.get(0).getNext_of_kin(),personal_detail_swisses.get(0).getNext_of_kin_phone(),personal_detail_swisses.get(0).getNext_of_kin_address()
                     ,personal_detail_swisses.get(0).getDisability(),additionaList_post);
 
-            swiss=new Swiss("12 month");
+            swiss=new Swiss("12 Months");
 
             SwissPostHead swissPostHead=new SwissPostHead(swissPersona,swiss,total_quoteprice, pin_txt_s4.getText().toString()
                    ,modeofPaymentString,userPreferences.getUserId());
@@ -372,7 +366,7 @@ class SwissFragment4 extends Fragment implements View.OnClickListener{
             sendPolicy(swissPostHead);
 
 
-        asyncSwissInsured(primaryKey);
+
 
     }
 
@@ -388,7 +382,27 @@ class SwissFragment4 extends Fragment implements View.OnClickListener{
             @Override
             public void onResponse(Call<BuyQuoteFormGetHead_Swiss> call, Response<BuyQuoteFormGetHead_Swiss> response) {
                 Log.i("ResponseCode", String.valueOf(response.code()));
-
+                if(response.code()==400){
+                    showMessage("Check your internet connection");
+                    mBtnLayout4S4.setVisibility(View.VISIBLE);
+                    mProgressbar4S4.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==429){
+                    showMessage("Too many requests on database");
+                    mBtnLayout4S4.setVisibility(View.VISIBLE);
+                    mProgressbar4S4.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==500){
+                    showMessage("Server Error");
+                    mBtnLayout4S4.setVisibility(View.VISIBLE);
+                    mProgressbar4S4.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==401){
+                    showMessage("Unauthorized access, please try login again");
+                    mBtnLayout4S4.setVisibility(View.VISIBLE);
+                    mProgressbar4S4.setVisibility(View.GONE);
+                    return;
+                }
 
                 try {
                     if (!response.isSuccessful()) {
@@ -418,21 +432,24 @@ class SwissFragment4 extends Fragment implements View.OnClickListener{
                         policy_num=policy_num.concat("\n"+policy.get(i).getPolicyNumber());
                     }
 
-                    total_price= String.valueOf(response.body().getData().getTotalPrice());
+                    total_price= String.valueOf(response.body().getData().getTransactions().getAmount());
+                    ref= response.body().getData().getTransactions().getReference();
 
                     Log.i("policyNum", policy_num);
                     Log.i("totalPrice", total_price);
 
                     showMessage("Submit Successful, Proceed to Payment");
-                    userPreferences.setTempAllRiskQuotePrice(0);
+                    userPreferences.setTempSwissQuotePrice("0.0");
 
                     mBtnLayout4S4.setVisibility(View.VISIBLE);
                     mProgressbar4S4.setVisibility(View.GONE);
                     if (total_price != null) {
-
+                        asyncSwissInsured(primaryKey);
                         Intent intent = new Intent(getContext(), PolicyPaymentActivity.class);
                         intent.putExtra(Constant.TOTAL_PRICE, total_price);
                         intent.putExtra(Constant.POLICY_NUM, policy_num);
+                        intent.putExtra(Constant.POLICY_TYPE, "swiss");
+                        intent.putExtra(Constant.REF, ref);
                         startActivity(intent);
                         getActivity().finish();
 
@@ -440,12 +457,24 @@ class SwissFragment4 extends Fragment implements View.OnClickListener{
                         showMessage("Error: " + response.body());
                         mBtnLayout4S4.setVisibility(View.VISIBLE);
                         mProgressbar4S4.setVisibility(View.GONE);
+                        asyncSwissInsured(primaryKey);
+                        userPreferences.setTempSwissQuotePrice("0.0");
+                        Fragment swissFragment2 = new SwissFragment2();
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.replace(R.id.fragment_swiss_form_container, swissFragment2);
+                        ft.commit();
                     }
                 }catch (Exception e){
                     showMessage("Submission Error: " + e.getMessage());
                     Log.i("policyResponse", e.getMessage());
                     mBtnLayout4S4.setVisibility(View.VISIBLE);
                     mProgressbar4S4.setVisibility(View.GONE);
+                    asyncSwissInsured(primaryKey);
+                    userPreferences.setTempSwissQuotePrice("0.0");
+                    Fragment swissFragment2 = new SwissFragment2();
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.replace(R.id.fragment_swiss_form_container, swissFragment2);
+                    ft.commit();
                 }
 
             }
@@ -455,11 +484,14 @@ class SwissFragment4 extends Fragment implements View.OnClickListener{
                 Log.i("GEtError",t.getMessage());
                 mBtnLayout4S4.setVisibility(View.VISIBLE);
                 mProgressbar4S4.setVisibility(View.GONE);
+                asyncSwissInsured(primaryKey);
+                userPreferences.setTempSwissQuotePrice("0.0");
+                Fragment swissFragment2 = new SwissFragment2();
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_swiss_form_container, swissFragment2);
+                ft.commit();
             }
         });
-
-
-
 
     }
 

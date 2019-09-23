@@ -61,7 +61,7 @@ private Context context;
 
         holder.pfi_noList_txt.setText(temp.getPfi_number());
         holder.pfi_dateList_txt.setText(temp.getPfi_date());
-        holder.interestList_txt.setText(temp.getInterest());
+        holder.descripList_txt.setText(temp.getDesc_goods());
         holder.quantityList_txt.setText(temp.getQuantity());
         holder.toalAmountList_txt.setText(temp.getValue());
         holder.portLoadingList_txt.setText(temp.getLoading_port());
@@ -71,28 +71,6 @@ private Context context;
     }
 
 
-
-  /*  //To Delete Record
-    private void asyncRemoveRecord(final String id){
-        AsyncTask<Void,Void,Void>remoteItem =new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-
-                realm=Realm.getDefaultInstance();
-
-                Monthly monthly=realm.where(Monthly.class).equalTo("id",id).findFirst();
-                if(monthly !=null){
-                    realm.beginTransaction();
-                    monthly.deleteFromRealm();
-                    realm.commitTransaction();
-                }
-                realm.close();
-                return null;
-            }
-        };
-        remoteItem.execute();
-    }
-*/
     public class MyViewHolder extends
             RecyclerView.ViewHolder {
 
@@ -102,8 +80,8 @@ private Context context;
           TextView pfi_noList_txt;
           @BindView(R.id.pfi_dateList_txt)
           TextView pfi_dateList_txt;
-          @BindView(R.id.interestList_txt)
-          TextView interestList_txt;
+          @BindView(R.id.descripList_txt)
+          TextView descripList_txt;
           @BindView(R.id.quantityList_txt)
           TextView quantityList_txt;
           @BindView(R.id.toalAmountList_txt)

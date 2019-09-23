@@ -242,7 +242,8 @@ class EticFragment4 extends Fragment implements View.OnClickListener{
             case R.id.v_back_btn4_e4:
 
                 mStepView.go(1, true);
-
+                asyncEticPolicy(primaryKey);
+                userPreferences.setTempEticQuotePrice("0.0");
                 Fragment eticFragment2 = new EticFragment2();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_etic_form_container, eticFragment2);
@@ -355,7 +356,7 @@ class EticFragment4 extends Fragment implements View.OnClickListener{
         
         
 
-        asyncEticPolicy(primaryKey);
+
         
     }
 
@@ -372,6 +373,27 @@ class EticFragment4 extends Fragment implements View.OnClickListener{
             public void onResponse(Call<BuyQuoteFormGetHead_Etic> call, Response<BuyQuoteFormGetHead_Etic> response) {
                 Log.i("ResponseCode", String.valueOf(response.code()));
 
+                if(response.code()==400){
+                    showMessage("Check your internet connection");
+                    mBtnLayout4E4.setVisibility(View.VISIBLE);
+                    mProgressbar4M4.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==429){
+                    showMessage("Too many requests on database");
+                    mBtnLayout4E4.setVisibility(View.VISIBLE);
+                    mProgressbar4M4.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==500){
+                    showMessage("Server Error");
+                    mBtnLayout4E4.setVisibility(View.VISIBLE);
+                    mProgressbar4M4.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==401){
+                    showMessage("Unauthorized access, please try login again");
+                    mBtnLayout4E4.setVisibility(View.VISIBLE);
+                    mProgressbar4M4.setVisibility(View.GONE);
+                    return;
+                }
 
                 try {
                     if (!response.isSuccessful()) {
@@ -401,30 +423,47 @@ class EticFragment4 extends Fragment implements View.OnClickListener{
                         policy_num=policy_num.concat("\n"+policy.get(i).getPolicyNumber());
                     }
 
-                    total_price= String.valueOf(response.body().getData().getTotalPrice());
+                    total_price= String.valueOf(response.body().getData().getUnitPrice());
+                    String ref= response.body().getData().getTransactions().get(0).getReference();
 
                     Log.i("policyNum", policy_num);
                     Log.i("totalPrice", total_price);
 
                     showMessage("Submit Successful, Proceed to Payment");
-                    userPreferences.setTempEticQuotePrice(0);
+                    userPreferences.setTempEticQuotePrice("0.0");
 
                     mBtnLayout4E4.setVisibility(View.VISIBLE);
                     mProgressbar4M4.setVisibility(View.GONE);
                     if (total_price != null) {
-
+                        asyncEticPolicy(primaryKey);
                         Intent intent = new Intent(getContext(), PolicyPaymentActivity.class);
                         intent.putExtra(Constant.TOTAL_PRICE, total_price);
                         intent.putExtra(Constant.POLICY_NUM, policy_num);
+                        intent.putExtra(Constant.POLICY_TYPE, "travel");
+                        intent.putExtra(Constant.REF, ref);
                         startActivity(intent);
                         getActivity().finish();
 
                     } else {
                         showMessage("Error: " + response.body());
+                        asyncEticPolicy(primaryKey);
+                        userPreferences.setTempEticQuotePrice("0.0");
+                        Fragment eticFragment2 = new EticFragment2();
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.replace(R.id.fragment_etic_form_container, eticFragment2);
+                        ft.commit();
+
                     }
                 }catch (Exception e){
                     showMessage("Submission Error: " + e.getMessage());
                     Log.i("policyResponse", e.getMessage());
+                    asyncEticPolicy(primaryKey);
+                    userPreferences.setTempEticQuotePrice("0.0");
+                    Fragment eticFragment2 = new EticFragment2();
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.replace(R.id.fragment_etic_form_container, eticFragment2);
+                    ft.commit();
+
                 }
 
             }
@@ -432,6 +471,13 @@ class EticFragment4 extends Fragment implements View.OnClickListener{
             public void onFailure(Call<BuyQuoteFormGetHead_Etic> call, Throwable t) {
                 showMessage("Submission Failed "+t.getMessage());
                 Log.i("GEtError",t.getMessage());
+                asyncEticPolicy(primaryKey);
+                userPreferences.setTempEticQuotePrice("0.0");
+                Fragment eticFragment2 = new EticFragment2();
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_etic_form_container, eticFragment2);
+                ft.commit();
+
             }
         });
 

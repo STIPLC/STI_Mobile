@@ -183,9 +183,9 @@ public class OtherInsureFragment2 extends Fragment implements View.OnClickListen
                 mStepView.done(false);
                 mStepView.go(currentStep, true);
 
-                Fragment otherInsureFragment2 = new OtherInsureFragment2();
+                Fragment otherInsureFragment1 = new OtherInsureFragment1();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_other_form_container, otherInsureFragment2);
+                ft.replace(R.id.fragment_other_form_container, otherInsureFragment1);
                 ft.commit();
 
                 break;

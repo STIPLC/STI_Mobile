@@ -61,7 +61,7 @@
 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Policy Type: "
+                    android:text="Policy \nType: "
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     android:textColor="@color/colorGrey"
@@ -71,6 +71,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="private"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     />
@@ -89,7 +91,7 @@
 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Vehicle Make: "
+                    android:text="Vehicle \nMake: "
                     android:layout_margin="6dp"
                     android:textSize="@dimen/size_twenty"
                     android:textColor="@color/colorGrey"
@@ -99,6 +101,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Acura"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     />
@@ -117,7 +121,7 @@
 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Vehicle Type: "
+                    android:text="Vehicle \nType: "
                     android:layout_margin="6dp"
                     android:textSize="@dimen/size_twenty"
                     android:textColor="@color/colorGrey"
@@ -127,6 +131,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="XML"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     />
@@ -144,7 +150,7 @@
 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Registration Number: "
+                    android:text="Registration \nNumber: "
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     android:textColor="@color/colorGrey"
@@ -154,6 +160,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="438h86"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     />
@@ -168,10 +176,10 @@
                 >
 
                 <TextView
-
+                    android:id="@+id/vehicle_value_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Vehicle Value: "
+                    android:text="Vehicle \nValue: "
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     android:textColor="@color/colorGrey"
@@ -181,6 +189,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Good"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     />

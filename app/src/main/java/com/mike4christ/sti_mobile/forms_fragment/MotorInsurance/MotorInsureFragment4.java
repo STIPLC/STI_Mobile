@@ -54,7 +54,7 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
 
     // TODO: Rename and change types of parameters
     private String vehicleMaker;
-    private int p_amount;
+    private String p_amount;
 
     @BindView(R.id.step_view)
     StepView stepView;
@@ -111,16 +111,12 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
     Uri rightview_img_uri;
     String rightview_img_url;
 
-
-
-
-
-
     private  int currentStep=3;
     Realm realm;
 
     VehiclePolicy id=new VehiclePolicy();
     String primaryKey=id.getId();
+    UserPreferences userPreferences;
 
 
 
@@ -152,13 +148,15 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             vehicleMaker = getArguments().getString(VEHICLE_MAKER);
-            int oldquote=userPreferences.getTempQuotePrice();
 
-            int newquote= Integer.parseInt(getArguments().getString(PREMIUM_AMOUNT));
-            int total_quote=oldquote+newquote;
-            userPreferences.setTempQuotePrice(total_quote);
+            double oldquote=Double.valueOf(userPreferences.getTempQuotePrice());
+
+            double newquote= Double.valueOf(getArguments().getString(PREMIUM_AMOUNT));
+            double total_quote=oldquote+newquote;
+            userPreferences.setTempQuotePrice(String.valueOf(total_quote));
             Log.i("PrimaryVariable",primaryKey);
 
+            p_amount= String.valueOf(newquote);
 
         }
     }
@@ -171,9 +169,10 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
         ButterKnife.bind(this,view);
         //        stepView next registration step
         stepView.go(currentStep, true);
+      userPreferences=new UserPreferences(getContext());
 
         realm=Realm.getDefaultInstance();
-        UserPreferences userPreferences=new UserPreferences(getContext());
+
 
 
 
@@ -1063,10 +1062,10 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
                 }
                 stepView.done(false);
                 stepView.go(currentStep, true);
-
+                userPreferences.setTempQuotePrice("0.0");
                 Fragment motorInsureFragment3 = new MotorInsureFragment3();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_motor_form_container, motorInsureFragment3);
+                ft.replace(R.id.fragment_motor_form_container, MotorInsureFragment3.newInstance(userPreferences.getMotorVehicleMake(),p_amount), MotorInsureFragment4.class.getSimpleName());
                 ft.commit();
 
                 break;
@@ -1094,6 +1093,8 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
                             personal_detail.setEmail(userPreferences.getMotorIEmail());
                             personal_detail.setGender(userPreferences.getMotorIGender());
                             personal_detail.setPhone(userPreferences.getMotorIPhoneNum());
+                            personal_detail.setBusiness(userPreferences.getMotorIBusiness());
+                            personal_detail.setState(userPreferences.getMotorIState());
                             personal_detail.setResident_address(userPreferences.getMotorIResAdrr());
                             personal_detail.setNext_of_kin(userPreferences.getMotorINextKin());
                             personal_detail.setNext_of_kin_address("");
@@ -1106,13 +1107,11 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
                             personal_detail.setPicture(userPreferences.getMotorIPersonal_image());
                             //Vehicle List
                             VehicleDetails vehicleDetails=new VehicleDetails();
-                            vehicleDetails.setPeriod("");
+                            vehicleDetails.setPeriod("12 Months");
                             vehicleDetails.setStartDate(userPreferences.getMotorStartDate());
-                            vehicleDetails.setPolicy_type(userPreferences.getMotorPolicyType());
+                            vehicleDetails.setPrivate_com_type(userPreferences.getMotorPolicyType());
                             vehicleDetails.setEnhanced_third_party(userPreferences.getMotorPEnhanceType());
-                            vehicleDetails.setPrivate_policy(userPreferences.getMotorPrivateType());
-                            vehicleDetails.setCommercial_policy(userPreferences.getMotorCommercialType());
-                            vehicleDetails.setMotor_cycle_policy(userPreferences.getMotorPolicyType());
+                            vehicleDetails.setPolicy_select_type(userPreferences.getMotorPolySelectType());
                             vehicleDetails.setVehicle_make(userPreferences.getMotorVehicleMake());
                             vehicleDetails.setVehicle_type(userPreferences.getMotorVehicleType());
                             vehicleDetails.setBody_type(userPreferences.getMotorVehicleBody());
@@ -1153,13 +1152,11 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
 
                             //Vehicle List
                             VehicleDetails vehicleDetails=new VehicleDetails();
-                            vehicleDetails.setPeriod("");
+                            vehicleDetails.setPeriod("12 Months");
                             vehicleDetails.setStartDate(userPreferences.getMotorStartDate());
-                            vehicleDetails.setPolicy_type(userPreferences.getMotorPolicyType());
+                            vehicleDetails.setPrivate_com_type(userPreferences.getMotorPolicyType());
                             vehicleDetails.setEnhanced_third_party(userPreferences.getMotorPEnhanceType());
-                            vehicleDetails.setPrivate_policy(userPreferences.getMotorPrivateType());
-                            vehicleDetails.setCommercial_policy(userPreferences.getMotorCommercialType());
-                            vehicleDetails.setMotor_cycle_policy(userPreferences.getMotorPolicyType());
+                            vehicleDetails.setPolicy_select_type(userPreferences.getMotorPolySelectType());
                             vehicleDetails.setVehicle_make(userPreferences.getMotorVehicleMake());
                             vehicleDetails.setVehicle_type(userPreferences.getMotorVehicleType());
                             vehicleDetails.setBody_type(userPreferences.getMotorVehicleBody());
@@ -1189,22 +1186,12 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
 
                             vehiclePolicy.getPersonal_info().add(personal_detail2);
 
-                           // showMessage(primaryKey);
-
-
-
                         }else {
                             showMessage("Invalid transaction");
                         }
 
-
-
                     }
                 });
-
-
-
-
 
                 stepView.done(false);
                 stepView.go(1, true);
@@ -1228,7 +1215,7 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
         if(frontview_img_url!=null&&leftview_img_url!=null&&rightview_img_url!=null&&backview_img_url!=null) {
 
 
-            UserPreferences userPreferences=new UserPreferences(getContext());
+
         btn_layout3.setVisibility(View.GONE);
         progressbar.setVisibility(View.VISIBLE);
 
@@ -1239,6 +1226,8 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
         personal_detail.setFirst_name(userPreferences.getMotorIFirstName());
         personal_detail.setLast_name(userPreferences.getMotorILastName());
         personal_detail.setEmail(userPreferences.getMotorIEmail());
+        personal_detail.setBusiness(userPreferences.getMotorIBusiness());
+        personal_detail.setState(userPreferences.getMotorIState());
         personal_detail.setGender(userPreferences.getMotorIGender());
         personal_detail.setPhone(userPreferences.getMotorIPhoneNum());
         personal_detail.setResident_address(userPreferences.getMotorIResAdrr());
@@ -1255,11 +1244,9 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
         VehicleDetails vehicleDetails=new VehicleDetails();
         vehicleDetails.setPeriod("");
         vehicleDetails.setStartDate(userPreferences.getMotorStartDate());
-        vehicleDetails.setPolicy_type(userPreferences.getMotorPolicyType());
+        vehicleDetails.setPrivate_com_type(userPreferences.getMotorPolicyType());
         vehicleDetails.setEnhanced_third_party(userPreferences.getMotorPEnhanceType());
-        vehicleDetails.setPrivate_policy(userPreferences.getMotorPrivateType());
-        vehicleDetails.setCommercial_policy(userPreferences.getMotorCommercialType());
-        vehicleDetails.setMotor_cycle_policy(userPreferences.getMotorPolicyType());
+        vehicleDetails.setPolicy_select_type(userPreferences.getMotorPolySelectType());
         vehicleDetails.setVehicle_make(userPreferences.getMotorVehicleMake());
         vehicleDetails.setVehicle_type(userPreferences.getMotorVehicleType());
         vehicleDetails.setBody_type(userPreferences.getMotorVehicleBody());

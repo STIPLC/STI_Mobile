@@ -36,20 +36,15 @@
         <item> Female</item>
     </string-array>
 
-    <string-array name="user_polices">
-        <item> Select a Policy </item>
-        <item> MOV/9076/K45 </item>
-        <item> MOP/9090/K45 </item>
+    <string-array name="cover_array">
+        <item> Select Cover </item>
+        <item> Clause C </item>
+
     </string-array>
 
-    <string-array name="country_array">
-        <item> Country </item>
-        <item> Nigeria</item>
-        <item> Other Countries </item>
-    </string-array>
 
     <string-array name="state_array">
-        <item> State </item>
+        <item> Geographical Location </item>
         <item> Abia</item>
         <item> Adamawa</item>
         <item> Anambra</item>
@@ -87,6 +82,60 @@
         <item> Yobe</item>
         <item> Zamfara</item>
         <item> FCT - Abuja</item>
+        <item> Others </item>
+    </string-array>
+
+    <string-array name="mm_array">
+        <item>MM</item>
+        <item>01</item>
+        <item>02</item>
+        <item>03</item>
+        <item>04</item>
+        <item>05</item>
+        <item>06</item>
+        <item>07</item>
+        <item>08</item>
+        <item>09</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+    </string-array>
+
+    <string-array name="yy_array">
+        <item>YY</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+        <item>21</item>
+        <item>22</item>
+        <item>23</item>
+        <item>24</item>
+        <item>25</item>
+        <item>26</item>
+        <item>27</item>
+        <item>28</item>
+        <item>29</item>
+        <item>30</item>
+        <item>31</item>
+        <item>32</item>
+        <item>33</item>
+        <item>34</item>
+        <item>35</item>
+        <item>36</item>
+        <item>37</item>
+        <item>38</item>
+        <item>39</item>
+        <item>40</item>
+        <item>41</item>
+        <item>42</item>
+        <item>44</item>
+        <item>44</item>
+        <item>45</item>
+        <item>46</item>
+        <item>47</item>
+        <item>48</item>
+        <item>49</item>
+        <item>50</item>
     </string-array>
 
     <string-array name="disable_array">
@@ -219,6 +268,8 @@
         <item> Saloon/Sedans </item>
     </string-array>
     <string name="title_activity_find_us">Map</string>
+    <string name="naira_currency">NGN</string>
+    <string name="policy_no">Policy Num</string>
 
 
 </resources>

@@ -13,26 +13,47 @@
     android:weightSum="2"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profile_icon"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
         android:layout_weight="1"
-        android:layout_gravity="center_horizontal"
+        android:layout_gravity="bottom"
         android:layout_marginTop="2dp"
         android:contentDescription="welcome_header"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:src="@drawable/man"
         app:srcCompat="@drawable/sti_logo" />
 
-    <TextView
-        android:layout_weight="1"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome to STI Mobile"
-        android:fontFamily="@font/montserrat_regular"
-        android:textColor="@color/colorPrimary"
-        android:textSize="14sp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        android:layout_weight="1"
+        android:gravity="end"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/nav_lastname"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Michael"
+            android:fontFamily="@font/montserrat_semibold"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        <TextView
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome to STI Mobile"
+            android:fontFamily="@font/montserrat_regular"
+            android:textColor="@color/colorPrimary"
+            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+    </LinearLayout>
+
+
 
 
 </LinearLayout>

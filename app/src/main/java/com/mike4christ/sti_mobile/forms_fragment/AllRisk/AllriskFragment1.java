@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 
 import androidx.appcompat.app.AlertDialog;
@@ -62,8 +63,14 @@ public class AllriskFragment1 extends Fragment implements View.OnClickListener{
     FrameLayout mQbFormLayout1;
     @BindView(R.id.step_view)
     StepView mStepView;
+    @BindView(R.id.reviewed_checked)
+    RadioButton reviewed_checked;
     @BindView(R.id.type_spinner_a1)
     Spinner mTypeSpinnerA1;
+
+    @BindView(R.id.state_spinner)
+    Spinner state_spinner;
+
     @BindView(R.id.prefix_spinner_a1)
     Spinner mPrefixSpinnerA1;
     @BindView(R.id.inputLayoutCompanyName_a1)
@@ -120,7 +127,7 @@ public class AllriskFragment1 extends Fragment implements View.OnClickListener{
     AVLoadingIndicatorView mProgressbar1A1;
 
 
-    String typeString,genderString,prifixString;
+    String typeString,genderString,prifixString,stateString;
     private int currentStep = 0;
     int PICK_IMAGE_PASSPORT = 1;
     int CAM_IMAGE_PASSPORT = 2;
@@ -176,6 +183,7 @@ public class AllriskFragment1 extends Fragment implements View.OnClickListener{
 
         mTypeSpinnerA1();
         mPrefixSpinnerA1();
+        stateSpinner();
         mGenderSpinnerA1();
         setViewActions();
 
@@ -312,6 +320,8 @@ public class AllriskFragment1 extends Fragment implements View.OnClickListener{
                     mInputLayoutPhoneA1.setVisibility(View.VISIBLE);
                     mInputLayoutEmailA1.setVisibility(View.VISIBLE);
                     mInputLayoutMailingAddrA1.setVisibility(View.VISIBLE);
+                    state_spinner.setVisibility(View.VISIBLE);
+
 
 
                 }
@@ -341,7 +351,39 @@ public class AllriskFragment1 extends Fragment implements View.OnClickListener{
                 mInputLayoutPhoneA1.setVisibility(View.VISIBLE);
                 mInputLayoutEmailA1.setVisibility(View.VISIBLE);
                 mInputLayoutMailingAddrA1.setVisibility(View.VISIBLE);
+                state_spinner.setVisibility(View.VISIBLE);
 
+
+            }
+        });
+
+    }
+
+    private void stateSpinner() {
+        // Create an ArrayAdapter using the string array and a default spinner
+        ArrayAdapter<CharSequence> staticAdapter = ArrayAdapter
+                .createFromResource(getContext(), R.array.state_array,
+                        android.R.layout.simple_spinner_item);
+
+        // Specify the layout to use when the list of choices appears
+        staticAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Apply the adapter to the spinner
+        state_spinner.setAdapter(staticAdapter);
+
+        state_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                String stateText = (String) parent.getItemAtPosition(position);
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+                state_spinner.getItemAtPosition(0);
 
             }
         });
@@ -754,12 +796,22 @@ public class AllriskFragment1 extends Fragment implements View.OnClickListener{
             isValid = false;
         }
 
+        if (!reviewed_checked.isChecked()) {
+            showMessage("Please checked below point, to accept you review");
+            isValid = false;
+        }
+
 
         //Tyepe Spinner
         typeString = mTypeSpinnerA1.getSelectedItem().toString();
         if (typeString.equals("Select Type")&&mTypeSpinnerA1.isClickable()) {
 
             showMessage("Select Product Type");
+            isValid = false;
+        }
+        stateString = state_spinner.getSelectedItem().toString();
+        if (stateString.equals("Geographical Location")&&state_spinner.isClickable()) {
+            showMessage("Select your Geographical Location");
             isValid = false;
         }
         //Prefix Spinner
@@ -806,6 +858,7 @@ public class AllriskFragment1 extends Fragment implements View.OnClickListener{
             userPreferences.setAllRiskIFirstName(mFirstnameEditxtA1.getText().toString());
             userPreferences.setAllRiskILastName(mLastnameEditxtA1.getText().toString());
             userPreferences.setAllRiskIGender(genderString);
+            userPreferences.setAllRiskIState(stateString);
             userPreferences.setAllRiskIResAdrr(mResidentsAddrEditxtA1.getText().toString());
             userPreferences.setAllRiskIPhoneNum(mPhoneNoEditxtA1.getText().toString());
             userPreferences.setAllRiskIEmail(mEmailEditxtA1.getText().toString());

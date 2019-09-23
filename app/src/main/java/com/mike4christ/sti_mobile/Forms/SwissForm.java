@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.mike4christ.sti_mobile.Constant;
 import com.mike4christ.sti_mobile.R;
+import com.mike4christ.sti_mobile.UserPreferences;
 import com.mike4christ.sti_mobile.forms_fragment.Swiss.SwissFragment1;
 
 import butterknife.BindView;
@@ -30,12 +31,14 @@ public class SwissForm extends AppCompatActivity {
     Fragment fragment;
 
     String title="";
+    UserPreferences userPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_swiiss_form);
         ButterKnife.bind(this);
+        userPreferences=new UserPreferences(this);
 
         Intent intent = getIntent();
         title=intent.getStringExtra(Constant.CARD_OPTION_TITLE);
@@ -63,6 +66,7 @@ public class SwissForm extends AppCompatActivity {
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        userPreferences.setTempSwissQuotePrice("0.0");
         finish();
         return super.onOptionsItemSelected(item);
     }

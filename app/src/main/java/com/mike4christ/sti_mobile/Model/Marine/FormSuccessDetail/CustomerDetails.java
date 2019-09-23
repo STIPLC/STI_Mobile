@@ -16,13 +16,13 @@ public class CustomerDetails implements Serializable
     private String lastName;
     @SerializedName("company_name")
     @Expose
-    private Object companyName;
+    private String companyName;
     @SerializedName("email")
     @Expose
     private String email;
     @SerializedName("account_number")
     @Expose
-    private Integer accountNumber;
+    private String accountNumber;
     @SerializedName("gender")
     @Expose
     private String gender;
@@ -61,22 +61,22 @@ public class CustomerDetails implements Serializable
     private String customerType;
     @SerializedName("contact_person")
     @Expose
-    private Object contactPerson;
+    private String contactPerson;
     @SerializedName("tin_number")
     @Expose
-    private Object tinNumber;
+    private String tinNumber;
     @SerializedName("mailing_address")
     @Expose
-    private Object mailingAddress;
+    private String mailingAddress;
     @SerializedName("office_address")
     @Expose
-    private Object officeAddress;
+    private String officeAddress;
     @SerializedName("business")
     @Expose
-    private Object business;
+    private String business;
     @SerializedName("user_id")
     @Expose
-    private Integer userId;
+    private String userId;
     @SerializedName("updated_at")
     @Expose
     private String updatedAt;
@@ -85,7 +85,7 @@ public class CustomerDetails implements Serializable
     private String createdAt;
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private String id;
     private final static long serialVersionUID = -5736052116718728823L;
 
     public String getFirstName() {
@@ -104,11 +104,11 @@ public class CustomerDetails implements Serializable
         this.lastName = lastName;
     }
 
-    public Object getCompanyName() {
+    public String getCompanyName() {
         return companyName;
     }
 
-    public void setCompanyName(Object companyName) {
+    public void setCompanyName(String companyName) {
         this.companyName = companyName;
     }
 
@@ -120,11 +120,11 @@ public class CustomerDetails implements Serializable
         this.email = email;
     }
 
-    public Integer getAccountNumber() {
+    public String getAccountNumber() {
         return accountNumber;
     }
 
-    public void setAccountNumber(Integer accountNumber) {
+    public void setAccountNumber(String accountNumber) {
         this.accountNumber = accountNumber;
     }
 
@@ -224,51 +224,51 @@ public class CustomerDetails implements Serializable
         this.customerType = customerType;
     }
 
-    public Object getContactPerson() {
+    public String getContactPerson() {
         return contactPerson;
     }
 
-    public void setContactPerson(Object contactPerson) {
+    public void setContactPerson(String contactPerson) {
         this.contactPerson = contactPerson;
     }
 
-    public Object getTinNumber() {
+    public String getTinNumber() {
         return tinNumber;
     }
 
-    public void setTinNumber(Object tinNumber) {
+    public void setTinNumber(String tinNumber) {
         this.tinNumber = tinNumber;
     }
 
-    public Object getMailingAddress() {
+    public String getMailingAddress() {
         return mailingAddress;
     }
 
-    public void setMailingAddress(Object mailingAddress) {
+    public void setMailingAddress(String mailingAddress) {
         this.mailingAddress = mailingAddress;
     }
 
-    public Object getOfficeAddress() {
+    public String getOfficeAddress() {
         return officeAddress;
     }
 
-    public void setOfficeAddress(Object officeAddress) {
+    public void setOfficeAddress(String officeAddress) {
         this.officeAddress = officeAddress;
     }
 
-    public Object getBusiness() {
+    public String getBusiness() {
         return business;
     }
 
-    public void setBusiness(Object business) {
+    public void setBusiness(String business) {
         this.business = business;
     }
 
-    public Integer getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
@@ -288,11 +288,11 @@ public class CustomerDetails implements Serializable
         this.createdAt = createdAt;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 

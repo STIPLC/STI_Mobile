@@ -24,6 +24,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.mike4christ.sti_mobile.Model.Errors.APIError;
 import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
+import com.mike4christ.sti_mobile.Model.Etic.QouteHeadEtic;
 import com.mike4christ.sti_mobile.Model.ServiceGenerator;
 import com.mike4christ.sti_mobile.Model.Vehicle.Quote.QouteHead;
 import com.mike4christ.sti_mobile.R;
@@ -59,8 +60,7 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
     TextInputLayout mInputLayoutTripDuratnE2;
     @BindView(R.id.trip_duration_e2)
     EditText mTripDurationE2;
-    @BindView(R.id.inputLayoutStartDate_e2)
-    TextInputLayout mInputLayoutStartDateE2;
+
     @BindView(R.id.start_date_e2)
     EditText mStartDateE2;
     @BindView(R.id.inputLayoutTravelMode_e2)
@@ -210,12 +210,22 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
                                        int position, long id) {
                 String stringText = (String) parent.getItemAtPosition(position);
 
+                if(stringText.equals("Yes")){
+                    mDisableDetailE2.setVisibility(View.VISIBLE);
+                    mDisableDetailE2.setClickable(true);
+                }else if(stringText.equals("No")){
+                    mDisableDetailE2.setVisibility(View.GONE);
+                    mDisableDetailE2.setClickable(false);
+                }
+
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 //De-Visualizing the individual form
                 mDisabilitySpinnerE2.getItemAtPosition(0);
+                mDisableDetailE2.setVisibility(View.GONE);
+                mDisableDetailE2.setClickable(false);
 
             }
         });
@@ -261,14 +271,14 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
             mInputLayoutTripDuratnE2.setError("Trip Duration is required!");
             isValid = false;
         } else if (mStartDateE2.getText().toString().isEmpty()) {
-            mInputLayoutStartDateE2.setError("Start Date is required!");
+            showMessage("Start Date is required!");
             isValid = false;
         } else if (mTravelModeE2.getText().toString().isEmpty()) {
             mInputLayoutTravelModeE2.setError("Travel Mode is required!");
 
             isValid = false;
-        } else if (mDisableDetailE2.getText().toString().isEmpty()) {
-            mInputLayoutDisabilityDetailE2.setError("Diasability Detail is required!");
+        } else if (mDisableDetailE2.getText().toString().isEmpty()&&mDisableDetailE2.isClickable()) {
+            mInputLayoutDisabilityDetailE2.setError("Disability detail is required!");
             isValid = false;
         } else if (mDeptPlaceTxtE2.getText().toString().isEmpty()) {
             mInputLayoutDeptPlaceE2.setError("Departure Place is required!");
@@ -281,7 +291,6 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
             mInputLayoutCountryVisitAddrE2.setErrorEnabled(false);
             mInputLayoutDeptPlaceE2.setErrorEnabled(false);
             mInputLayoutDisabilityDetailE2.setErrorEnabled(false);
-            mInputLayoutStartDateE2.setErrorEnabled(false);
             mInputLayoutTravelModeE2.setErrorEnabled(false);
             mInputLayoutTripDuratnE2.setErrorEnabled(false);
         }
@@ -345,13 +354,41 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
 
         //get client and call object for request
         ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
-        Call<QouteHead> call=client.etic_quote("Token "+userPreferences.getUserToken(),mArrivalPlaceTxtE2.getText().toString());
+        Call<QouteHeadEtic> call=client.etic_quote("Token "+userPreferences.getUserToken(), 2000);
 
-        call.enqueue(new Callback<QouteHead>() {
+        call.enqueue(new Callback<QouteHeadEtic>() {
             @Override
-            public void onResponse(Call<QouteHead> call, Response<QouteHead> response) {
+            public void onResponse(Call<QouteHeadEtic> call, Response<QouteHeadEtic> response) {
                 Log.i("ResponseCode", String.valueOf(response.code()));
 
+                if(response.code()==406){
+                    showMessage("Error! Wrong Value provided!");
+                    mBtnLayout2E2.setVisibility(View.VISIBLE);
+                    mProgressbar2E2.setVisibility(View.GONE);
+                    return;
+                }
+
+                if(response.code()==400){
+                    showMessage("Check your internet connection");
+                    mBtnLayout2E2.setVisibility(View.VISIBLE);
+                    mProgressbar2E2.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==429){
+                    showMessage("Too many requests on database");
+                    mBtnLayout2E2.setVisibility(View.VISIBLE);
+                    mProgressbar2E2.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==500){
+                    showMessage("Server Error");
+                    mBtnLayout2E2.setVisibility(View.VISIBLE);
+                    mProgressbar2E2.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==401){
+                    showMessage("Unauthorized access, please try login again");
+                    mBtnLayout2E2.setVisibility(View.VISIBLE);
+                    mProgressbar2E2.setVisibility(View.GONE);
+                    return;
+                }
 
                 try {
                     if (!response.isSuccessful()) {
@@ -377,14 +414,17 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
                     }
 
                     String quote_price=response.body().getData().getPrice();
-                    Log.i("quote_price",quote_price);
+
+                    double roundOff = Math.round(Double.valueOf(quote_price)*100)/100.00;
+
+                    Log.i("quote_price", String.valueOf(roundOff));
                     showMessage("Successfully Fetched Quote");
                     mBtnLayout2E2.setVisibility(View.VISIBLE);
                     mProgressbar2E2.setVisibility(View.GONE);
 
 
                     FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.replace(R.id.fragment_etic_form_container, EticFragment3.newInstance(mArrivalPlaceTxtE2.getText().toString(),quote_price), EticFragment3.class.getSimpleName());
+                    ft.replace(R.id.fragment_etic_form_container, EticFragment3.newInstance(mArrivalPlaceTxtE2.getText().toString(), String.valueOf(roundOff)), EticFragment3.class.getSimpleName());
                     ft.commit();
                 }catch (Exception e){
                     Log.i("policyResponse", e.getMessage());
@@ -394,7 +434,7 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
 
             }
             @Override
-            public void onFailure(Call<QouteHead> call, Throwable t) {
+            public void onFailure(Call<QouteHeadEtic> call, Throwable t) {
                 showMessage("Submission Failed "+t.getMessage());
                 Log.i("GEtError",t.getMessage());
                 mBtnLayout2E2.setVisibility(View.VISIBLE);
@@ -429,7 +469,7 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
                     return;
                 }
                 int monthofYear=monthOfYear+1;
-                startDateStrg = dayOfMonth + "-" + monthofYear + "-" + year;
+                startDateStrg = year + "-" + monthofYear + "-" + dayOfMonth;
                 mStartDateE2.setText(startDateStrg);
                 datePickerDialog1.dismiss();
             }

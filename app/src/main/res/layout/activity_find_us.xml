@@ -58,7 +58,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="17, Adetokunbo Ademola Street, Victoria Island, Lagos, Nigeria.\nContact Number: +2349085689063"
+                        android:text="17, Adetokunbo Ademola Street, Victoria Island, Lagos, Nigeria.\nContact Number: 017008609"
                         android:textSize="14sp"
                         android:textColor="@color/colorGrey"/>
 

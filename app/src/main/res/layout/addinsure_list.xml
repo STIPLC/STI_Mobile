@@ -14,9 +14,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         >
-
-
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -34,7 +31,7 @@
 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="First Name: "
+                    android:text="First \nName: "
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     android:textColor="@color/colorGrey"
@@ -44,6 +41,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="private"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     />
@@ -62,7 +61,7 @@
 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Last Name: "
+                    android:text="Last \nName: "
                     android:layout_margin="6dp"
                     android:textSize="@dimen/size_twenty"
                     android:textColor="@color/colorGrey"
@@ -72,6 +71,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Acura"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     />
@@ -90,7 +91,7 @@
 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Phone Number: "
+                    android:text="Phone \nNumber: "
                     android:layout_margin="6dp"
                     android:textSize="@dimen/size_twenty"
                     android:textColor="@color/colorGrey"
@@ -100,6 +101,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="XML"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     />
@@ -127,6 +130,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="438h86"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     />
@@ -144,7 +149,7 @@
 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Marital Status: "
+                    android:text="Marital \nStatus: "
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     android:textColor="@color/colorGrey"
@@ -154,6 +159,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Good"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     />

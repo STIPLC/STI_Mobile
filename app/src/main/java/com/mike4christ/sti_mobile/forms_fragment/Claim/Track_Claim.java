@@ -16,7 +16,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.FileProvider;
@@ -29,6 +31,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.mike4christ.sti_mobile.BuildConfig;
 import com.mike4christ.sti_mobile.Model.Claim.ClaimPost;
+import com.mike4christ.sti_mobile.Model.Claim.TrackClaim.Claim;
 import com.mike4christ.sti_mobile.Model.Claim.TrackClaim.GetClaimStatus;
 import com.mike4christ.sti_mobile.Model.Errors.APIError;
 import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
@@ -70,29 +73,36 @@ public class Track_Claim extends Fragment implements View.OnClickListener{
     /** ButterKnife Code **/
     @BindView(R.id.track_claim_layout1)
     FrameLayout mTrackClaimLayout1;
-    @BindView(R.id.polynum_type_spinner)
-    Spinner mPolynumTypeSpinner;
+
+    @BindView(R.id.inputLayoutClaimNum)
+    TextInputLayout inputLayoutClaimNum;
+    @BindView(R.id.claim_num_editxt)
+    EditText mClaimNumEditxt;
     @BindView(R.id.search)
     Button mSearch;
     @BindView(R.id.progressbar)
-   AVLoadingIndicatorView mProgressbar;
+    com.wang.avi.AVLoadingIndicatorView mProgressbar;
+    @BindView(R.id.status)
+    TextView mStatus;
+    @BindView(R.id.type)
+    TextView mType;
+    @BindView(R.id.description)
+    TextView mDescription;
+    @BindView(R.id.cost_estimate)
+    TextView mCostEstimate;
+    @BindView(R.id.loss_estimate)
+    TextView mLossEstimate;
+    @BindView(R.id.ref_code)
+    TextView mRefCode;
+    @BindView(R.id.scroll_parent)
+    ScrollView scroll_parent;
     /** ButterKnife Code **/
 
-     /*"policy_id": "MOT/CV/06/19/SA/00297",
-             "type": "vehicle",
-             "description": "ghh\n",
-             "cost_estimate": "2000.00",
-             "loss_estimate": "20000000.00",
-             "created_at": "2019-09-06 10:37:29",
-             "updated_at": "2019-09-06 10:37:29",
-             "status": "PENDING",
-             "reference": "MOT/CV/06/19/SA/00297/2019/C00001",
-             "date_loss": null,
-             "sti_estimate": null*/
 
 
 
-    String policyTypeString,policy_id,type,cost_estimate,loss_estimate,status,reference_code;
+
+    String policyTypeString,type,cost_estimate,loss_estimate,status,reference_code,description;
 
     NetworkConnection networkConnection=new NetworkConnection();
 
@@ -139,11 +149,6 @@ public class Track_Claim extends Fragment implements View.OnClickListener{
         userPreferences=new UserPreferences(getContext());
 
 
-        ArrayList<String> policies = new ArrayList<String>(
-                Arrays.asList("Claim Number","MOT/8767/CF", "MOV/5688/hsfgs", "TL/576223/hdgd77"));
-
-        polyNumTypeSpinner(policies);
-
         setViewActions();
 
         return  view;
@@ -152,30 +157,6 @@ public class Track_Claim extends Fragment implements View.OnClickListener{
 
 
 
-    private void polyNumTypeSpinner(ArrayList<String> arrayList) {
-        // Create an ArrayAdapter using the string array and a default spinner
-
-        mPolynumTypeSpinner
-                .setAdapter(new ArrayAdapter<String>(getContext(),
-                        android.R.layout.simple_spinner_dropdown_item,
-                        arrayList));
-
-        mPolynumTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int position, long id) {
-                String VehicleTypeString = (String) parent.getItemAtPosition(position);
-
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                mPolynumTypeSpinner.getItemAtPosition(0);
-            }
-        });
-
-    }
 
     //seting onclicks listeners
     private void setViewActions() {
@@ -201,18 +182,19 @@ public class Track_Claim extends Fragment implements View.OnClickListener{
 
         boolean isValid = true;
 
-            //Policy type Spinner
-            policyTypeString = mPolynumTypeSpinner.getSelectedItem().toString();
-            if (policyTypeString.equals("Policy Number")) {
-                showMessage("Select your Policy Number");
-                isValid = false;
-            }
+        if (mClaimNumEditxt.getText().toString().isEmpty()) {
+            inputLayoutClaimNum.setError("Claim Number is Required!");
+            isValid = false;
+        } else {
+            inputLayoutClaimNum.setErrorEnabled(false);
 
-
+        }
             if (isValid) {
-//            send inputs to next next page
-//            Goto to the next Registration step
-                initFragment();
+                if(networkConnection.isNetworkConnected(getContext())) {
+                    initFragment();
+                }else {
+                    showMessage("No Internet Connection");
+                }
             }
 
 
@@ -241,7 +223,7 @@ public class Track_Claim extends Fragment implements View.OnClickListener{
         //get client and call object for request
         ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
 
-        Call<GetClaimStatus> call=client.track_claim("Token "+userPreferences.getUserToken(),policyTypeString);
+        Call<GetClaimStatus> call=client.track_claim("Token "+userPreferences.getUserToken(),mClaimNumEditxt.getText().toString());
 
         call.enqueue(new Callback<GetClaimStatus>() {
             @Override
@@ -249,7 +231,29 @@ public class Track_Claim extends Fragment implements View.OnClickListener{
                 Log.i("ResponseCode", String.valueOf(response.code()));
 
                 if(response.code()==406){
-                    showMessage("Error! Wrong Policy Number provided!");
+                    showMessage("Error! Wrong Claim Number provided!");
+                    mSearch.setVisibility(View.VISIBLE);
+                    mProgressbar.setVisibility(View.GONE);
+                    return;
+                }
+
+                if(response.code()==400){
+                    showMessage("Check your internet connection");
+                    mSearch.setVisibility(View.VISIBLE);
+                    mProgressbar.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==429){
+                    showMessage("Too many requests on database");
+                    mSearch.setVisibility(View.VISIBLE);
+                    mProgressbar.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==500){
+                    showMessage("Server Error");
+                    mSearch.setVisibility(View.VISIBLE);
+                    mProgressbar.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==401){
+                    showMessage("Unauthorized access, please try login again");
                     mSearch.setVisibility(View.VISIBLE);
                     mProgressbar.setVisibility(View.GONE);
                     return;
@@ -279,9 +283,34 @@ public class Track_Claim extends Fragment implements View.OnClickListener{
                         return;
                     }
 
-                    String status=response.body().getData().getClaim().getStatus();
-                    showMessage("Claim Successfully Submitted");
-                    Log.i("claim_response",claim_response);
+                    status=response.body().getData().getClaim().getStatus();
+                    Claim flag=response.body().getData().getClaim();
+
+                    if(status!=null||flag!=null) {
+                        scroll_parent.setVisibility(View.VISIBLE);
+                        status = response.body().getData().getClaim().getStatus();
+                        type = response.body().getData().getClaim().getType();
+                        cost_estimate = response.body().getData().getClaim().getCostEstimate();
+                        loss_estimate = response.body().getData().getClaim().getLossEstimate();
+                        reference_code = response.body().getData().getClaim().getReference();
+                        description = response.body().getData().getClaim().getDescription();
+
+                        mStatus.setText(status);
+                        mType.setText(type);
+                        mCostEstimate.setText(cost_estimate);
+                        mLossEstimate.setText(loss_estimate);
+                        mRefCode.setText(reference_code);
+                        mDescription.setText(description);
+
+                        Log.i("claim_response", status);
+
+                    }else{
+                        scroll_parent.setVisibility(View.GONE);
+                        showMessage("Error in Claim Number");
+                    }
+
+                    mSearch.setVisibility(View.VISIBLE);
+                    mProgressbar.setVisibility(View.GONE);
 
 
                 }catch (Exception e){

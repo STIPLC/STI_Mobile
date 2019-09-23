@@ -10,7 +10,7 @@ import java.util.Map;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
-//import co.paystack.android.PaystackSdk;
+import co.paystack.android.PaystackSdk;
 
 public class BaseApplication extends Application {
     @Override
@@ -27,6 +27,9 @@ public class BaseApplication extends Application {
                 .deleteRealmIfMigrationNeeded()
                 .build();
         Realm.setDefaultConfiguration(config);
+
+        PaystackSdk.initialize(getApplicationContext());
+
 
         Map configCloudinary = new HashMap();
         configCloudinary.put("cloud_name", "aaua");

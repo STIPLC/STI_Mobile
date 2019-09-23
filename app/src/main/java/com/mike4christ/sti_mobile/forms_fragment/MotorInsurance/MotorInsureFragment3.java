@@ -56,6 +56,7 @@ public class MotorInsureFragment3 extends Fragment implements View.OnClickListen
 
     @BindView(R.id.progressbar)
     AVLoadingIndicatorView progressbar;
+    UserPreferences userPreferences;
 
 
     private  int currentStep=2;
@@ -100,6 +101,8 @@ public class MotorInsureFragment3 extends Fragment implements View.OnClickListen
         ButterKnife.bind(this,view);
         //        stepView next registration step
         stepView.go(currentStep, true);
+        userPreferences=new UserPreferences(getContext());
+
 
         vehicleMake_txt.setText(vehicleMaker);
         if(p_amount==null){
@@ -107,7 +110,7 @@ public class MotorInsureFragment3 extends Fragment implements View.OnClickListen
             String format = p_amount + ".00";
             amount.setText(format);
         }else {
-            String format = p_amount + ".00";
+            String format = p_amount ;
             amount.setText(format);
         }
 
@@ -140,7 +143,7 @@ public class MotorInsureFragment3 extends Fragment implements View.OnClickListen
                 }
                 stepView.done(false);
                 stepView.go(currentStep, true);
-
+                userPreferences.setTempQuotePrice("0.0");
                 Fragment motorInsureFragment2 = new MotorInsureFragment2();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_motor_form_container, motorInsureFragment2);

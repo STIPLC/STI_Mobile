@@ -13,6 +13,11 @@
         android:src="@drawable/sign_up_in"
         android:scaleType="centerCrop"
         />
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/layout_inner"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_width="match_parent">
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,9 +33,15 @@
         android:layout_gravity="center"
         >
 
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical"
+            >
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:padding="@dimen/size_four"
             android:orientation="vertical">
@@ -49,7 +60,7 @@
                     android:id="@+id/email_editxt"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:drawableStart="@drawable/ic_email_black_24dp"
+                    android:drawableEnd="@drawable/ic_email_black_24dp"
                     android:hint="Email"
                     android:drawableTint="@color/colorPrimary"
                     android:inputType="textEmailAddress"
@@ -71,7 +82,7 @@
                     android:id="@+id/password_editxt"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:drawableStart="@drawable/ic_fingerprint_black_24dp"
+                    android:drawableEnd="@drawable/ic_vpn_key_black_24dp"
                     android:hint="Password (at least 6 characters)"
                     android:fontFamily="@font/montserrat_regular"
                     android:drawableTint="@color/colorPrimary"
@@ -99,6 +110,19 @@
                 android:visibility="gone"
                 app:indicatorColor="@color/colorAccent"
                 app:indicatorName="BallPulseIndicator" />
+
+            <TextView
+                android:id="@+id/forget_pass"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:textAlignment="center"
+                android:text="Forgot Password? "
+                android:fontFamily="@font/montserrat_regular"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorGrey"
+                />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -132,22 +156,30 @@
                     />
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="12dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="© 2019 Sovereign Trust Insurance Plc \n All right reserved."
+                android:textAlignment="center"
+                android:textSize="12sp"
+                android:layout_marginTop="10dp"
+                android:layout_gravity="bottom"
+                android:layout_margin="@dimen/size_fifteen"
+                />
+
 
         </LinearLayout>
+
+        </ScrollView>
 
 
 
 
     </com.google.android.material.card.MaterialCardView>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="© 2019 Soverign Trust Insurance Plc \n All right reserved."
-        android:textAlignment="center"
-        android:textSize="12sp"
-        android:layout_gravity="bottom"
-        android:layout_margin="@dimen/size_ten"
-        />
 
 </FrameLayout>

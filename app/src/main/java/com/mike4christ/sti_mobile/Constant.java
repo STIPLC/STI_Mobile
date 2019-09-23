@@ -29,9 +29,15 @@ public class Constant {
     public static final String BVN = "bvn";
     public static final String PASSWORD = "password";
 
+
     //PAYMENT
     public static final String TOTAL_PRICE = "total_price";
     public static final String POLICY_NUM = "policy_number";
+    public static final String REF = "ref";
+    public static final String POLICY_TYPE = "policy_type";
+
+
+
 
     public static final String ROLE = "role";
     public static final String PROFILE_PIC = "profile_pic";
@@ -79,6 +85,10 @@ public class Constant {
     public static final String MOTOR_INSURED_GENDER = "motor_insured_gender";
     public static final String MOTOR_RESIDENT_ADDRESS = "resident_addr";
     public static final String MOTOR_NEXT_OF_KIN = "next_of_kin";
+
+    public static final String MOTOR_INSURED_BUSINESS = "motor_insured_business";
+
+    public static final String MOTOR_INSURED_STATE = "motor_insured_state";
     public static final String MOTOR_INSURED_PHONE_NUM = "motor_insured_ph_num";
     public static final String MOTOR_INSURED_EMAIL = "motor_insured_email";
     public static final String MOTOR_INSURED_MAILING_ADDR = "motor_insured_mail_addr";
@@ -86,7 +96,7 @@ public class Constant {
     //Motor Insurance Vehicle Details
     public static final String MOTOR_POLICY_TYPE = "motor_policy_type";
     public static final String MOTOR_STARTDATE = "motor_start_date";
-    public static final String MOTOR_PRIVATE_TYPE = "motor_private_type";
+    public static final String MOTOR_POLY_SELECT_TYPE = "motor_p_select_type";
     public static final String MOTOR_PENHANCE_TYPE = "motor_PEnhance_type";
     public static final String MOTOR_COMMERCIAL_TYPE = "motor_commercial_type";
     public static final String MOTOR_CYCLE_TYPE = "motor_cycle_type";
@@ -114,6 +124,7 @@ public class Constant {
     public static final String SWISS_INSURED_LASTNAME = "swiss_insured_ltname";
     public static final String SWISS_INSURED_GENDER = "swiss_insured_gender";
     public static final String SWISS_RESIDENT_ADDRESS = "resident_addr";
+    public static final String SWISS_STATE = "swiss_state";
     public static final String SWISS_MARITAL_STATUS = "marital_status";
     public static final String SWISS_NEXT_OF_KIN = "next_of_kin";
     public static final String SWISS_NEXT_OF_KIN_ADDR = "next_of_kin_addr";
@@ -130,6 +141,7 @@ public class Constant {
     public static final String SWISS_AddINSURED_LASTNAME = "swiss_addinsured_ltname";
     public static final String SWISS_AddINSURED_GENDER = "swiss_addinsured_gender";
     public static final String SWISS_AddMARITAL_STATUS = "marital_addstatus";
+    public static final String SWISS_AddOTHER_IMAGE = "marital_addother_image";
     public static final String SWISS_AddDATE_OF_BIRTH = "swiss_addinsured_dob";
     public static final String SWISS_AddDISABILITY = "swiss_add_disability";
     public static final String SWISS_AddBENEFIT_CAT = "swiss_add_benefit_cat";
@@ -139,6 +151,7 @@ public class Constant {
 
     //Swiss Quote Price
     public static final String SWISS_QUOTE_PRICE = "swiss_quote_price";
+    public static final String SWISS_QUOTE_PRICE_INIT = "swiss_quote_price_init";
 
     //Marine P.Detail
     public static final String MARINE_INSURED_PERSONAL_TYPE = "marine_personal_type";
@@ -154,17 +167,20 @@ public class Constant {
     public static final String MARINE_INSURED_MARITAL_STATUS = "marine_insured_marital_st";
     public static final String MARINE_RESIDENT_ADDRESS = "resident_addr";
     public static final String MARINE_NEXT_OF_KIN = "next_of_kin";
+    public static final String MARINE_TRADE = "marine_trade";
     public static final String MARINE_INSURED_PHONE_NUM = "marine_insured_ph_num";
     public static final String MARINE_INSURED_EMAIL = "marine_insured_email";
+    public static final String MARINE_INSURED_STATE = "marine_insured_state";
     public static final String MARINE_INSURED_MAILING_ADDR = "marine_insured_mail_addr";
 
     //Cargo Insurance Vehicle Details
     public static final String MARINE_PROF_INV_NO = "marine_Prof_inv_no";
     public static final String MARINE_DATE_PROF_INV = "marine_date_pro_inv";
     public static final String MARINE_DESC_GOODS = "marine_desc_goods";
-    public static final String MARINE_INTEREST = "marine_interest";
     public static final String MARINE_QUANTITY = "marine_quantity";
     public static final String MARINE_CURRENCY = "marine_currency";
+    public static final String MARINE_START_DATE_COVER = "marine_start_date_cover";
+    public static final String MARINE_COVER = "marine_cover";
     public static final String MARINE_TOTAL_AMOUNT = "marine_total_amount";
     public static final String MARINE_NAIRA_CONVERT_RATE = "marine_naira_convert_rate";
     public static final String MARINE_PORT_OFLOADING = "marine_port_ofloading";
@@ -173,7 +189,7 @@ public class Constant {
 
     //Quote Price
     public static final String MARINE_QUOTE_PRICE = "marine_quote_price";
-    
+
     //All Risk Insured
     public static final String ALLRISK_INSURED_PERSONAL_TYPE = "allrisk_personal_type";
     public static final String ALLRISK_INSURED_PREFIX = "allrisk_prefix";
@@ -187,6 +203,7 @@ public class Constant {
     public static final String ALLRISK_RESIDENT_ADDRESS = "resident_addr";
     public static final String ALLRISK_NEXT_OF_KIN = "next_of_kin";
     public static final String ALLRISK_INSURED_PHONE_NUM = "allrisk_insured_ph_num";
+    public static final String ALLRISK_INSURED_STATE = "allrisk_insured_state";
     public static final String ALLRISK_INSURED_EMAIL = "allrisk_insured_email";
     public static final String ALLRISK_INSURED_MAILING_ADDR = "allrisk_insured_mail_addr";
 
@@ -213,6 +230,13 @@ public class Constant {
     public static final String ETIC_RESIDENT_ADDRESS = "resident_addr";
     public static final String ETIC_NEXT_OF_KIN = "next_of_kin";
     public static final String ETIC_INSURED_PHONE_NUM = "etic_insured_ph_num";
+    public static final String ETIC_INSURED_BUSINESS = "etic_insured_business";
+    public static final String ETIC_INSURED_NATIONALITY = "etic_insured_nationality";
+    public static final String ETIC_INSURED_EMPLOYER_NAME = "etic_insured_employer_name";
+    public static final String ETIC_INSURED_EMPLOYER_ADDR= "etic_insured_employer_addr";
+    public static final String ETIC_INSURED_STATE = "etic_insured_state";
+    public static final String ETIC_INSURED_INTENDED_START_DATE = "etic_insured_intend_strt_date";
+    public static final String ETIC_INSURED_END_DATE = "etic_insured_end_date";
     public static final String ETIC_INSURED_EMAIL = "etic_insured_email";
     public static final String ETIC_INSURED_MAILING_ADDR = "etic_insured_mail_addr";
 
@@ -244,6 +268,7 @@ public class Constant {
     public static final String OTHER_RESIDENT_ADDRESS = "resident_addr";
     public static final String OTHER_NEXT_OF_KIN = "next_of_kin";
     public static final String OTHER_INSURED_PHONE_NUM = "other_insured_ph_num";
+    public static final String OTHER_INSURED_STATE = "other_insured_state";
     public static final String OTHER_INSURED_EMAIL = "other_insured_email";
     public static final String OTHER_INSURED_MAILING_ADDR = "other_insured_mail_addr";
 

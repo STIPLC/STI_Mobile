@@ -9,13 +9,17 @@ public class CargoDetail extends RealmObject {
     String pfi_date;
     String quantity;
     String currency;
-    String interest;
+
+
+
     String desc_goods;
     String conversion_rate;
     String loading_port;
     String discharge_port;
     String conveyance_mode;
     String value;
+    String start_date_cover;
+    String cover;
     String picture;
 
     public CargoDetail(){
@@ -53,14 +57,22 @@ public class CargoDetail extends RealmObject {
     public void setCurrency(String currency) {
         this.currency = currency;
     }
-
-    public String getInterest() {
-        return interest;
+    public String getStart_date_cover() {
+        return start_date_cover;
     }
 
-    public void setInterest(String interest) {
-        this.interest = interest;
+    public void setStart_date_cover(String start_date_cover) {
+        this.start_date_cover = start_date_cover;
     }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
+
 
     public String getDesc_goods() {
         return desc_goods;

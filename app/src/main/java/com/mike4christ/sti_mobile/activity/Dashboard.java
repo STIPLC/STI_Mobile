@@ -23,16 +23,25 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 
 import android.view.MenuItem;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.mike4christ.sti_mobile.Forms.Claim;
+import com.mike4christ.sti_mobile.MainActivity;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.SignUp;
 import com.mike4christ.sti_mobile.UserPreferences;
 import com.mike4christ.sti_mobile.forms_fragment.Claim.SubFragment_Claim;
+import com.mike4christ.sti_mobile.forms_fragment.Claim.Track_Claim;
+import com.mike4christ.sti_mobile.forms_fragment.Pin.PinFragment;
 import com.mike4christ.sti_mobile.fragment.DashboardFragment;
+import com.mike4christ.sti_mobile.fragment.EmailUsFragment;
+import com.mike4christ.sti_mobile.fragment.MyClaimFragment;
+import com.mike4christ.sti_mobile.fragment.MyPoliciesFragment;
 import com.mike4christ.sti_mobile.fragment.ProfileFragment;
 import com.mike4christ.sti_mobile.fragment.QuoteBuyFragment;
 import com.mike4christ.sti_mobile.fragment.TransactionHistoryFragment;
+import com.mike4christ.sti_mobile.fragment.ValidatePolicyFragment;
 
 
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -46,11 +55,13 @@ import androidx.fragment.app.FragmentTransaction;
 import android.view.Menu;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 
 /*
@@ -66,37 +77,48 @@ public class Dashboard extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,View.OnClickListener {
 
 /** ButterKnife Code **/
-@BindView(R.id.toolbar)
-Toolbar mToolbar;
-@BindView(R.id.content_dash_layout)
-LinearLayout mContentDashLayout;
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+    @BindView(R.id.content_dash_layout)
+    LinearLayout mContentDashLayout;
     @BindView(R.id.fragment_container)
     FrameLayout mFragmentContainer;
     @BindView(R.id.dashboard_btn_lay)
     LinearLayout mDashboardBtnLay;
     @BindView(R.id.find_us_btn_lay)
     LinearLayout mFindUsBtnLay;
-    @BindView(R.id.payment_btn_lay)
-    LinearLayout mPaymentBtnLay;
+    @BindView(R.id.policy_btn_lay)
+    LinearLayout mPolicyBtnLay;
     @BindView(R.id.claim_btn_lay)
     LinearLayout mClaimBtnLay;
+  /*  @BindView(R.id.profile_icon)
+    CircleImageView mProfileIcon;*/
     /** ButterKnife Code **/
+    CircleImageView mProfileIcon;
+    TextView nav_lastname;
 
     UserPreferences userPreferences;
 
     Fragment fragment;
-
+    String personal_img_url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
         ButterKnife.bind(this);
+
+
         userPreferences=new UserPreferences(this);
        // customizeToolbar(mToolbar);
         setClick();
+        personal_img_url=userPreferences.getProfileImg();
+
         fragment = new DashboardFragment();
         showFragment(fragment);
+
+
+
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -106,6 +128,29 @@ LinearLayout mContentDashLayout;
 
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+       /* TextView userName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.username);
+        userName.setText(new UserPreference().getUser(MainActivity.this).userName);*/
+
+        mProfileIcon=navigationView.getHeaderView(0).findViewById(R.id.profile_icon);
+        nav_lastname=navigationView.getHeaderView(0).findViewById(R.id.nav_lastname);
+        nav_lastname.setText(userPreferences.getLastName());
+
+
+
+        if(personal_img_url==null) {
+            Glide.with(this).load(userPreferences.getProfileImg()).apply(new RequestOptions().fitCenter().circleCrop()).into(mProfileIcon);
+        }else{
+            Glide.with(this).load(personal_img_url).apply(new RequestOptions().fitCenter().circleCrop()).into(mProfileIcon);
+
+        }
+
+        mProfileIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fragment = new ProfileFragment();
+                showFragment(fragment);
+            }
+        });
 
         checkPremission();
 
@@ -114,49 +159,11 @@ LinearLayout mContentDashLayout;
         //Onclick Method initiated
         mDashboardBtnLay.setOnClickListener(this);
         mFindUsBtnLay.setOnClickListener(this);
-        mPaymentBtnLay.setOnClickListener(this);
+        mPolicyBtnLay.setOnClickListener(this);
         mClaimBtnLay.setOnClickListener(this);
     }
 
 
-    //customizing the toolbar to fit middle of appbar
-    public void customizeToolbar(Toolbar toolbar){
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_chevron_left_black_24dp);
-        //setting Elevation for > API 21
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            toolbar.setElevation(10f);
-        }
-        // Save current title and subtitle
-        final CharSequence originalTitle = toolbar.getTitle();
-
-        // Temporarily modify title and subtitle to help detecting each
-        toolbar.setTitle("storex");
-
-        for(int i = 0; i < toolbar.getChildCount(); i++){
-            View view = toolbar.getChildAt(i);
-
-            if(view instanceof TextView){
-                TextView textView = (TextView) view;
-
-
-                if(textView.getText().equals("storex")){
-                    // Customize title's TextView
-                    Toolbar.LayoutParams params = new Toolbar.LayoutParams(Toolbar.LayoutParams.WRAP_CONTENT, Toolbar.LayoutParams.MATCH_PARENT);
-                    params.gravity = Gravity.CENTER_HORIZONTAL;
-                    textView.setLayoutParams(params);
-                    textView.setTextColor(getResources().getColor(R.color.colorPrimary));
-
-
-                }
-            }
-        }
-
-        // Restore title and subtitle
-        toolbar.setTitle(originalTitle);
-    }
 
     //Method to set fragment immediately Onclick
     private void showFragment(Fragment fragment) {
@@ -221,10 +228,10 @@ LinearLayout mContentDashLayout;
             fragment = new QuoteBuyFragment();
             showFragment(fragment);
 
-        } else if (id == R.id.manage_policy) {
+        } else if (id == R.id.my_policy) {
 
-            /*fragment = new ManagePolicyFragment();
-            showFragment(fragment);*/
+            fragment = new MyPoliciesFragment();
+            showFragment(fragment);
 
         } else if (id == R.id.find_us) {
 
@@ -241,18 +248,32 @@ LinearLayout mContentDashLayout;
             startActivity(new Intent(Dashboard.this, Claim.class));
 
 
-        } else if (id == R.id.track_claim) {
+        } else if (id == R.id.my_claim) {
 
+            fragment = new MyClaimFragment();
+            showFragment(fragment);
+
+
+        }else if (id == R.id.track_claim) {
+            fragment = new Track_Claim();
+            showFragment(fragment);
         }
         else if (id == R.id.val_motor_insured) {
+            fragment = new ValidatePolicyFragment();
+            showFragment(fragment);
 
-        }
-        else if (id == R.id.email_us) {
-
+        }else if (id == R.id.email_us) {
+            fragment = new EmailUsFragment();
+            showFragment(fragment);
         }
         else if (id == R.id.nav_account) {
 
             fragment = new ProfileFragment();
+            showFragment(fragment);
+
+        }else if (id == R.id.set_change_pin) {
+
+            fragment = new PinFragment();
             showFragment(fragment);
 
         }
@@ -276,7 +297,9 @@ LinearLayout mContentDashLayout;
                 startActivity(new Intent(Dashboard.this, FindUs.class));
                 break;
 
-            case R.id.payment_btn_lay:
+            case R.id.policy_btn_lay:
+                fragment = new MyPoliciesFragment();
+                showFragment(fragment);
 
                 break;
 

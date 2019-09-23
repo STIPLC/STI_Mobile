@@ -50,21 +50,52 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         holder.mPolicyNum.setText(transactionOption.getPolicyNumber());
         holder.mAmount.setText(transactionOption.getAmount());
         holder.mDateTime.setText(transactionOption.getCreatedAt());
-        holder.mStatus.setText(transactionOption.getStatus());
         holder.mDecription.setText(transactionOption.getDescription());
-        holder.setItemClickListener(pos -> {
 
-            nextActivity(transactionList.get(pos).getPolicyNumber(), transactionList.get(pos).getAmount(), PolicyPaymentActivity.class);
+        if ("Pending".equals(transactionOption.getStatus())) {
+            holder.mStatus.setText("Incomplete");
+        }else {
+            holder.mStatus.setText(transactionOption.getStatus());
+        }
 
 
+            holder.setItemClickListener(pos -> {
+                if(transactionOption.getStatus().equals("Pending")) {
 
+                    String p_tag=transactionOption.getPolicyNumber();
+                    String poliy_type;
+
+
+                        if(p_tag.contains("MOT")){
+                            poliy_type="vehicle";
+                        }else if(p_tag.contains("SWISS")){
+                            poliy_type="swiss";
+                        }else if(p_tag.contains("ET")){
+                            poliy_type="travel";
+                        }else if(p_tag.contains("ACC/AR")){
+                            poliy_type="all_risk";
+                        }else if(p_tag.contains("MAR")){
+                            poliy_type="marine";
+                        }else{
+                            poliy_type="vehicle";
+                        }
+
+
+                    nextActivity(transactionList.get(pos).getReference(), transactionList.get(pos).getPolicyNumber(),
+                            transactionList.get(pos).getAmount(),poliy_type, PolicyPaymentActivity.class);
+                }
             });
+
+
+
     }
 
-    private void nextActivity(String policynum,String amount, Class productActivityClass) {
+    private void nextActivity(String ref,String policy_num,String amount,String poliy_type, Class productActivityClass) {
         Intent i = new Intent(context, productActivityClass);
-        i.putExtra(Constant.POLICY_NUM, policynum);
+        i.putExtra(Constant.REF, ref);
+        i.putExtra(Constant.POLICY_NUM, policy_num);
         i.putExtra(Constant.TOTAL_PRICE, amount);
+        i.putExtra(Constant.POLICY_TYPE, poliy_type);
         context.startActivity(i);
     }
 

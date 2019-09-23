@@ -31,6 +31,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.mike4christ.sti_mobile.BuildConfig;
+import com.mike4christ.sti_mobile.Model.AllRisk.QouteHeadAllrisk;
 import com.mike4christ.sti_mobile.Model.Errors.APIError;
 import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
 import com.mike4christ.sti_mobile.Model.ServiceGenerator;
@@ -79,8 +80,6 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
     TextInputLayout mInputLayoutItemDescriptnA2;
     @BindView(R.id.item_desc_a2)
     EditText mItemDescA2;
-    @BindView(R.id.inputLayoutStartDate_a2)
-    TextInputLayout mInputLayoutStartDateA2;
     @BindView(R.id.start_date_a2)
     EditText mStartDateA2;
     @BindView(R.id.inputLayoutSerialNo_a2)
@@ -524,7 +523,7 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
 
             isValid = false;
         } else if (mStartDateA2.getText().toString().isEmpty()) {
-            mInputLayoutStartDateA2.setError("Start Date is required!");
+            showMessage("Start Date is required!");
 
             isValid = false;
         } else if (mSerialNumA2.getText().toString().isEmpty()) {
@@ -537,7 +536,6 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
         } else {
             mInputLayoutItemValueA2.setErrorEnabled(false);
             mInputLayoutSerialNoA2.setErrorEnabled(false);
-            mInputLayoutStartDateA2.setErrorEnabled(false);
             mInputLayoutItemDescriptnA2.setErrorEnabled(false);
 
         }
@@ -592,13 +590,25 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
         ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
 
 
-        Call<QouteHead> call=client.allrisk_quote("Token "+userPreferences.getUserToken(),mItemValueA2.getText().toString());
+        Call<QouteHeadAllrisk> call=client.allrisk_quote("Token "+userPreferences.getUserToken(), mItemValueA2.getText().toString());
 
-        call.enqueue(new Callback<QouteHead>() {
+        call.enqueue(new Callback<QouteHeadAllrisk>() {
             @Override
-            public void onResponse(Call<QouteHead> call, Response<QouteHead> response) {
+            public void onResponse(Call<QouteHeadAllrisk> call, Response<QouteHeadAllrisk> response) {
                 Log.i("ResponseCode", String.valueOf(response.code()));
-
+                if(response.code()==400){
+                    showMessage("Check your internet connection");
+                    return;
+                }else if(response.code()==429){
+                    showMessage("Too many requests on database");
+                    return;
+                }else if(response.code()==500){
+                    showMessage("Server Error");
+                    return;
+                }else if(response.code()==401){
+                    showMessage("Unauthorized access, please try login again");
+                    return;
+                }
 
                 try {
                     if (!response.isSuccessful()) {
@@ -623,8 +633,11 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
                         return;
                     }
 
-                    String quote_price=response.body().getData().getPrice();
-                    Log.i("quote_price",quote_price);
+                    long quote_price=response.body().getData().getPrice();
+
+                    double roundOff = Math.round(quote_price*100)/100.00;
+
+                    Log.i("quote_price", String.valueOf(quote_price));
                     showMessage("Successfully Fetched Quote");
                     mBtnLayout2A2.setVisibility(View.VISIBLE);
                     mProgressbar.setVisibility(View.GONE);
@@ -632,7 +645,7 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
 
                     // Fragment quoteBuyFragment3 = new MotorInsureFragment3();
                     FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.replace(R.id.fragment_allrisk_form_container, AllriskFragment3.newInstance(userPreferences.getAllRiskItemType(),quote_price), AllriskFragment3.class.getSimpleName());
+                    ft.replace(R.id.fragment_allrisk_form_container, AllriskFragment3.newInstance(userPreferences.getAllRiskItemType(), String.valueOf(roundOff)), AllriskFragment3.class.getSimpleName());
                     ft.commit();
                 }catch (Exception e){
                     Log.i("policyResponse", e.getMessage());
@@ -642,7 +655,7 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
 
             }
             @Override
-            public void onFailure(Call<QouteHead> call, Throwable t) {
+            public void onFailure(Call<QouteHeadAllrisk> call, Throwable t) {
                 showMessage("Submission Failed "+t.getMessage());
                 Log.i("GEtError",t.getMessage());
                 mBtnLayout2A2.setVisibility(View.VISIBLE);
@@ -677,7 +690,7 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
                     return;
                 }
                 int monthofYear=monthOfYear+1;
-                startDateStrg = dayOfMonth + "-" + monthofYear + "-" + year;
+                startDateStrg = year + "-" + monthofYear + "-" + dayOfMonth;
                 mStartDateA2.setText(startDateStrg);
                 datePickerDialog1.dismiss();
             }

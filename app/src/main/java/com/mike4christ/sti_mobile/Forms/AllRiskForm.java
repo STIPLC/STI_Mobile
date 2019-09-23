@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.mike4christ.sti_mobile.Constant;
 import com.mike4christ.sti_mobile.R;
+import com.mike4christ.sti_mobile.UserPreferences;
 import com.mike4christ.sti_mobile.forms_fragment.AllRisk.AllriskFragment1;
 
 import butterknife.BindView;
@@ -32,12 +33,15 @@ public class AllRiskForm extends AppCompatActivity {
     Fragment fragment;
 
     String title="";
+    UserPreferences userPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_allrisk_form);
         ButterKnife.bind(this);
+        UserPreferences userPreferences=new UserPreferences(this);
+
 
         Intent intent = getIntent();
         title=intent.getStringExtra(Constant.CARD_OPTION_TITLE);
@@ -65,6 +69,7 @@ public class AllRiskForm extends AppCompatActivity {
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        userPreferences.setTempAllRiskQuotePrice("0.0");
         finish();
         return super.onOptionsItemSelected(item);
     }

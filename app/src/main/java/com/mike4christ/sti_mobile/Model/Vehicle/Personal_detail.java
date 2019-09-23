@@ -10,6 +10,10 @@ public class Personal_detail extends RealmObject {
     String email;
     String gender;
     String phone;
+
+    String business;
+    String state;
+
     String resident_address;
     String marital_status;
 
@@ -66,6 +70,23 @@ public class Personal_detail extends RealmObject {
     public String getPhone() {
         return phone;
     }
+
+    public String getBusiness() {
+        return business;
+    }
+
+    public void setBusiness(String business) {
+        this.business = business;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
 
     public void setPhone(String phone) {
         this.phone = phone;

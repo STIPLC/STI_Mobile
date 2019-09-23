@@ -202,6 +202,22 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener{
         call.enqueue(new Callback<UserDataHead>() {
             @Override
             public void onResponse(Call<UserDataHead> call, Response<UserDataHead> response) {
+
+                if(response.code()==400){
+                    showMessage("Check your internet connection");
+                    return;
+                }else if(response.code()==429){
+                    showMessage("Too many requests on database");
+                    return;
+                }else if(response.code()==500){
+                    showMessage("Server Error");
+                    return;
+                }else if(response.code()==401){
+                    showMessage("Unauthorized access, please try login again");
+                    return;
+                }
+
+
                 try {
                     if (!response.isSuccessful()) {
 

@@ -57,10 +57,12 @@ public class EticFragment3 extends Fragment implements View.OnClickListener{
 
 
     private  int currentStep=2;
+
     Realm realm;
 
     EticPolicy id=new EticPolicy();
     String primaryKey=id.getId();
+    UserPreferences userPreferences;
 
     public EticFragment3() {
         // Required empty public constructor
@@ -91,12 +93,13 @@ public class EticFragment3 extends Fragment implements View.OnClickListener{
         if (getArguments() != null) {
             premiumText = getArguments().getString(PREMIUM_TXT);
             UserPreferences userPreferences=new UserPreferences(getContext());
-            int oldquote=userPreferences.getTempEticQuotePrice();
+
+            double oldquote=Double.valueOf(userPreferences.getTempEticQuotePrice());
             p_amount=getArguments().getString(PREMIUM_AMOUNT);
 
-            int newquote= Integer.parseInt(getArguments().getString(PREMIUM_AMOUNT));
-            int total_quote=oldquote+newquote;
-            userPreferences.setTempEticQuotePrice(total_quote);
+            double newquote= Double.valueOf(getArguments().getString(PREMIUM_AMOUNT));
+            double total_quote=oldquote+newquote;
+            userPreferences.setTempEticQuotePrice(String.valueOf(total_quote));
             Log.i("PrimaryVariable",primaryKey);
 
 
@@ -113,6 +116,7 @@ public class EticFragment3 extends Fragment implements View.OnClickListener{
         ButterKnife.bind(this,view);
         //        mStepView next registration step
         mStepView.go(currentStep, true);
+        userPreferences = new UserPreferences(getContext());
 
         //instancial Realm db
         realm=Realm.getDefaultInstance();
@@ -123,7 +127,7 @@ public class EticFragment3 extends Fragment implements View.OnClickListener{
             String format = p_amount + ".00";
             mAmountE3.setText(format);
         }else {
-            String format = p_amount + ".00";
+            String format = p_amount;
             mAmountE3.setText(format);
         }
 
@@ -159,7 +163,7 @@ public class EticFragment3 extends Fragment implements View.OnClickListener{
                 }
                 mStepView.done(false);
                 mStepView.go(currentStep, true);
-
+                userPreferences.setTempEticQuotePrice("0.0");
                 Fragment eticFragment2 = new EticFragment2();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_etic_form_container, eticFragment2);
@@ -181,8 +185,6 @@ public class EticFragment3 extends Fragment implements View.OnClickListener{
 
                 Personal_Detail_etic personal_detail_etic=new Personal_Detail_etic();
 
-
-
                 personal_detail_etic.setPrefix(userPreferences.getEticIPrefix());
                 personal_detail_etic.setFirst_name(userPreferences.getEticIFirstName());
                 personal_detail_etic.setLast_name(userPreferences.getEticILastName());
@@ -192,6 +194,17 @@ public class EticFragment3 extends Fragment implements View.OnClickListener{
                 personal_detail_etic.setNext_of_kin(userPreferences.getEticINextKin());
                 personal_detail_etic.setMailing_addr(userPreferences.getEticIMailingAddr());
                 personal_detail_etic.setEmail(userPreferences.getEticIEmail());
+
+
+                personal_detail_etic.setBusiness(userPreferences.getEticIBusiness());
+                personal_detail_etic.setNationality(userPreferences.getEticINationality());
+                personal_detail_etic.setEmployer_name(userPreferences.getEticIEmployerName());
+                personal_detail_etic.setEmployer_addr(userPreferences.getEticIEmployerAddr());
+                personal_detail_etic.setState(userPreferences.getEticIState());
+                personal_detail_etic.setIntnded_start_dateCover(userPreferences.getEticIIntendStartDate());
+                personal_detail_etic.setEnd_dateCover(userPreferences.getEticIEndDate());
+
+
                 personal_detail_etic.setPicture(userPreferences.getEticIPersonalImage());
                 
                 //Additional Insured List

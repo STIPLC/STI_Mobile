@@ -26,7 +26,7 @@ public class Data implements Serializable
     private String unitPrice;
     @SerializedName("total_price")
     @Expose
-    private Integer totalPrice;
+    private String totalPrice;
 
     public List<Policy> getPolicy() {
         return policy;
@@ -68,11 +68,11 @@ public class Data implements Serializable
         this.unitPrice = unitPrice;
     }
 
-    public Integer getTotalPrice() {
+    public String getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(Integer totalPrice) {
+    public void setTotalPrice(String totalPrice) {
         this.totalPrice = totalPrice;
     }
 

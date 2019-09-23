@@ -13,9 +13,9 @@
             android:icon="@drawable/ic_shopping_cart_black_24dp"
             android:title="Quote and Buy" />
         <item
-            android:id="@+id/manage_policy"
+            android:id="@+id/my_policy"
             android:icon="@drawable/ic_manage"
-            android:title="Manage Policy" />
+            android:title="My Policy" />
         <item
             android:id="@+id/transaction_history"
             android:icon="@drawable/ic_payment_black_24dp"
@@ -25,6 +25,10 @@
             android:id="@+id/make_claim"
             android:icon="@drawable/ic_make_claim"
             android:title="Make Claim" />
+        <item
+            android:id="@+id/my_claim"
+            android:icon="@drawable/ic_make_claim"
+            android:title="My Claim" />
         <item
             android:id="@+id/track_claim"
             android:icon="@drawable/ic_location_on_white_24dp"
@@ -41,6 +45,11 @@
                 android:id="@+id/nav_account"
                 android:icon="@drawable/ic_person_black_24dp"
                 android:title="My Account" />
+            <item
+                android:id="@+id/set_change_pin"
+                android:icon="@drawable/ic_vpn_key_black_24dp"
+                android:title="Set/Change Pin" />
+
             <item
                 android:id="@+id/find_us"
                 android:icon="@drawable/ic_location_on_black_24dp"

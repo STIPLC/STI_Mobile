@@ -10,25 +10,25 @@ public class PayoutAccount implements Serializable
 
     @SerializedName("bank")
     @Expose
-    private Object bank;
+    private String bank;
     @SerializedName("account_number")
     @Expose
-    private Object accountNumber;
+    private String accountNumber;
     @SerializedName("account_name")
     @Expose
-    private Object accountName;
+    private String accountName;
 
-    public Object getBank() {
+    public String getBank() {
         return bank;
     }
 
 
-    public Object getAccountNumber() {
+    public String getAccountNumber() {
         return accountNumber;
     }
 
 
-    public Object getAccountName() {
+    public String getAccountName() {
         return accountName;
     }
 

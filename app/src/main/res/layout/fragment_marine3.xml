@@ -114,7 +114,7 @@
                             android:id="@+id/premium_txt"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Premium price"
+                            android:text="Premium Price"
                             android:layout_weight="1"
                             android:textColor="@color/colorPrimary"
                             android:textSize="@dimen/size_twenty"
@@ -135,6 +135,8 @@
 
 
                     </LinearLayout>
+
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="2.5dp"
@@ -206,7 +208,7 @@
         </LinearLayout>
 
     </RelativeLayout>
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+ <!--   <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddCargo_m3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -214,5 +216,5 @@
         android:layout_margin="@dimen/size_sixteen"
         app:fabSize="normal"
         app:srcCompat="@drawable/ic_add_black_24dp"
-        tools:ignore="VectorDrawableCompat"/>
+        tools:ignore="VectorDrawableCompat"/>-->
 </FrameLayout>

@@ -167,6 +167,37 @@
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/inputLayoutBusinessProfession"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+
+                        >
+
+                        <EditText
+                            android:id="@+id/business_prof_editxt"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/size_three"
+                            android:background="@drawable/rounded_bg"
+                            android:hint="Business/Profession"
+                            android:importantForAutofill="noExcludeDescendants"
+                            android:inputType="text"
+                            android:padding="@dimen/size_ten"
+                            tools:targetApi="o"
+                            />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+
+                    <Spinner
+                        android:id="@+id/state_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="@dimen/size_three"
+                        android:background="@drawable/spinner_bg"
+
+                        />
+
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/inputLayoutFirstName"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -235,7 +266,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/size_three"
                             android:background="@drawable/rounded_bg"
-                            android:hint="Residentail Address"
+                            android:hint="Residential Address"
                             android:importantForAutofill="noExcludeDescendants"
                             android:inputType="text"
                             android:padding="@dimen/size_ten"
@@ -283,6 +314,8 @@
                             tools:targetApi="o"
                             />
                     </com.google.android.material.textfield.TextInputLayout>
+
+
 
 
 
@@ -338,13 +371,26 @@
                         android:layout_marginBottom="@dimen/size_ten"
                         android:visibility="visible"
                         />
-                    <TextView
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/colorPrimary"
-                        android:text="I have review and agreed to the disclosure and the privacy policy"
-                        android:textStyle="italic"
-                        />
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/reviewed_checked"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:clickable="true"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/colorPrimary"
+                            android:text="I have review and agreed to the disclosure and the privacy policy"
+                            android:textStyle="italic"
+                            />
+                    </LinearLayout>
+
 
                     <Button
                         android:id="@+id/next_btn0"

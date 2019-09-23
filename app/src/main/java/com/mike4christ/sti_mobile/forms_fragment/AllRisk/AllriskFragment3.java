@@ -59,15 +59,12 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
     FloatingActionButton fabAddItem_a3;
 
 
-
-
-
-
     private  int currentStep=2;
     Realm realm;
 
     AllriskPolicy id=new AllriskPolicy();
     String primaryKey=id.getId();
+    UserPreferences userPreferences;
 
 
 
@@ -99,12 +96,12 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             selectedItem = getArguments().getString(SELECTED_ITEM);
-            int oldquote=userPreferences.getTempAllRiskQuotePrice();
+            double oldquote=Double.valueOf(userPreferences.getTempAllRiskQuotePrice());
             p_amount=getArguments().getString(PREMIUM_AMOUNT);
 
-            int newquote= Integer.parseInt(getArguments().getString(PREMIUM_AMOUNT));
-            int total_quote=oldquote+newquote;
-            userPreferences.setTempAllRiskQuotePrice(total_quote);
+            double newquote= Double.valueOf(getArguments().getString(PREMIUM_AMOUNT));
+            double total_quote=oldquote+newquote;
+            userPreferences.setTempAllRiskQuotePrice(String.valueOf(total_quote));
             Log.i("PrimaryVariable",primaryKey);
 
 
@@ -121,7 +118,7 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
         mStepView.go(currentStep, true);
 
         realm=Realm.getDefaultInstance();
-        UserPreferences userPreferences=new UserPreferences(getContext());
+         userPreferences=new UserPreferences(getContext());
 
         mSelectedItemTxtA3.setText(selectedItem);
         if(p_amount==null){
@@ -163,10 +160,10 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
                 }
                 mStepView.done(false);
                 mStepView.go(currentStep, true);
-
-                Fragment quoteBuyFragment3 = new AllriskFragment3();
+                userPreferences.setTempAllRiskQuotePrice("0.0");
+                Fragment quoteBuyFragment2 = new AllriskFragment2();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_allrisk_form_container, quoteBuyFragment3);
+                ft.replace(R.id.fragment_allrisk_form_container, quoteBuyFragment2);
                 ft.commit();
 
                 break;
@@ -191,6 +188,7 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
                             personal_detail_allrisk.setResident_address(userPreferences.getAllRiskIResAdrr());
                             personal_detail_allrisk.setNext_of_kin(userPreferences.getAllRiskINextKin());
                             personal_detail_allrisk.setPolicy_type(userPreferences.getAllRiskPtype());
+                            personal_detail_allrisk.setState(userPreferences.getAllRiskIState());
                             personal_detail_allrisk.setCompany_name(userPreferences.getAllRiskICompanyName());
                             personal_detail_allrisk.setMailing_addr(userPreferences.getAllRiskIMailingAddr());
                             personal_detail_allrisk.setTin_num(userPreferences.getAllRiskITinNumber());
@@ -295,6 +293,7 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
         personal_detail_allrisk.setEmail(userPreferences.getAllRiskIEmail());
         personal_detail_allrisk.setGender(userPreferences.getAllRiskIGender());
         personal_detail_allrisk.setPhone(userPreferences.getAllRiskIPhoneNum());
+        personal_detail_allrisk.setState(userPreferences.getAllRiskIState());
         personal_detail_allrisk.setResident_address(userPreferences.getAllRiskIResAdrr());
         personal_detail_allrisk.setNext_of_kin(userPreferences.getAllRiskINextKin());
         personal_detail_allrisk.setPolicy_type(userPreferences.getAllRiskPtype());
@@ -327,10 +326,10 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
                 final Personal_Detail_allrisk personal_detail_allrisk1=realm.copyToRealm(personal_detail_allrisk);
 
                 AllriskPolicy allriskPolicy=realm.createObject(AllriskPolicy.class,primaryKey);
-                allriskPolicy.setAgent_id("1");
+                allriskPolicy.setAgent_id(userPreferences.getUserId());
                 allriskPolicy.setQuote_price(String.valueOf(userPreferences.getTempAllRiskQuotePrice()));
                 allriskPolicy.setPayment_source("paystack");
-                allriskPolicy.setPin("11234");
+                allriskPolicy.setPin("0000");
 
                 allriskPolicy.getPersonal_detail_allrisks().add(personal_detail_allrisk1);
 

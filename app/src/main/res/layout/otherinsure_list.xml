@@ -34,7 +34,7 @@
 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Selected Product: "
+                    android:text="Selected \nProduct: "
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     android:textColor="@color/colorGrey"
@@ -44,6 +44,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="private"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     />
@@ -72,6 +74,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Acura"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:textSize="@dimen/size_twenty"
                     android:layout_margin="6dp"
                     />

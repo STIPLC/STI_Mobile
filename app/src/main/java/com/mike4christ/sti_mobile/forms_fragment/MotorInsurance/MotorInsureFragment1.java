@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 
 import androidx.appcompat.app.AlertDialog;
@@ -57,6 +58,8 @@ public class MotorInsureFragment1 extends Fragment implements View.OnClickListen
 
     @BindView(R.id.step_view)
     StepView stepView;
+    @BindView(R.id.reviewed_checked)
+    RadioButton reviewed_checked;
 
     //EditText
     @BindView(R.id.firstname_editxt)
@@ -67,6 +70,8 @@ public class MotorInsureFragment1 extends Fragment implements View.OnClickListen
     EditText residents_addr_editxt;
     @BindView(R.id.next_kin_editxt)
     EditText next_kin_editxt;
+    @BindView(R.id.business_prof_editxt)
+    EditText business_prof_editxt;
     @BindView(R.id.phone_no_editxt)
     EditText phone_no_editxt;
     @BindView(R.id.email_editxt)
@@ -111,6 +116,8 @@ public class MotorInsureFragment1 extends Fragment implements View.OnClickListen
     @BindView(R.id.inputLayoutContactPerson)
     TextInputLayout inputLayoutContactPerson;
 
+    @BindView(R.id.inputLayoutBusinessProfession)
+    TextInputLayout inputLayoutBusinessProfession;
 
     //Spinners
     @BindView(R.id.type_spinner)
@@ -119,6 +126,8 @@ public class MotorInsureFragment1 extends Fragment implements View.OnClickListen
     Spinner prefixSpinner;
     @BindView(R.id.gender_spinner)
     Spinner genderSpinner;
+    @BindView(R.id.state_spinner)
+    Spinner state_spinner;
 
     //Buttons
     @BindView(R.id.upload_img_btn)
@@ -130,7 +139,7 @@ public class MotorInsureFragment1 extends Fragment implements View.OnClickListen
     @BindView(R.id.progressbar)
     AVLoadingIndicatorView progressbar;
 
-    String typeString,genderString,prifixString,cameraFilePath;
+    String typeString,stateString,genderString,prifixString,cameraFilePath;
     private int currentStep = 0;
 
     int PICK_IMAGE_PASSPORT = 1;
@@ -187,6 +196,7 @@ public class MotorInsureFragment1 extends Fragment implements View.OnClickListen
 
         typeSpinner();
         prefixSpinner();
+        stateSpinner();
         genderSpinner();
         setViewActions();
 
@@ -321,6 +331,8 @@ public class MotorInsureFragment1 extends Fragment implements View.OnClickListen
                     typeSpinner.setVisibility(View.VISIBLE);
                     inputLayoutPhone.setVisibility(View.VISIBLE);
                     inputLayoutEmail.setVisibility(View.VISIBLE);
+                    state_spinner.setVisibility(View.VISIBLE);
+                    inputLayoutBusinessProfession.setVisibility(View.VISIBLE);
                     inputLayoutMailingAddr.setVisibility(View.VISIBLE);
                     upload_img_btn.setVisibility(View.VISIBLE);
 
@@ -351,6 +363,8 @@ public class MotorInsureFragment1 extends Fragment implements View.OnClickListen
                 typeSpinner.setVisibility(View.VISIBLE);
                 inputLayoutPhone.setVisibility(View.VISIBLE);
                 inputLayoutEmail.setVisibility(View.VISIBLE);
+                state_spinner.setVisibility(View.VISIBLE);
+                inputLayoutBusinessProfession.setVisibility(View.VISIBLE);
                 inputLayoutMailingAddr.setVisibility(View.VISIBLE);
                 upload_img_btn.setVisibility(View.VISIBLE);
 
@@ -389,6 +403,38 @@ public class MotorInsureFragment1 extends Fragment implements View.OnClickListen
         });
 
     }
+
+    private void stateSpinner() {
+        // Create an ArrayAdapter using the string array and a default spinner
+        ArrayAdapter<CharSequence> staticAdapter = ArrayAdapter
+                .createFromResource(getContext(), R.array.state_array,
+                        android.R.layout.simple_spinner_item);
+
+        // Specify the layout to use when the list of choices appears
+        staticAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Apply the adapter to the spinner
+        state_spinner.setAdapter(staticAdapter);
+
+        state_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                String stateText = (String) parent.getItemAtPosition(position);
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+                state_spinner.getItemAtPosition(0);
+
+            }
+        });
+
+    }
+
     private void genderSpinner() {
         // Create an ArrayAdapter using the string array and a default spinner
         ArrayAdapter<CharSequence> staticAdapter = ArrayAdapter
@@ -709,11 +755,13 @@ public class MotorInsureFragment1 extends Fragment implements View.OnClickListen
             if (mail_addr_editxt.getText().toString().isEmpty()&& inputLayoutMailingAddr.isClickable()) {
                 inputLayoutMailingAddr.setError("Mailing Address is required!");
                 isValid = false;
-            } else if (!isValidEmailAddress(mail_addr_editxt.getText().toString())&&inputLayoutMailingAddr.isClickable()) {
-                inputLayoutMailingAddr.setError("Valid Mailing Address is required!");
+            }else if (business_prof_editxt.getText().toString().isEmpty()&& inputLayoutBusinessProfession.isClickable()) {
+                inputLayoutBusinessProfession.setError("Business or Profession is required!");
                 isValid = false;
             } else {
                 inputLayoutMailingAddr.setErrorEnabled(false);
+                inputLayoutBusinessProfession.setErrorEnabled(false);
+
             }
 
 
@@ -747,6 +795,11 @@ public class MotorInsureFragment1 extends Fragment implements View.OnClickListen
                 inputLayoutNextKin.setErrorEnabled(false);
             }
 
+            if (!reviewed_checked.isChecked()) {
+                showMessage("Please checked below point, to accept you review");
+                isValid = false;
+            }
+
             if (personal_img_url==null) {
                 showMessage("Please upload an image: passport,company license..etc");
                 isValid = false;
@@ -771,6 +824,12 @@ public class MotorInsureFragment1 extends Fragment implements View.OnClickListen
                 showMessage("Don't forget to Select Gender");
                 isValid = false;
             }
+
+                stateString = state_spinner.getSelectedItem().toString();
+                if (stateString.equals("Geographical Location")&&state_spinner.isClickable()) {
+                    showMessage("Select your Geographical Location");
+                    isValid = false;
+                }
 
             if (isValid) {
 //            send inputs to next next page
@@ -804,6 +863,8 @@ public class MotorInsureFragment1 extends Fragment implements View.OnClickListen
             userPreferences.setMotorIResAdrr(residents_addr_editxt.getText().toString());
             userPreferences.setMotorINextKin(next_kin_editxt.getText().toString());
             userPreferences.setMotorIPhoneNum(phone_no_editxt.getText().toString());
+            userPreferences.setMotorIBusiness(business_prof_editxt.getText().toString());
+            userPreferences.setMotorIState(stateString);
             userPreferences.setMotorIEmail(email_editxt.getText().toString());
             userPreferences.setMotorIMailingAddr(mail_addr_editxt.getText().toString());
             userPreferences.setMotorIPersonal_image(personal_img_url);

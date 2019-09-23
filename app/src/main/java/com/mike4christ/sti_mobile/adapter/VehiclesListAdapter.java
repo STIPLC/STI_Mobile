@@ -56,8 +56,9 @@ private Context context;
 
         assert temp != null;
 
-      if(temp.getPolicy_type().equals("Motor Cycle")){
-          holder.policytype_txt.setText(temp.getMotor_cycle_policy());
+      if(temp.getPrivate_com_type().equals("Motor Cycle")){
+          holder.policytype_txt.setText(temp.getPrivate_com_type());
+          holder.vehicle_value_title.setText("Motor Cycle\nValue");
           holder.vehicle_value.setText(temp.getMotorcylce_value());
           holder.reg_num_txt.setText(temp.getRegistration_number());
           holder.reg_code.setText(temp.getRegistration_number());
@@ -66,9 +67,7 @@ private Context context;
 
       }else {
 
-        /*count=count+1;
-        holder.numbering.setText(count);*/
-          holder.policytype_txt.setText(temp.getPolicy_type());
+          holder.policytype_txt.setText(temp.getPrivate_com_type());
           holder.vehicle_make_txt.setText(temp.getVehicle_make());
           holder.vehicle_type_txt.setText(temp.getVehicle_type());
           holder.reg_num_txt.setText(temp.getRegistration_number());
@@ -98,6 +97,8 @@ private Context context;
           TextView reg_num_txt;
           @BindView(R.id.vehicle_value_txt)
           TextView vehicle_value;
+        @BindView(R.id.vehicle_value_title)
+        TextView vehicle_value_title;
 
 
 

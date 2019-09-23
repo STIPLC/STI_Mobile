@@ -1,5 +1,6 @@
 package com.mike4christ.sti_mobile.forms_fragment.Claim;
 
+import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
@@ -21,6 +23,8 @@ import android.widget.Spinner;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
@@ -35,11 +39,22 @@ import com.mike4christ.sti_mobile.Model.Errors.APIError;
 import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
 import com.mike4christ.sti_mobile.Model.Etic.EticPost.EticPostHead;
 import com.mike4christ.sti_mobile.Model.Etic.FormSuccessDetail.BuyQuoteFormGetHead_Etic;
+import com.mike4christ.sti_mobile.Model.MyPolicies.AllRisk;
+import com.mike4christ.sti_mobile.Model.MyPolicies.Marine;
+import com.mike4christ.sti_mobile.Model.MyPolicies.PolicyHead;
+import com.mike4christ.sti_mobile.Model.MyPolicies.Swis;
+import com.mike4christ.sti_mobile.Model.MyPolicies.Travel;
+import com.mike4christ.sti_mobile.Model.MyPolicies.Vehicle;
+import com.mike4christ.sti_mobile.Model.Pin.UserPin;
+import com.mike4christ.sti_mobile.Model.Pin.setPin;
 import com.mike4christ.sti_mobile.Model.ServiceGenerator;
 import com.mike4christ.sti_mobile.NetworkConnection;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
 import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
+import com.mike4christ.sti_mobile.forms_fragment.AllRisk.AllriskFragment2;
+import com.mike4christ.sti_mobile.fragment.DashboardFragment;
+import com.mike4christ.sti_mobile.fragment.MyPoliciesFragment;
 import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -48,6 +63,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -83,8 +99,8 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
     EditText mDescclaimEditxtS1;
     @BindView(R.id.inputLayoutDateofLoss)
     TextInputLayout mInputLayoutDateofLoss;
-    @BindView(R.id.lossde_editxt_s1)
-    EditText mLossdeEditxtS1;
+    @BindView(R.id.dateloss_editxt_s1)
+    EditText mDateLossEditxtS1;
     @BindView(R.id.sti_est_spinner)
     Spinner mStiEstSpinner;
     @BindView(R.id.inputLayoutEstimateCost)
@@ -105,6 +121,7 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
     Button mProceed;
     @BindView(R.id.progressbar1_s1)
     AVLoadingIndicatorView mProgressbar1S1;
+    DatePickerDialog datePickerDialog1;
 
 
 
@@ -130,6 +147,26 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
     String damage_img_url;
     List<String> claimPictureList_post=new ArrayList<>();
     UserPreferences userPreferences;
+
+    List<Vehicle> vehicleList;
+    List<Swis> swisList;
+    List<Marine> marineList;
+    List<Travel> travelList;
+    List<AllRisk> allRiskList;
+    
+    
+    
+    ArrayList<String> policySpinnerList=new ArrayList<>();
+
+    ArrayList<String> vehicleTypeString=new ArrayList<>();
+    ArrayList<String> swissTypeString=new ArrayList<>();
+    ArrayList<String> marineTypeString=new ArrayList<>();
+    ArrayList<String> travelTypeString=new ArrayList<>();
+    ArrayList<String> allriskTypeString=new ArrayList<>();
+    
+    ApiInterface client= ServiceGenerator.createService(ApiInterface.class);
+
+    String dateLossString;
 
 
     public SubFragment_Claim() {
@@ -171,54 +208,192 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
         ButterKnife.bind(this,view);
         userPreferences=new UserPreferences(getContext());
 
+        policySpinnerList.add("Select Claim Type");
+        policySpinnerList.add("Motor");
+        policySpinnerList.add("Swiss-F");
+        policySpinnerList.add("Marine");
+        policySpinnerList.add("Travel");
+        policySpinnerList.add("All Risk");
 
-        ArrayList<String> policies = new ArrayList<String>(
-                Arrays.asList("Policy Number","MOT/8767/CF", "MOV/5688/hsfgs", "TL/576223/hdgd77"));
+       
 
 
-
-        claimtypeSpinner();
-        polyNumTypeSpinner(policies);
+        getPolicies();
+        userClaimType();
+        
         stiEsttypeSpinner();
+        showDatePicker();
 
         setViewActions();
 
         return  view;
     }
 
+    private void getPolicies(){
 
 
-    private void claimtypeSpinner() {
+        //get client and call object for request
+
+        Call<PolicyHead> call=client.get_paid_policies("Token "+userPreferences.getUserToken());
+        call.enqueue(new Callback<PolicyHead>() {
+            @Override
+            public void onResponse(Call<PolicyHead> call, Response<PolicyHead> response) {
+                if(response.code()==400){
+                    showMessage("Check your internet connection");
+                    return;
+                }else if(response.code()==429){
+                    showMessage("Too many requests on database");
+                    return;
+                }else if(response.code()==500){
+                    showMessage("Server Error");
+                    return;
+                }else if(response.code()==401){
+                    showMessage("Unauthorized access, please try login again");
+                    return;
+                }
+                if(!response.isSuccessful()){
+                    try {
+                        APIError apiError = ErrorUtils.parseError(response);
+
+                        showMessage("Fetch Failed: " + apiError.getErrors());
+                        Log.i("Invalid Fetch", String.valueOf(apiError.getErrors()));
+                        //Log.i("Invalid Entry", response.errorBody().toString());
+
+                    } catch (Exception e) {
+                        Log.i("Fetch Failed", e.getMessage());
+                        showMessage("Fetch Failed");
+
+                    }
+
+                    return;
+                }
+
+                vehicleList=response.body().getData().getPolicies().getVehicle();
+                swisList=response.body().getData().getPolicies().getSwiss();
+                travelList=response.body().getData().getPolicies().getTravel();
+                allRiskList=response.body().getData().getPolicies().getAllRisk();
+                marineList=response.body().getData().getPolicies().getMarine();
+
+                int count_vehicle=vehicleList.size();
+                int count_swis=swisList.size();
+                int count_travel=travelList.size();
+                int count_allrisk=allRiskList.size();
+                int count_marine=marineList.size();
+
+                //policySpinnerList.add("Select Policy Number");
+                if(count_vehicle!=0){
+                    for(int i=0; i<vehicleList.size();i++){
+                        // policySpinnerList.add(vehicleList.get(i).getPolicyNumber());
+                        vehicleTypeString.add(vehicleList.get(i).getPolicyNumber());
+                    }
+                }
+                if(count_swis!=0) {
+                    for (int i = 0; i < swisList.size(); i++) {
+                        //policySpinnerList.add(swisList.get(i).getPolicyNumber());
+                        swissTypeString.add(swisList.get(i).getPolicyNumber());
+                    }
+                }
+                if(count_travel!=0) {
+                    for (int i = 0; i < travelList.size(); i++) {
+                        // policySpinnerList.add(travelList.get(i).getPolicyNumber());
+                        travelTypeString.add(travelList.get(i).getPolicyNumber());
+                    }
+                }
+                if(count_marine!=0) {
+                    for (int i = 0; i < marineList.size(); i++) {
+                        //policySpinnerList.add(marineList.get(i).getPolicyNumber());
+                        marineTypeString.add(marineList.get(i).getPolicyNumber());
+                    }
+                }
+                if(count_allrisk!=0) {
+                    for (int i = 0; i < allRiskList.size(); i++) {
+                        //policySpinnerList.add(allRiskList.get(i).getPolicyNumber());
+                        allriskTypeString.add(allRiskList.get(i).getPolicyNumber());
+                    }
+                }
+
+                if(count_allrisk==0&&count_marine==0&&count_swis==0&&count_travel==0&&count_vehicle==0){
+                    showMessage("You have not paid any policy");
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<PolicyHead> call, Throwable t) {
+                showMessage("Fetch failed, please try again "+t.getMessage());
+                Log.i("GEtError",t.getMessage());
+            }
+        });
+
+
+    }
+
+
+
+    private void userClaimType() {
         // Create an ArrayAdapter using the string array and a default spinner
-        ArrayAdapter<CharSequence> staticAdapter = ArrayAdapter
-                .createFromResource(getContext(), R.array.claim_array,
-                        android.R.layout.simple_spinner_item);
-
-        // Specify the layout to use when the list of choices appears
-        staticAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        // Apply the adapter to the spinner
-        mClaimTypeSpinner.setAdapter(staticAdapter);
+        mClaimTypeSpinner
+                .setAdapter(new ArrayAdapter<String>(getContext(),
+                        android.R.layout.simple_spinner_dropdown_item,
+                        policySpinnerList));
 
         mClaimTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
-                String stringText = (String) parent.getItemAtPosition(position);
+                String policy_type = (String) parent.getItemAtPosition(position);
+
+                if(position!=0) {
+                    if(policy_type.equals("Motor")){
+                        vehiclePolicy();
+
+                    }else if(policy_type.equals("Swiss-F")){
+                        swissPolicy();
+                    }
+                    else if(policy_type.equals("Marine")){
+                        marinePolicy();
+
+                    }
+                    else if(policy_type.equals("Travel")){
+                        travelPolicy();
+
+                    }
+                    else if(policy_type.equals("All Risk")){
+                        allriskPolicy();
+
+                    }
+
+                }
 
 
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                //De-Visualizing the individual form
                 mClaimTypeSpinner.getItemAtPosition(0);
-
-
             }
         });
 
     }
+
+    private void showDatePicker() {
+        //Get current date
+        Calendar calendar = Calendar.getInstance();
+
+        //Create datePickerDialog with initial date which is current and decide what happens when a date is selected.
+        datePickerDialog1 = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                int monthofYear=monthOfYear+1;
+                dateLossString = monthofYear + "/" + dayOfMonth + "/" + year;
+                mDateLossEditxtS1.setText(dateLossString);
+                datePickerDialog1.dismiss();
+            }
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+    }
+
+
 
     private void stiEsttypeSpinner() {
         // Create an ArrayAdapter using the string array and a default spinner
@@ -252,20 +427,45 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
 
     }
 
-
-    private void polyNumTypeSpinner(ArrayList<String> arrayList) {
+    private void vehiclePolicy() {
         // Create an ArrayAdapter using the string array and a default spinner
-
         mPolynumTypeSpinner
                 .setAdapter(new ArrayAdapter<String>(getContext(),
                         android.R.layout.simple_spinner_dropdown_item,
-                        arrayList));
+                        vehicleTypeString));
 
         mPolynumTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
-                String VehicleTypeString = (String) parent.getItemAtPosition(position);
+                String user_policy_String = (String) parent.getItemAtPosition(position);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                mPolynumTypeSpinner.getItemAtPosition(0);
+             
+            }
+        });
+
+    }
+
+
+
+    private void swissPolicy() {
+        // Create an ArrayAdapter using the string array and a default spinner
+        mPolynumTypeSpinner
+                .setAdapter(new ArrayAdapter<String>(getContext(),
+                        android.R.layout.simple_spinner_dropdown_item,
+                        swissTypeString));
+
+        mPolynumTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                String user_policy_String = (String) parent.getItemAtPosition(position);
+
 
 
             }
@@ -273,10 +473,91 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 mPolynumTypeSpinner.getItemAtPosition(0);
+
             }
         });
 
     }
+
+    private void marinePolicy() {
+        // Create an ArrayAdapter using the string array and a default spinner
+        mPolynumTypeSpinner
+                .setAdapter(new ArrayAdapter<String>(getContext(),
+                        android.R.layout.simple_spinner_dropdown_item,
+                        marineTypeString));
+
+        mPolynumTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                String user_policy_String = (String) parent.getItemAtPosition(position);
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                mPolynumTypeSpinner.getItemAtPosition(0);
+
+            }
+        });
+
+    }
+
+    private void travelPolicy() {
+        // Create an ArrayAdapter using the string array and a default spinner
+        mPolynumTypeSpinner
+                .setAdapter(new ArrayAdapter<String>(getContext(),
+                        android.R.layout.simple_spinner_dropdown_item,
+                        travelTypeString));
+
+        mPolynumTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                String user_policy_String = (String) parent.getItemAtPosition(position);
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                mPolynumTypeSpinner.getItemAtPosition(0);
+
+            }
+        });
+
+    }
+
+    private void allriskPolicy() {
+        // Create an ArrayAdapter using the string array and a default spinner
+        mPolynumTypeSpinner
+                .setAdapter(new ArrayAdapter<String>(getContext(),
+                        android.R.layout.simple_spinner_dropdown_item,
+                        allriskTypeString));
+
+        mPolynumTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                String user_policy_String = (String) parent.getItemAtPosition(position);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                mPolynumTypeSpinner.getItemAtPosition(0);
+
+            }
+        });
+
+    }
+
+
+
+
+
+
 
     //seting onclicks listeners
     private void setViewActions() {
@@ -284,6 +565,7 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
         mUploadDocument.setOnClickListener(this);
         mUploadEstimateCost.setOnClickListener(this);
         mProceed.setOnClickListener(this);
+        mDateLossEditxtS1.setOnClickListener(this);
     }
 
     @Override
@@ -384,6 +666,10 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
 //                validate user input
 
                 validateUserInputs();
+                break;
+
+            case R.id.dateloss_editxt_s1:
+                datePickerDialog1.show();
                 break;
         }
     }
@@ -953,7 +1239,7 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
             if (mDescclaimEditxtS1.getText().toString().isEmpty()) {
                 mInputLayoutLastDescClaim.setError("Claim Description is required!");
                 isValid = false;
-            } else if (mLossdeEditxtS1.getText().toString().isEmpty()) {
+            } else if (mDateLossEditxtS1.getText().toString().isEmpty()) {
                 mInputLayoutDateofLoss.setError("Loss Date is required!");
                 isValid = false;
             } else if (mEstCostEditxtS1.getText().toString().isEmpty()) {
@@ -962,7 +1248,7 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
             }else if (mPinEditxt.getText().toString().isEmpty()) {
                 mInputLayoutPin.setError("Your Pin is required!");
                 isValid = false;
-            } else if (mPinEditxt.getText().toString().trim().length() >4 ||mPinEditxt.getText().toString().trim().length() <4) {
+            } else if (mPinEditxt.getText().toString().trim().length() >4 ||mPinEditxt.getText().toString().trim().length() <4 || mPinEditxt.getText().toString().isEmpty()) {
                 mInputLayoutPin.setError("Invalid Entry !");
                 Snackbar snackbar = Snackbar.make(mClaimFormLayout1, "If you have not set pin, click to set your pin", Snackbar.LENGTH_LONG);
                 snackbar.setAction("Set Pin", new View.OnClickListener() {
@@ -1052,6 +1338,8 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
                 pinString = input.getText().toString();
 
                //Post request to set pin with other parameter
+                initFragmentSetPin();
+
                 showMessage("Pin Set Successfully");
             }
         });
@@ -1065,6 +1353,71 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
         builder.show();
     }
 
+
+    private void initFragmentSetPin() {
+
+        UserPin userPin=new UserPin(mPinEditxt.getText().toString());
+        setPin setPin=new setPin(userPin);
+        sendPinData(setPin);
+
+    }
+
+    private void sendPinData(setPin setPin){
+
+
+        //get client and call object for request
+        ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
+
+        Call<ResponseBody> call=client.set_pin("Token "+userPreferences.getUserToken(),setPin);
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.i("ResponseCode", String.valueOf(response.code()));
+
+                try {
+                    if (!response.isSuccessful()) {
+
+                        try{
+                            APIError apiError= ErrorUtils.parseError(response);
+
+                            showMessage("Invalid Entry: "+apiError.getErrors());
+                            Log.i("Invalid EntryK",apiError.getErrors().toString());
+                            Log.i("Invalid Entry",response.errorBody().toString());
+
+                        }catch (Exception e){
+                            Log.i("InvalidEntry",e.getMessage());
+                            Log.i("ResponseError",response.errorBody().string());
+                            showMessage("Failed to Set Pin "+e.getMessage());
+
+
+                        }
+                        showMessage("Failed to Set Pin");
+                        return;
+                    }
+
+                    showMessage("Pin Successfully set");
+
+                }catch (Exception e){
+                    showMessage("Submission Error: " + e.getMessage());
+                    Log.i("Submission", e.getMessage());
+
+                }
+
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                showMessage("Submission Failed "+t.getMessage());
+                Log.i("GEtError",t.getMessage());
+            }
+        });
+
+
+
+
+    }
+
+
     private void initFragment() {
         mProceed.setVisibility(View.GONE);
         mProgressbar1S1.setVisibility(View.VISIBLE);
@@ -1075,7 +1428,7 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
         claimPictureList_post.add(otherdoc_img_url);
 
         ClaimPost claimPost=new ClaimPost(mDescclaimEditxtS1.getText().toString(),claimTypeString,"Paid",policyTypeString,
-                Integer.parseInt(mLossdeEditxtS1.getText().toString()),Integer.parseInt(mEstCostEditxtS1.getText().toString()),claimPictureList_post,mPinEditxt.getText().toString());
+                Integer.parseInt(mDateLossEditxtS1.getText().toString()),Integer.parseInt(mEstCostEditxtS1.getText().toString()),claimPictureList_post,mPinEditxt.getText().toString());
 
         sendClaimData(claimPost);
 
@@ -1132,6 +1485,11 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
                     showMessage("Claim Successfully Submitted");
                     Log.i("claim_response",claim_response);
 
+                    Fragment dashboardFragment = new DashboardFragment();
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.replace(R.id.fragment_container, dashboardFragment);
+                    ft.commit();
+
 
                 }catch (Exception e){
                     showMessage("Submission Error: " + e.getMessage());
@@ -1154,6 +1512,8 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
 
 
     }
+
+
 
 
     private void showMessage(String s) {

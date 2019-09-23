@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.mike4christ.sti_mobile.Constant;
 import com.mike4christ.sti_mobile.R;
+import com.mike4christ.sti_mobile.UserPreferences;
 import com.mike4christ.sti_mobile.forms_fragment.Etic.EticFragment1;
 
 import butterknife.BindView;
@@ -27,6 +28,7 @@ public class EticForm extends AppCompatActivity {
 
    /* @BindView(R.id.message)
     TextView mTextMessage;*/
+   UserPreferences userPreferences;
 
 
     Fragment fragment;
@@ -38,6 +40,7 @@ public class EticForm extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_etic_form);
         ButterKnife.bind(this);
+        userPreferences=new UserPreferences(this);
 
         Intent intent = getIntent();
         title=intent.getStringExtra(Constant.CARD_OPTION_TITLE);
@@ -65,6 +68,7 @@ public class EticForm extends AppCompatActivity {
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        userPreferences.setTempEticQuotePrice("0.0");
         finish();
         return super.onOptionsItemSelected(item);
     }

@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 
 import androidx.fragment.app.Fragment;
@@ -43,6 +44,8 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
 
     @BindView(R.id.qb_form_layout1)
     FrameLayout mQbFormLayout1;
+    @BindView(R.id.reviewed_checked)
+    RadioButton reviewed_checked;
     @BindView(R.id.step_view)
     StepView mStepView;
     @BindView(R.id.type_spinner_m1)
@@ -79,6 +82,8 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
     EditText mLastnameEditxtM1;
     @BindView(R.id.gender_spinner_m1)
     Spinner mGenderSpinnerM1;
+    @BindView(R.id.state_spinner)
+    Spinner state_spinner;
     @BindView(R.id.marital_spinner_m1)
     Spinner mMaritalSpinnerM1;
     @BindView(R.id.inputLayoutResAddr_m1)
@@ -102,8 +107,7 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
     @BindView(R.id.progressbar1_m1)
     AVLoadingIndicatorView mProgressbar1M1;
 
-
-    String typeString,genderString,prifixString,maritalString;
+    String typeString,genderString,prifixString,maritalString,stateString;
     private int currentStep = 0;
     
 
@@ -155,6 +159,7 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
         mTypeSpinnerM1();
         mPrefixSpinnerM1();
         mGenderSpinnerM1();
+        stateSpinner();
         maritalmTypeSpinnerM1();
         setViewActions();
 
@@ -187,6 +192,38 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
         mMailAddrEditxtM1.setText(userPreferences.getMarineIMailingAddr());
 
     }
+
+    private void stateSpinner() {
+        // Create an ArrayAdapter using the string array and a default spinner
+        ArrayAdapter<CharSequence> staticAdapter = ArrayAdapter
+                .createFromResource(getContext(), R.array.state_array,
+                        android.R.layout.simple_spinner_item);
+
+        // Specify the layout to use when the list of choices appears
+        staticAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Apply the adapter to the spinner
+        state_spinner.setAdapter(staticAdapter);
+
+        state_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                String stateText = (String) parent.getItemAtPosition(position);
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+                state_spinner.getItemAtPosition(0);
+
+            }
+        });
+
+    }
+
 
 
     private void maritalmTypeSpinnerM1() {
@@ -246,28 +283,31 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
 
                     //De-Visualizing the corporate form
                     mInputLayoutCompanyNameM1.setVisibility(View.GONE);
-                    mInputLayoutCompanyNameM1.setClickable(false);
+                    mCompanynameEditxtM1.setClickable(false);
                     mInputLayoutTinNumM1.setVisibility(View.GONE);
-                    mInputLayoutTinNumM1.setClickable(false);
+                    mTinNumEditxtM1.setClickable(false);
                     mInputLayoutOfficeAddrM1.setVisibility(View.GONE);
-                    mInputLayoutOfficeAddrM1.setClickable(false);
+                    mOfficeAddrEditxtM1.setClickable(false);
                     mInputLayoutTradeM1.setVisibility(View.GONE);
-                    mInputLayoutTradeM1.setClickable(false);
+                    mTradeEditxtM1.setClickable(false);
                     mInputLayoutContactPersonM1.setVisibility(View.GONE);
-                    mInputLayoutContactPersonM1.setClickable(false);
+                    mContactPersonEditxtM1.setClickable(false);
 
                     //Visualizing the individual form
 
                     mPrefixSpinnerM1.setVisibility(View.VISIBLE);
                     mPrefixSpinnerM1.setClickable(true);
                     mInputLayoutFirstNameM1.setVisibility(View.VISIBLE);
-                    mInputLayoutFirstNameM1.setClickable(true);
+                    mFirstnameEditxtM1.setClickable(true);
                     mInputLayoutLastNameM1.setVisibility(View.VISIBLE);
-                    mInputLayoutLastNameM1.setClickable(true);
+                    mLastnameEditxtM1.setClickable(true);
                     mGenderSpinnerM1.setVisibility(View.VISIBLE);
                     mGenderSpinnerM1.setClickable(true);
+                    mMaritalSpinnerM1.setVisibility(View.VISIBLE);
+                    mMaritalSpinnerM1.setClickable(true);
+
                     mInputLayoutResAddrM1.setVisibility(View.VISIBLE);
-                    mInputLayoutResAddrM1.setClickable(true);
+                    mResidentsAddrEditxtM1.setClickable(true);
                    
 
                 }else if(stringText.equals("Corporate")){
@@ -281,6 +321,8 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
                     mLastnameEditxtM1.setClickable(false);
                     mGenderSpinnerM1.setVisibility(View.GONE);
                     mGenderSpinnerM1.setClickable(false);
+                    mMaritalSpinnerM1.setVisibility(View.GONE);
+                    mMaritalSpinnerM1.setClickable(false);
                     mInputLayoutResAddrM1.setVisibility(View.GONE);
                     mResidentsAddrEditxtM1.setClickable(false);
                
@@ -295,6 +337,8 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
                     mTinNumEditxtM1.setClickable(true);
                     mInputLayoutOfficeAddrM1.setVisibility(View.VISIBLE);
                     mOfficeAddrEditxtM1.setClickable(true);
+                    mInputLayoutTradeM1.setVisibility(View.VISIBLE);
+                    mTradeEditxtM1.setClickable(true);
                     mInputLayoutContactPersonM1.setVisibility(View.VISIBLE);
                     mContactPersonEditxtM1.setClickable(true);
 
@@ -305,10 +349,12 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
                     mInputLayoutFirstNameM1.setVisibility(View.GONE);
                     mInputLayoutLastNameM1.setVisibility(View.GONE);
                     mGenderSpinnerM1.setVisibility(View.GONE);
+                    mMaritalSpinnerM1.setVisibility(View.GONE);
                     mInputLayoutResAddrM1.setVisibility(View.GONE);
                     mInputLayoutCompanyNameM1.setVisibility(View.GONE);
                     mInputLayoutTinNumM1.setVisibility(View.GONE);
                     mInputLayoutOfficeAddrM1.setVisibility(View.GONE);
+                    mInputLayoutTradeM1.setVisibility(View.GONE);
                     mInputLayoutContactPersonM1.setVisibility(View.GONE);
 
 
@@ -319,6 +365,7 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
                     mInputLayoutPhoneM1.setVisibility(View.VISIBLE);
                     mInputLayoutEmailM1.setVisibility(View.VISIBLE);
                     mInputLayoutMailingAddrM1.setVisibility(View.VISIBLE);
+                    state_spinner.setVisibility(View.VISIBLE);
 
 
                 }
@@ -347,6 +394,7 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
                 mInputLayoutPhoneM1.setVisibility(View.VISIBLE);
                 mInputLayoutEmailM1.setVisibility(View.VISIBLE);
                 mInputLayoutMailingAddrM1.setVisibility(View.VISIBLE);
+                state_spinner.setVisibility(View.VISIBLE);
 
 
             }
@@ -456,7 +504,7 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
                 mInputLayoutOfficeAddrM1.setError("Office Address is required!");
                 isValid = false;
             }else if (mTradeEditxtM1.getText().toString().isEmpty()&&mInputLayoutTradeM1.isClickable()) {
-                mInputLayoutTradeM1.setError("Office Address is required!");
+                mInputLayoutTradeM1.setError("Trade or Occupation is required!");
                 isValid = false;
             }else {
                 mInputLayoutFirstNameM1.setErrorEnabled(false);
@@ -464,6 +512,7 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
                 mInputLayoutCompanyNameM1.setErrorEnabled(false);
                 mInputLayoutTinNumM1.setErrorEnabled(false);
                 mInputLayoutOfficeAddrM1.setErrorEnabled(false);
+                mInputLayoutTradeM1.setErrorEnabled(false);
             }
 
             if (mEmailEditxtM1.getText().toString().isEmpty()&&mInputLayoutEmailM1.isClickable()) {
@@ -510,7 +559,10 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
                 mInputLayoutResAddrM1.setErrorEnabled(false);
             }
 
-
+            if (!reviewed_checked.isChecked()) {
+                showMessage("Please checked below point, to accept you review");
+                isValid = false;
+            }
             //Tyepe Spinner
             typeString = mTypeSpinnerM1.getSelectedItem().toString();
             if (typeString.equals("Select Type")&&mTypeSpinnerM1.isClickable()) {
@@ -528,6 +580,11 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
             genderString = mGenderSpinnerM1.getSelectedItem().toString();
             if (genderString.equals("Gender")&&mGenderSpinnerM1.isClickable()) {
                 showMessage("Don't forget to Select Gender");
+                isValid = false;
+            }
+            stateString = state_spinner.getSelectedItem().toString();
+            if (stateString.equals("Geographical Location")&&state_spinner.isClickable()) {
+                showMessage("Select Geographical Location");
                 isValid = false;
             }
             maritalString = mMaritalSpinnerM1.getSelectedItem().toString();
@@ -567,10 +624,12 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
             userPreferences.setMarineILastName(mLastnameEditxtM1.getText().toString());
             userPreferences.setMarineIGender(genderString);
             userPreferences.setMarineIMaritalStatus(maritalString);
+            userPreferences.setMarineIState(stateString);
             userPreferences.setMarineIResAdrr(mResidentsAddrEditxtM1.getText().toString());
             userPreferences.setMarineIPhoneNum(mPhoneNoEditxtM1.getText().toString());
             userPreferences.setMarineIEmail(mEmailEditxtM1.getText().toString());
             userPreferences.setMarineIMailingAddr(mMailAddrEditxtM1.getText().toString());
+
             if (currentStep < mStepView.getStepCount() - 1) {
                 currentStep++;
                 Fragment marineFragment2 = new MarineFragment2();

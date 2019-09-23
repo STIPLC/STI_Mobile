@@ -31,6 +31,7 @@ import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
 import com.mike4christ.sti_mobile.Model.Vehicle.FormSuccessDetail.BuyQuoteFormGetHead;
 import com.mike4christ.sti_mobile.Model.Vehicle.FormSuccessDetail.Policy;
 import com.mike4christ.sti_mobile.Model.ServiceGenerator;
+import com.mike4christ.sti_mobile.Model.Vehicle.FormSuccessDetail.Transaction;
 import com.mike4christ.sti_mobile.Model.Vehicle.Personal_detail;
 import com.mike4christ.sti_mobile.Model.Vehicle.VehicleDetails;
 import com.mike4christ.sti_mobile.Model.Vehicle.VehiclePictures;
@@ -121,6 +122,7 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
     NetworkConnection networkConnection=new NetworkConnection();
     String policy_num="";
     String total_price="";
+    String ref="";
 
 
 
@@ -218,6 +220,8 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
         total_quoteprice=vehiclePolicy.getQuote_price();
         personal_details=vehiclePolicy.getPersonal_info();
 
+        Log.i("price",total_quoteprice);
+
 
 
 
@@ -267,7 +271,8 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
             case R.id.v_back_btn2:
 
                 stepView.go(1, true);
-
+                asyncVehiclePolicy(primaryKey);
+                userPreferences.setTempQuotePrice("0.0");
                 Fragment quoteBuyFragment2 = new MotorInsureFragment2();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_motor_form_container, quoteBuyFragment2);
@@ -379,8 +384,8 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
         if(userPreferences.getMotorPtype().equals("Corporate")){
 
             Persona persona=new Persona("null","null",personal_details.get(0).getEmail(),"null",personal_details.get(0).getPhone(),"null",
-                    "null","null",personal_details.get(0).getPicture(),"null","null","null","null","null",
-                    "null","2",personal_details.get(0).getCompany_name(),"null",personal_details.get(0).getTin_number(),
+                    "null","null",personal_details.get(0).getPicture(),"null","null","null","null",personal_details.get(0).getBusiness(),
+                    personal_details.get(0).getState(),"2",personal_details.get(0).getCompany_name(),personal_details.get(0).getMailing_address(),personal_details.get(0).getTin_number(),
                     personal_details.get(0).getOffice_address(),personal_details.get(0).getContact_person());
 
             for(int i=0;i<results.size();i++) {
@@ -397,13 +402,12 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
 
             for(int i=0;i<results.size();i++) {
                 VehicleDetails vehicleDetails=results.get(i);
-                Vehicle vehicle=new Vehicle(vehicleDetails.getPeriod(),vehicleDetails.getPolicy_type(),vehicleDetails.getEnhanced_third_party(),
-                        vehicleDetails.getPrivate_policy(),vehicleDetails.getMotor_cycle_policy(),vehicleDetails.getVehicle_make(),
+                Vehicle vehicle=new Vehicle(vehicleDetails.getPeriod(),vehicleDetails.getPolicy_select_type(),vehicleDetails.getEnhanced_third_party(),
+                        vehicleDetails.getPrivate_com_type(),"",vehicleDetails.getVehicle_make(),
                         vehicleDetails.getBody_type(),vehicleDetails.getYear(),"null",vehicleDetails.getRegistration_number(),
                         vehicleDetails.getChasis_number(),vehicleDetails.getEngine_number(),vehicleDetails.getVehicle_value(),vehiclePictureList_post);
                 vehiclesList_post.add(vehicle);
 
-                Log.i("policyLoop",vehicleDetails.getPolicy_type());
 
             }
 
@@ -412,6 +416,7 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
 
             Log.i("policyPostPix1",vehiclePictureList_post.toString());
             Log.i("policyPostVec1",vehiclesList_post.toString());
+            Log.i("policyTotalPrice",total_quoteprice);
 
             sendPolicy(vehiclePostHead);
 
@@ -419,10 +424,9 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
         }else if (userPreferences.getMotorPtype().equals("Individual")){
 
             Persona persona=new Persona(personal_details.get(0).getFirst_name(),personal_details.get(0).getLast_name(),personal_details.get(0).getEmail(),personal_details.get(0).getGender(),personal_details.get(0).getPhone(),personal_details.get(0).getResident_address(),
-                    "null","null",personal_details.get(0).getPicture(),"null","null","null","null","null",
-                    "null","1","null",personal_details.get(0).getMailing_address(),"null",
-                    "null","null"
-                    );
+                    "null","null",personal_details.get(0).getPicture(),"null",personal_details.get(0).getNext_of_kin(),"null","null",personal_details.get(0).getBusiness(),
+                    personal_details.get(0).getState(),"1","null",personal_details.get(0).getMailing_address(),"null",
+                    "null","null");
 
             for(int i=0;i<picture_results.size();i++) {
 
@@ -439,8 +443,8 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
 
             for(int i=0;i<results.size();i++) {
                 VehicleDetails vehicleDetails=results.get(i);
-                vehiclesList_post.add(new Vehicle(vehicleDetails.getPeriod(),vehicleDetails.getPolicy_type(),vehicleDetails.getEnhanced_third_party(),
-                        vehicleDetails.getPrivate_policy(),vehicleDetails.getMotor_cycle_policy(),vehicleDetails.getVehicle_make(),
+                vehiclesList_post.add(new Vehicle(vehicleDetails.getPeriod(),vehicleDetails.getPolicy_select_type(),vehicleDetails.getEnhanced_third_party(),
+                        vehicleDetails.getPrivate_com_type(),"",vehicleDetails.getVehicle_make(),
                         vehicleDetails.getBody_type(),vehicleDetails.getYear(),"null",vehicleDetails.getRegistration_number(),
                         vehicleDetails.getChasis_number(),vehicleDetails.getEngine_number(),vehicleDetails.getVehicle_value(),vehiclePictureList_post));
 
@@ -450,13 +454,14 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
                     pin_txt_m5.getText().toString(),modeofPaymentString,userPreferences.getUserId());
 
                 Log.i("policyPost2",vehiclePostHead.toString());
+            Log.i("policyTotalPrice",total_quoteprice);
             sendPolicy(vehiclePostHead);
 
 
         }
 
 
-        asyncVehiclePolicy(primaryKey);
+
 
     }
 
@@ -475,7 +480,27 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
             public void onResponse(Call<BuyQuoteFormGetHead> call, Response<BuyQuoteFormGetHead> response) {
                 Log.i("ResponseCode", String.valueOf(response.code()));
 
-
+                if(response.code()==400){
+                    showMessage("Check your internet connection");
+                    btn_layout3.setVisibility(View.VISIBLE);
+                    progressbar.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==429){
+                    showMessage("Too many requests on database");
+                    btn_layout3.setVisibility(View.VISIBLE);
+                    progressbar.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==500){
+                    showMessage("Server Error");
+                    btn_layout3.setVisibility(View.VISIBLE);
+                    progressbar.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==401){
+                    showMessage("Unauthorized access, please try login again");
+                    btn_layout3.setVisibility(View.VISIBLE);
+                    progressbar.setVisibility(View.GONE);
+                    return;
+                }
                 try {
                     if (!response.isSuccessful()) {
 
@@ -504,30 +529,50 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
                         policy_num=policy_num.concat("\n"+policy.get(i).getPolicyNumber());
                     }
 
-                    total_price= String.valueOf(response.body().getData().getTotalPrice());
+                    total_price= String.valueOf(response.body().getData().getUnitPrice());
+
+                    ref= response.body().getData().getTransactions().get(0).getReference();
 
                     Log.i("policyNum", policy_num);
                     Log.i("totalPrice", total_price);
+                    Log.i("ref", ref);
+                    showMessage("Ref:"+ref);
 
                     showMessage("Submit Successful, Proceed to Payment");
-                    userPreferences.setTempQuotePrice(0);
+                    userPreferences.setTempQuotePrice("0.0");
 
                     btn_layout3.setVisibility(View.VISIBLE);
                     progressbar.setVisibility(View.GONE);
                     if (total_price != null) {
-
+                        asyncVehiclePolicy(primaryKey);
                         Intent intent = new Intent(getContext(), PolicyPaymentActivity.class);
                         intent.putExtra(Constant.TOTAL_PRICE, total_price);
                         intent.putExtra(Constant.POLICY_NUM, policy_num);
+                        intent.putExtra(Constant.POLICY_TYPE, "vehicle");
+                        intent.putExtra(Constant.REF, ref);
                         startActivity(intent);
                         getActivity().finish();
 
                     } else {
                         showMessage("Error: " + response.body());
+                        asyncVehiclePolicy(primaryKey);
+                        userPreferences.setTempQuotePrice("0.0");
+                        Fragment quoteBuyFragment2 = new MotorInsureFragment2();
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.replace(R.id.fragment_motor_form_container, quoteBuyFragment2);
+                        ft.commit();
                     }
                 }catch (Exception e){
                     showMessage("Submission Error: " + e.getMessage());
                     Log.i("policyResponse", e.getMessage());
+                    btn_layout3.setVisibility(View.VISIBLE);
+                    progressbar.setVisibility(View.GONE);
+                    asyncVehiclePolicy(primaryKey);
+                    userPreferences.setTempQuotePrice("0.0");
+                    Fragment quoteBuyFragment2 = new MotorInsureFragment2();
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.replace(R.id.fragment_motor_form_container, quoteBuyFragment2);
+                    ft.commit();
                 }
 
             }
@@ -535,6 +580,14 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
             public void onFailure(Call<BuyQuoteFormGetHead> call, Throwable t) {
                 showMessage("Submission Failed "+t.getMessage());
                 Log.i("GEtError",t.getMessage());
+                btn_layout3.setVisibility(View.VISIBLE);
+                progressbar.setVisibility(View.GONE);
+                asyncVehiclePolicy(primaryKey);
+                userPreferences.setTempQuotePrice("0.0");
+                Fragment quoteBuyFragment2 = new MotorInsureFragment2();
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_motor_form_container, quoteBuyFragment2);
+                ft.commit();
             }
         });
 
@@ -544,7 +597,7 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
     }
 
     //To Delete vehicle
-    private void asyncVehiclePolicy(final String id){
+    public void asyncVehiclePolicy(final String id){
         AsyncTask<Void, Void, Void> remoteItem =new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -580,31 +633,6 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
         };
         remoteItem.execute();
     }
-
-    /*//To Delete vehicle
-    private void asyncVehicleList(final String id){
-        AsyncTask<Void,Void,Void> remoteItem =new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-
-                realm=Realm.getDefaultInstance();
-
-                VehiclePolicy expenses=realm.where(VehiclePolicy.class).equalTo("id",id).findFirst();
-                if(expenses !=null){
-                    realm.beginTransaction();
-                    expenses.deleteFromRealm();
-                    realm.commitTransaction();
-                }
-                realm.close();
-                return null;
-            }
-        };
-        remoteItem.execute();
-    }
-*/
-
-
-
 
 
     private void showMessage(String s) {

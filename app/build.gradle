@@ -76,7 +76,8 @@ dependencies {
     implementation "com.squareup.okhttp3:logging-interceptor:3.8.0"
 
     //paystack
-    //   implementation 'co.paystack.android:paystack:3.0.12'
+    implementation 'co.paystack.android:paystack:3.0.12'
+    implementation 'co.paystack.android.design.widget:pinpad:1.0.1'
 
 
     //cloudinary API

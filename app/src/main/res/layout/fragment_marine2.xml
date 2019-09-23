@@ -86,18 +86,14 @@
 
 
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/inputLayoutProfInvoiceDate_m2"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:visibility="visible"
-                        >
+
 
                         <EditText
                             android:id="@+id/prof_invoice_date_txt_m2"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/size_three"
+                            android:layout_marginTop="@dimen/size_five"
+                            android:visibility="visible"
                             android:background="@drawable/rounded_bg"
                             android:hint="Date of Proforma Invoice"
                             android:importantForAutofill="noExcludeDescendants"
@@ -105,7 +101,7 @@
                             android:padding="@dimen/size_ten"
                             tools:targetApi="o"
                             />
-                    </com.google.android.material.textfield.TextInputLayout>
+
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/inputLayoutDescGoods_m2"
@@ -127,27 +123,33 @@
                             tools:targetApi="o"
                             />
                     </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/inputLayoutInterest_m2"
+                    <Spinner
+                        android:id="@+id/cover_m2"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="@dimen/size_three"
+                        android:background="@drawable/spinner_bg"
                         android:visibility="visible"
-                        >
+                        />
+
+
+
+
 
                         <EditText
-                            android:id="@+id/interest_txt_m2"
+                            android:id="@+id/start_date_cover_m2"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/size_three"
+                            android:layout_marginTop="@dimen/size_five"
+                            android:visibility="visible"
                             android:background="@drawable/rounded_bg"
-                            android:hint="Interest"
+                            android:hint="Start Date of Cover"
                             android:importantForAutofill="noExcludeDescendants"
-                            android:inputType="text"
+                            android:inputType="date"
                             android:padding="@dimen/size_ten"
                             tools:targetApi="o"
                             />
-                    </com.google.android.material.textfield.TextInputLayout>
+
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/inputLayoutQuantity_m2"
@@ -162,9 +164,9 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/size_three"
                             android:background="@drawable/rounded_bg"
-                            android:hint="Quantity"
+                            android:hint="Quantity (e.g 1,2,3..)"
                             android:importantForAutofill="noExcludeDescendants"
-                            android:inputType="text"
+                            android:inputType="number"
                             android:padding="@dimen/size_ten"
                             tools:targetApi="o"
                             />
@@ -195,7 +197,7 @@
                             android:background="@drawable/rounded_bg"
                             android:hint="Total Amount/Value of Proforma Invoice"
                             android:importantForAutofill="noExcludeDescendants"
-                            android:inputType="text"
+                            android:inputType="number"
                             android:padding="@dimen/size_ten"
                             tools:targetApi="o"
                             />
@@ -216,7 +218,7 @@
                             android:background="@drawable/rounded_bg"
                             android:hint="Naira to Dollar(e.g 365)"
                             android:importantForAutofill="noExcludeDescendants"
-                            android:inputType="number"
+                            android:inputType="numberDecimal"
                             android:padding="@dimen/size_ten"
                             tools:targetApi="o"
                             />

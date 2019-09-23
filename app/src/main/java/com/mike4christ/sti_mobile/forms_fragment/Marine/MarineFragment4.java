@@ -32,6 +32,7 @@ import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
 import com.mike4christ.sti_mobile.Model.Marine.CargoDetail;
 import com.mike4christ.sti_mobile.Model.Marine.FormSuccessDetail.BuyQuoteFormGetHead_Marine;
 import com.mike4christ.sti_mobile.Model.Marine.FormSuccessDetail.Policy;
+import com.mike4christ.sti_mobile.Model.Marine.FormSuccessDetail.Transaction;
 import com.mike4christ.sti_mobile.Model.Marine.MarinePolicy;
 import com.mike4christ.sti_mobile.Model.Marine.MarinePost.Cargo;
 import com.mike4christ.sti_mobile.Model.Marine.MarinePost.MarinePersona;
@@ -222,19 +223,22 @@ public class MarineFragment4 extends Fragment implements View.OnClickListener{
 
 
         if(userPreferences.getMotorPtype().equals("Corporate")){
-            String corperate="Comapany Name: "+personal_detail_marines.get(0).getCompany_name()+"\n"+"TIN Number: "+personal_detail_marines.get(0).getTin_number()+"\n"+
+            String corperate="Company Name: "+personal_detail_marines.get(0).getCompany_name()+"\n"+"TIN Number: "+personal_detail_marines.get(0).getTin_number()+"\n"+
                    "\n"+"Phone Number: "+personal_detail_marines.get(0).getPhone()+"\n"+
                     "Office Address: "+personal_detail_marines.get(0).getOffice_address()+"\n"+"Contact Person: "+personal_detail_marines.get(0).getContact_person()+"\n"+
                     "Phone Number: "+personal_detail_marines.get(0).getPhone()+"\n"+"Email Address: "+personal_detail_marines.get(0).getEmail()+"\n"+
                     "Total Premium: "+total_quoteprice;
             mPersonalInfoTxtM4.setText(corperate);
 
+            Log.i("Personaal",personal_detail_marines.get(0).getCompany_name());
+
         }else if (userPreferences.getMotorPtype().equals("Individual")){
-            String individual="Prefix: "+personal_detail_marines.get(0).getPrefix()+"\n"+"First Name: "+personal_detail_marines.get(0).getFirst_name()+"\n"+
+            String individual="First Name: "+personal_detail_marines.get(0).getFirst_name()+"\n"+
                     "Last Name: "+personal_detail_marines.get(0).getLast_name()+"\n"+"Phone Number: "+personal_detail_marines.get(0).getPhone()+"\n"+
                     "Gender: "+personal_detail_marines.get(0).getResident_address()+"\n"+"Mailing Address: "+personal_detail_marines.get(0).getMailing_address()+"\n"+
                     "Total Premium: "+total_quoteprice;
             mPersonalInfoTxtM4.setText(individual);
+            Log.i("Personaal",personal_detail_marines.get(0).getFirst_name());
 
         }
 
@@ -267,7 +271,8 @@ public class MarineFragment4 extends Fragment implements View.OnClickListener{
             case R.id.v_back_btn4_m4:
 
                 mStepView.go(1, true);
-
+                asyncMarinePolicy(primaryKey);
+                userPreferences.setTempMarineQuotePrice("0.0");
                 Fragment marineFragment2 = new MarineFragment2();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_marine_form_container, marineFragment2);
@@ -372,7 +377,7 @@ public class MarineFragment4 extends Fragment implements View.OnClickListener{
             for(int i=0;i<results.size();i++) {
                 cargoPictureList_post.add("null");
                 CargoDetail cargoDetail=results.get(i);
-                Cargo cargo=new Cargo("null","null",cargoDetail.getDesc_goods(),
+                Cargo cargo=new Cargo("12 Months","Marine",cargoDetail.getDesc_goods(),
                         cargoDetail.getPfi_number(),cargoDetail.getPfi_date(),cargoDetail.getQuantity(),
                         cargoDetail.getValue(),cargoDetail.getConversion_rate(),cargoDetail.getLoading_port(),cargoDetail.getDischarge_port(),
                         cargoDetail.getConveyance_mode(),"null",cargoPictureList_post);
@@ -399,7 +404,7 @@ public class MarineFragment4 extends Fragment implements View.OnClickListener{
             for(int i=0;i<results.size();i++) {
                 cargoPictureList_post.add("null");
                 CargoDetail cargoDetail=results.get(i);
-                Cargo cargo=new Cargo("null","null",cargoDetail.getDesc_goods(),
+                Cargo cargo=new Cargo("12 Months","null",cargoDetail.getDesc_goods(),
                         cargoDetail.getPfi_number(),cargoDetail.getPfi_date(),cargoDetail.getQuantity(),
                         cargoDetail.getValue(),cargoDetail.getConversion_rate(),cargoDetail.getLoading_port(),cargoDetail.getDischarge_port(),
                         cargoDetail.getConveyance_mode(),"null",cargoPictureList_post);
@@ -421,7 +426,7 @@ public class MarineFragment4 extends Fragment implements View.OnClickListener{
 
 
 
-        asyncMarinePolicy(primaryKey);
+
         // asyncVehicleList(primaryKey);
 
 
@@ -441,7 +446,27 @@ public class MarineFragment4 extends Fragment implements View.OnClickListener{
             @Override
             public void onResponse(Call<BuyQuoteFormGetHead_Marine> call, Response<BuyQuoteFormGetHead_Marine> response) {
                 Log.i("ResponseCode", String.valueOf(response.code()));
-
+                if(response.code()==400){
+                    showMessage("Check your internet connection");
+                    mBtnLayout4M4.setVisibility(View.VISIBLE);
+                    mProgressbar4M4.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==429){
+                    showMessage("Too many requests on database");
+                    mBtnLayout4M4.setVisibility(View.VISIBLE);
+                    mProgressbar4M4.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==500){
+                    showMessage("Server Error");
+                    mBtnLayout4M4.setVisibility(View.VISIBLE);
+                    mProgressbar4M4.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==401){
+                    showMessage("Unauthorized access, please try login again");
+                    mBtnLayout4M4.setVisibility(View.VISIBLE);
+                    mProgressbar4M4.setVisibility(View.GONE);
+                    return;
+                }
 
                 try {
                     if (!response.isSuccessful()) {
@@ -471,30 +496,49 @@ public class MarineFragment4 extends Fragment implements View.OnClickListener{
                         policy_num=policy_num.concat("\n"+policy.get(i).getPolicyNumber());
                     }
 
-                    total_price= String.valueOf(response.body().getData().getTotalPrice());
+                    total_price= String.valueOf(response.body().getData().getUnitPrice());
+
+                    String ref= response.body().getData().getTransactions().get(0).getReference();
 
                     Log.i("policyNum", policy_num);
                     Log.i("totalPrice", total_price);
 
                     showMessage("Submit Successful, Proceed to Payment");
-                    userPreferences.setTempMarineQuotePrice(0);
+                    userPreferences.setTempMarineQuotePrice("0.0");
 
                     mBtnLayout4M4.setVisibility(View.VISIBLE);
                     mProgressbar4M4.setVisibility(View.GONE);
                     if (total_price != null) {
-
+                        asyncMarinePolicy(primaryKey);
                         Intent intent = new Intent(getContext(), PolicyPaymentActivity.class);
                         intent.putExtra(Constant.TOTAL_PRICE, total_price);
                         intent.putExtra(Constant.POLICY_NUM, policy_num);
+                        intent.putExtra(Constant.POLICY_TYPE, "marine");
+                        intent.putExtra(Constant.REF, ref);
                         startActivity(intent);
                         getActivity().finish();
 
                     } else {
                         showMessage("Error: " + response.body());
+                        asyncMarinePolicy(primaryKey);
+                        userPreferences.setTempMarineQuotePrice("0.0");
+                        Fragment marineFragment2 = new MarineFragment2();
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.replace(R.id.fragment_marine_form_container, marineFragment2);
+                        ft.commit();
                     }
                 }catch (Exception e){
                     showMessage("Submission Error: " + e.getMessage());
                     Log.i("policyResponse", e.getMessage());
+                    mBtnLayout4M4.setVisibility(View.VISIBLE);
+                    mProgressbar4M4.setVisibility(View.GONE);
+
+                    asyncMarinePolicy(primaryKey);
+                    userPreferences.setTempMarineQuotePrice("0.0");
+                    Fragment marineFragment2 = new MarineFragment2();
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.replace(R.id.fragment_marine_form_container, marineFragment2);
+                    ft.commit();
                 }
 
             }
@@ -502,6 +546,8 @@ public class MarineFragment4 extends Fragment implements View.OnClickListener{
             public void onFailure(Call<BuyQuoteFormGetHead_Marine> call, Throwable t) {
                 showMessage("Submission Failed "+t.getMessage());
                 Log.i("GEtError",t.getMessage());
+                mBtnLayout4M4.setVisibility(View.VISIBLE);
+                mProgressbar4M4.setVisibility(View.GONE);
             }
         });
 

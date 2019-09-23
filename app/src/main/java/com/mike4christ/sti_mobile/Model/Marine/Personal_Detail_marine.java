@@ -14,7 +14,6 @@ public class Personal_Detail_marine extends RealmObject {
     String phone;
     String resident_address;
     String marital_status;
-
     String prefix;
 
     String customer_type;
@@ -23,6 +22,10 @@ public class Personal_Detail_marine extends RealmObject {
     String tin_number;
     String office_address;
     String trade;
+
+
+
+    String state;
     String contact_person;
 
     RealmList<CargoDetail> cargoDetails;
@@ -49,6 +52,13 @@ public class Personal_Detail_marine extends RealmObject {
 
     public String getEmail() {
         return email;
+    }
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     public void setEmail(String email) {

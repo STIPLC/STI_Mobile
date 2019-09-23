@@ -62,29 +62,26 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/inputLayoutStartDate"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:visibility="visible"
-                        >
+
 
                         <EditText
                             android:id="@+id/start_date"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/size_three"
+                            android:layout_marginBottom="@dimen/size_five"
                             android:background="@drawable/rounded_bg"
                             android:hint="Start Date"
                             android:importantForAutofill="noExcludeDescendants"
                             android:inputType="date"
                             android:padding="@dimen/size_ten"
                             tools:targetApi="o"
+                            android:visibility="visible"
                             />
-                    </com.google.android.material.textfield.TextInputLayout>
+
 
                     <Spinner
-                    android:id="@+id/poly_type_spinner"
+                    android:id="@+id/private_comm_spinner"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:layout_marginTop="@dimen/size_three"
@@ -92,7 +89,7 @@
                         android:background="@drawable/spinner_bg"
                     />
                     <Spinner
-                        android:id="@+id/private_type_spinner"
+                        android:id="@+id/poly_select_type_spinner"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
                         android:layout_marginTop="@dimen/size_three"
@@ -109,24 +106,7 @@
                         android:background="@drawable/spinner_bg"
                         android:clickable="false"
                         />
-                    <Spinner
-                        android:id="@+id/commercial_type_spinner"
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:layout_marginTop="@dimen/size_three"
-                        android:visibility="gone"
-                        android:background="@drawable/spinner_bg"
-                        android:clickable="false"
-                        />
-                    <Spinner
-                        android:id="@+id/motor_cycle_type_spinner"
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:layout_marginTop="@dimen/size_three"
-                        android:visibility="gone"
-                        android:background="@drawable/spinner_bg"
-                        android:clickable="false"
-                        />
+
 
                     <Spinner
                         android:id="@+id/vehicle_make_spinner"
@@ -192,6 +172,7 @@
                             android:hint="Registration Number"
                             android:importantForAutofill="noExcludeDescendants"
                             android:inputType="text"
+                            android:textAllCaps="true"
                             android:padding="@dimen/size_ten"
                             tools:targetApi="o"
                             />
@@ -213,6 +194,7 @@
                             android:hint="Chasis Number"
                             android:importantForAutofill="noExcludeDescendants"
                             android:inputType="text"
+                            android:textAllCaps="true"
                             android:padding="@dimen/size_ten"
                             tools:targetApi="o"
                             />
@@ -234,6 +216,7 @@
                             android:hint="Engine Number"
                             android:importantForAutofill="noExcludeDescendants"
                             android:inputType="text"
+                            android:textAllCaps="true"
                             android:padding="@dimen/size_ten"
                             tools:targetApi="o"
                             />

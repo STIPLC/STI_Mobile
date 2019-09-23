@@ -94,11 +94,11 @@ public class OtherInsureFragment3 extends Fragment implements View.OnClickListen
             seleted_product = getArguments().getString(SELECTED_PRODUCT);
 
             p_amount=getArguments().getString(PREMIUM_AMOUNT);
-            int oldquote=userPreferences.getTempOtherQuotePrice();
+            double oldquote=Double.valueOf(userPreferences.getTempOtherQuotePrice());
 
-            int newquote= Integer.parseInt(getArguments().getString(PREMIUM_AMOUNT));
-            int total_quote=oldquote+newquote;
-            userPreferences.setTempOtherQuotePrice(total_quote);
+            double newquote= Double.valueOf(getArguments().getString(PREMIUM_AMOUNT));
+            double total_quote=oldquote+newquote;
+            userPreferences.setTempOtherQuotePrice(String.valueOf(total_quote));
             
             Log.i("PrimaryVariable",primaryKey);
 
@@ -189,6 +189,7 @@ public class OtherInsureFragment3 extends Fragment implements View.OnClickListen
         personal_detail_other.setResident_address(userPreferences.getOtherIResAdrr());
         personal_detail_other.setNext_of_kin(userPreferences.getOtherINextKin());
         personal_detail_other.setPolicy_type(userPreferences.getOtherPtype());
+        personal_detail_other.setState(userPreferences.getOtherIState());
         personal_detail_other.setCompany_name(userPreferences.getOtherICompanyName());
         personal_detail_other.setMailing_addr(userPreferences.getOtherIMailingAddr());
         personal_detail_other.setTin_num(userPreferences.getOtherITinNumber());
@@ -213,10 +214,10 @@ public class OtherInsureFragment3 extends Fragment implements View.OnClickListen
                 final Personal_Detail_other personal_detail_other1=realm.copyToRealm(personal_detail_other);
 
                 OtherPolicy allriskPolicy=realm.createObject(OtherPolicy.class,primaryKey);
-                allriskPolicy.setAgent_id("1");
+                allriskPolicy.setAgent_id(userPreferences.getUserId());
                 allriskPolicy.setQuote_price(String.valueOf(userPreferences.getTempOtherQuotePrice()));
                 allriskPolicy.setPayment_source("paystack");
-                allriskPolicy.setPin("11234");
+                allriskPolicy.setPin("0000");
 
                 allriskPolicy.getPersonal_detail_others().add(personal_detail_other1);
 

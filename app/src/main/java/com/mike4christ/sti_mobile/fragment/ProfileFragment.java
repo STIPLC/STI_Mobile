@@ -26,9 +26,17 @@ import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
+import com.mike4christ.sti_mobile.Model.Errors.APIError;
+import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
+import com.mike4christ.sti_mobile.Model.Pin.setPin;
+import com.mike4christ.sti_mobile.Model.ProfileUpdate.User;
+import com.mike4christ.sti_mobile.Model.ProfileUpdate.UserEditHead;
+import com.mike4christ.sti_mobile.Model.ProfileUpdate.UserGetUpdateHead;
+import com.mike4christ.sti_mobile.Model.ServiceGenerator;
 import com.mike4christ.sti_mobile.NetworkConnection;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.Map;
@@ -38,6 +46,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public  class ProfileFragment extends Fragment {
 
@@ -50,8 +62,8 @@ public  class ProfileFragment extends Fragment {
     CircleImageView mProfilePhoto;
     @BindView(R.id.edit_prof)
     ImageView mEditProf;
-    /*@BindView(R.id.username_txt)
-    TextView mUsernameTxt;*/
+    @BindView(R.id.username_txt)
+    TextView mUsernameTxt;
     @BindView(R.id.progressBar_profile)
     ProgressBar mProgressBarProfile;
     @BindView(R.id.profile_data_layout)
@@ -100,7 +112,7 @@ public  class ProfileFragment extends Fragment {
     AVLoadingIndicatorView mAvi1;
 
     private Uri imageUri;
-    String address,firstname,phone_num,lastname;
+    String password,firstname,phone_num,lastname,username;
 
     int PICK_IMAGE_PASSPORT = 1;
     NetworkConnection networkConnection=new NetworkConnection();
@@ -121,7 +133,6 @@ public  class ProfileFragment extends Fragment {
         View fragmentView = inflater.inflate(R.layout.fragment_profile, container, false);
         ButterKnife.bind(this, fragmentView);
         userPreferences=new UserPreferences(getContext());
-
         getUserProfile();
         return fragmentView;
     }
@@ -132,8 +143,6 @@ public  class ProfileFragment extends Fragment {
     public void showEditProfile() {
 
         editProfile();
-
-
 
     }
 
@@ -248,7 +257,7 @@ public  class ProfileFragment extends Fragment {
         mEditLayout.setVisibility(View.VISIBLE);
 
 
-            mPhoneNumEditxt.setText(userPreferences.getEmail());
+            mPhoneNumEditxt.setText(userPreferences.getPhoneNUM());
             mUsernameEditxt.setText(userPreferences.getUsername());
             mFirstnameEditxt.setText(userPreferences.getFirstName());
             mLastnameEditxt.setText(userPreferences.getLastName());
@@ -263,18 +272,14 @@ public  class ProfileFragment extends Fragment {
 
 
 
-
         mUpdateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Request for Post Request for Profile Update
-
-
-                showMessage("Updated Successfully");
+                validateUserInputs();
 
                 mProfilePhoto.setClickable(false);
                 mEditLayout.setVisibility(View.GONE);
-
 
                 mProfileDataLayout.setVisibility(View.VISIBLE);
                 mEditProf.setVisibility(View.VISIBLE);
@@ -282,6 +287,143 @@ public  class ProfileFragment extends Fragment {
             }
         });
     }
+
+    private void validateUserInputs() {
+
+        boolean isValid = true;
+
+        if (mFirstnameEditxt.getText().toString().trim().isEmpty()) {
+            mInputLayoutFirstnameP.setError("First Name is Required !");
+            isValid = false;
+        }else if(mLastnameEditxt.getText().toString().trim().isEmpty()){
+            mInputLayoutLastnameP.setError("First Name is Required !");
+            isValid = false;
+        }else if (mPhoneNumEditxt.getText().toString().trim().isEmpty()) {
+            mInputLayoutPhoneNumP.setError("Password is Required!");
+            isValid = false;
+        }else if (mPhoneNumEditxt.getText().toString().trim().length() < 11||mPhoneNumEditxt.getText().toString().trim().length() >11) {
+            mInputLayoutPhoneNumP.setError("Your Phone number must be 11 in length");
+            isValid = false;
+        }else if (password_editxt.getText().toString().trim().length() < 11||mPhoneNumEditxt.getText().toString().trim().length() >11) {
+            mInputLayoutPhoneNumP.setError("Your Phone number must be 11 in length");
+            isValid = false;
+        }else if (password_editxt.getText().toString().isEmpty()) {
+            inputLayoutPassword.setError("Password is required!");
+            isValid = false;
+        } else if (password_editxt.getText().toString().trim().length()<6 ) {
+            inputLayoutPassword.setError("Your Password must not less than 6 character");
+            isValid = false;
+        }else if (mUsernameEditxt.getText().toString().trim().isEmpty()) {
+            mInputLayoutUsername.setError("Invalid Entry !");
+            isValid = false;
+        }else {
+            mInputLayoutFirstnameP.setErrorEnabled(false);
+            mInputLayoutLastnameP.setErrorEnabled(false);
+            mInputLayoutPhoneNumP.setErrorEnabled(false);
+            mInputLayoutUsername.setErrorEnabled(false);
+            inputLayoutPassword.setErrorEnabled(false);
+        }
+
+        if (isValid) {
+            if(networkConnection.isNetworkConnected(getContext())) {
+                initFragment();
+            }else {
+                showMessage("No Internet Connection");
+            }
+        }
+
+
+
+
+
+    }
+
+    private void initFragment(){
+        mUpdateBtn.setVisibility(View.GONE);
+        mAvi1.setVisibility(View.VISIBLE);
+
+        User user=new User(userPreferences.getEmail(),mPhoneNumEditxt.getText().toString(),password_editxt.getText().toString(),
+                mUsernameEditxt.getText().toString(),mFirstnameEditxt.getText().toString(),mLastnameEditxt.getText().toString());
+        UserEditHead userEditHead=new UserEditHead(user);
+        updateUserDate(userEditHead);
+
+
+    }
+
+
+    private void updateUserDate(UserEditHead userEditHead){
+
+
+        //get client and call object for request
+        ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
+
+        Call<UserGetUpdateHead> call=client.update_profile("Token "+userPreferences.getUserToken(),userEditHead);
+
+        call.enqueue(new Callback<UserGetUpdateHead>() {
+            @Override
+            public void onResponse(Call<UserGetUpdateHead> call, Response<UserGetUpdateHead> response) {
+                Log.i("ResponseCode", String.valueOf(response.code()));
+
+                try {
+                    if (!response.isSuccessful()) {
+
+                        try{
+                            APIError apiError= ErrorUtils.parseError(response);
+
+                            showMessage("Invalid Entry: "+apiError.getErrors());
+                            Log.i("Invalid EntryK",apiError.getErrors().toString());
+                            Log.i("Invalid Entry",response.errorBody().toString());
+
+                        }catch (Exception e){
+                            Log.i("InvalidEntry",e.getMessage());
+                            Log.i("ResponseError",response.errorBody().string());
+                            showMessage("Failed to Register"+e.getMessage());
+                            mUpdateBtn.setVisibility(View.VISIBLE);
+                            mAvi1.setVisibility(View.GONE);
+
+                        }
+                        mUpdateBtn.setVisibility(View.VISIBLE);
+                        mAvi1.setVisibility(View.GONE);
+                        return;
+                    }
+
+                    firstname=response.body().getUser().getFirstName();
+                    lastname=response.body().getUser().getLastName();
+                    username=response.body().getUser().getUsername();
+                    phone_num=response.body().getUser().getPhone();
+
+                    userPreferences.setFirstName(firstname);
+                    userPreferences.setLastName(lastname);
+                    userPreferences.setUsername(username);
+                    userPreferences.setPhoneNUM(phone_num);
+
+                    mUpdateBtn.setVisibility(View.VISIBLE);
+                    mAvi1.setVisibility(View.GONE);
+
+                    showMessage("Profile Updated Successfully");
+                    getUserProfile();
+
+
+
+                }catch (Exception e){
+                    showMessage("Submission Error: " + e.getMessage());
+                    Log.i("Submission", e.getMessage());
+                    mUpdateBtn.setVisibility(View.VISIBLE);
+                    mAvi1.setVisibility(View.GONE);
+                }
+
+            }
+            @Override
+            public void onFailure(Call<UserGetUpdateHead> call, Throwable t) {
+                showMessage("Submission Failed "+t.getMessage());
+                mUpdateBtn.setVisibility(View.VISIBLE);
+                mAvi1.setVisibility(View.GONE);
+                Log.i("GEtError",t.getMessage());
+            }
+        });
+
+    }
+
 
 
     private void showMessage(String s) {
@@ -292,7 +434,11 @@ public  class ProfileFragment extends Fragment {
         //Getting profile from Pref
         mFirstname.setText("FirstName: "+userPreferences.getFirstName());
         mLastname.setText("LastName: "+userPreferences.getLastName());
-        //mUsernameTxt.setText(userPreferences.getUsername());
+        if(userPreferences.getUsername()=="null"){
+            mUsernameTxt.setText("");
+        }else{
+            mUsernameTxt.setText(userPreferences.getUsername());
+        }
         mEmail.setText("Email: "+userPreferences.getEmail());
         mPhoneNum.setText("Phone No: "+userPreferences.getPhoneNUM());
         mPinProfileTxt.setText("Pin: "+userPreferences.getPin());
@@ -308,9 +454,6 @@ public  class ProfileFragment extends Fragment {
 
         }
         mProgressBarProfile.setVisibility(View.GONE);
-
-
-
     }
 
 

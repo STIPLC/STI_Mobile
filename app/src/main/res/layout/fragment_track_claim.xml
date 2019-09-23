@@ -30,15 +30,26 @@
 
                 />
 
-            <Spinner
-                android:id="@+id/polynum_type_spinner"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/inputLayoutClaimNum"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="@dimen/size_three"
-                android:background="@drawable/spinner_bg"
+                android:layout_height="match_parent"
+                >
 
+                <EditText
+                    android:id="@+id/claim_num_editxt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/size_three"
+                    android:background="@drawable/rounded_bg"
+                    android:hint="Claim Number"
+                    android:importantForAutofill="noExcludeDescendants"
+                    android:inputType="text"
+                    android:padding="@dimen/size_ten"
+                    tools:targetApi="o"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
 
-                />
 
             <Button
                 android:id="@+id/search"
@@ -47,7 +58,7 @@
                 android:background="@drawable/rounded_bg_color_btn"
                 android:drawableEnd="@drawable/ic_search_black_24dp"
                 android:padding="@dimen/size_ten"
-                android:text="Search"
+                android:text="Track Your Claim"
                 android:layout_marginTop="@dimen/size_ten"
                 android:textColor="@color/colorWhite"
                 android:layout_marginBottom="@dimen/size_ten"
@@ -66,42 +77,117 @@
                 tools:ignore="RtlHardcoded"/>
 
 
-            /*"policy_id": "MOT/CV/06/19/SA/00297",
-            "type": "vehicle",
-            "description": "ghh\n",
-            "cost_estimate": "2000.00",
-            "loss_estimate": "20000000.00",
-            "created_at": "2019-09-06 10:37:29",
-            "updated_at": "2019-09-06 10:37:29",
-            "status": "PENDING",
-            "reference": "MOT/CV/06/19/SA/00297/2019/C00001",
-            "date_loss": null,
-            "sti_estimate": null*/
 
             <ScrollView
+                android:id="@+id/scroll_parent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="visible">
+                android:visibility="gone">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Status: "/>
-                    <TextView
+                    android:orientation="vertical">
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Pending: "/>
+                        android:orientation="horizontal">
 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Status: "/>
+                        <TextView
+                            android:id="@+id/status"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Pending"/>
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Type: "/>
+                        <TextView
+                            android:id="@+id/type"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Vehicle"/>
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Description: "/>
+                        <TextView
+                            android:id="@+id/description"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Pending"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Cost Estimate: "/>
+                        <TextView
+                            android:id="@+id/cost_estimate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Pending"/>
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Loss Estimate: "/>
+                        <TextView
+                            android:id="@+id/loss_estimate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Pending"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Reference Code: "/>
+                        <TextView
+                            android:id="@+id/ref_code"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Pending"/>
+
+                    </LinearLayout>
 
 
                 </LinearLayout>
-
-
-
 
             </ScrollView>
 

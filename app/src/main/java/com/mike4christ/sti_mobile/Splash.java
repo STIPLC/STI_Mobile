@@ -71,18 +71,9 @@ public class Splash extends AppCompatActivity {
 
             //start animation
             imgLogo.startAnimation(slide_front_left);
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
             txtDesc.startAnimation(blink);
             txtVersion.startAnimation(blink);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
 
             Thread myThread = new Thread(){
                 @Override

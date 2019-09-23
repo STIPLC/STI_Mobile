@@ -29,6 +29,7 @@
         android:orientation="vertical"
         android:gravity="center"
         >
+
         <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -92,17 +93,17 @@
             android:orientation="vertical"
             android:layout_weight="1"
             android:gravity="center"
-            android:id="@+id/payment_btn_lay"
+            android:id="@+id/policy_btn_lay"
             >
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_payment_white_24dp"
+                app:srcCompat="@drawable/ic_manage_white"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="PAYMENT"
+                android:text="MY POLICY"
                 android:textColor="@color/colorWhite"
                 android:textSize="10sp"
                 android:gravity="center_horizontal"
@@ -136,6 +137,7 @@
 
 
     </LinearLayout>
+
     </LinearLayout>
 
 
