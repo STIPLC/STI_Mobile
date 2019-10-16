@@ -1,6 +1,9 @@
 package com.mike4christ.sti_mobile.forms_fragment.MotorInsurance;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,14 +11,20 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.snackbar.Snackbar;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.activity.Dashboard;
 import com.shuhart.stepview.StepView;
 import com.wang.avi.AVLoadingIndicatorView;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -110,11 +119,32 @@ public class MotorInsureFragment3 extends Fragment implements View.OnClickListen
             String format = p_amount + ".00";
             amount.setText(format);
         }else {
-            String format = p_amount ;
-            amount.setText(format);
+            // String format = p_amount ;
+            NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
+            nf.setMaximumFractionDigits(2);
+            DecimalFormat df = (DecimalFormat) nf;
+            String v_price = "₦" + df.format(Double.valueOf(p_amount));
+            amount.setText(v_price);
         }
 
         setViewActions();
+
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+        view.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                Log.i("backPress_KeyCode", "keyCode: " + keyCode);
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    Log.i("backPress", "onKey Back listener is working!!!");
+                    userPreferences.setTempQuotePrice("0.0");
+                    startActivity(new Intent(getActivity(), Dashboard.class));
+                    return true;
+                }
+                return false;
+            }
+        });
+
 
         return  view;
     }

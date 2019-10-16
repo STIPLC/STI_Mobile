@@ -82,6 +82,8 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
     EditText mItemDescA2;
     @BindView(R.id.start_date_a2)
     EditText mStartDateA2;
+    @BindView(R.id.upload_img_btn1_a2)
+    Button mUploadImgBtn1A2;
     @BindView(R.id.inputLayoutSerialNo_a2)
     TextInputLayout mInputLayoutSerialNoA2;
     @BindView(R.id.serial_num_a2)
@@ -116,13 +118,18 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
     DatePickerDialog datePickerDialog1;
     UserPreferences userPreferences;
 
-    int PICK_IMAGE_RECEIPT = 1;
-    int CAM_IMAGE_RECEIPT = 2;
+    int PICK_IMAGE_RECEIPT = 11;
+    int CAM_IMAGE_RECEIPT = 12;
+    int PICK_IMAGE_PASSPORT = 21;
+    int CAM_IMAGE_PASSPORT = 22;
     private String cameraFilePath;
     NetworkConnection networkConnection=new NetworkConnection();
 
     Uri receipt_info_img_uri;
     String receipt_img_url;
+
+    Uri personal_info_img_uri;
+    String personal_item_img_url;
 
     public AllriskFragment2() {
         // Required empty public constructor
@@ -166,11 +173,8 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
 
         mStepView.go(currentStep, true);
         userPreferences = new UserPreferences(getContext());
-
-        init();
-
         itemtypeSpinner();
-
+        init();
 
         setViewActions();
         showDatePicker();
@@ -187,7 +191,7 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
 
         mItemDescA2.setText(userPreferences.getAllRiskItemDesc());
 
-        mStartDateA2.setText(userPreferences.getAllRiskStartDate());
+        //mStartDateA2.setText(userPreferences.getAllRiskStartDate());
 
         mSerialNumA2.setText(userPreferences.getAllRiskSerialNo());
 
@@ -215,7 +219,29 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
-                String stringText = (String) parent.getItemAtPosition(position);
+                String itemtypeText = (String) parent.getItemAtPosition(position);
+                if (itemtypeText.equals("Mobile Phones")) {
+
+                    mInputLayoutSerialNoA2.setVisibility(View.VISIBLE);
+                    mInputLayoutSerialNoA2.setClickable(true);
+                    mInputLayoutItemImeiA2.setVisibility(View.VISIBLE);
+                    mInputLayoutItemImeiA2.setClickable(true);
+
+
+                } else if (itemtypeText.equals("Laptops")) {
+
+                    mInputLayoutSerialNoA2.setVisibility(View.VISIBLE);
+                    mInputLayoutSerialNoA2.setClickable(true);
+                    mInputLayoutItemImeiA2.setVisibility(View.GONE);
+                    mInputLayoutItemImeiA2.setClickable(false);
+
+                } else {
+                    mInputLayoutSerialNoA2.setVisibility(View.GONE);
+                    mInputLayoutSerialNoA2.setClickable(false);
+                    mInputLayoutItemImeiA2.setVisibility(View.GONE);
+                    mInputLayoutItemImeiA2.setClickable(false);
+                }
+
 
 
             }
@@ -223,7 +249,10 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 mItemTypeSpinnerA2.getItemAtPosition(0);
-
+                mInputLayoutSerialNoA2.setVisibility(View.GONE);
+                mInputLayoutSerialNoA2.setClickable(false);
+                mInputLayoutItemImeiA2.setVisibility(View.GONE);
+                mInputLayoutItemImeiA2.setClickable(false);
 
 
             }
@@ -238,6 +267,8 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
         mVNextBtn2A2.setOnClickListener(this);
         mVBackBtn2A2.setOnClickListener(this);
         mStartDateA2.setOnClickListener(this);
+        mUploadImgBtn1A2.setOnClickListener(this);
+        mUploadReceiptBtn2A2.setOnClickListener(this);
 
     }
 
@@ -265,6 +296,36 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_allrisk_form_container, allriskFragment1);
                 ft.commit();
+
+                break;
+
+            case R.id.upload_img_btn1_a2:
+                // setup the alert builder
+                AlertDialog.Builder builderImg = new AlertDialog.Builder(getContext());
+                builderImg.setTitle("Choose Mode of Entry");
+// add a list
+                String[] entryImg = {"Camera", "Gallery"};
+                builderImg.setItems(entryImg, (dialogImg, option) -> {
+                    switch (option) {
+                        case 0:
+                            // direct entry
+                            chooseIdImage1_camera();
+                            dialogImg.dismiss();
+                            break;
+
+                        case 1: // export
+
+                            chooseImageFile1();
+                            dialogImg.dismiss();
+
+                            break;
+
+                    }
+                });
+// create and show the alert dialog
+                AlertDialog dialogImg = builderImg.create();
+                dialogImg.show();
+                mUploadImgBtn1A2.setBackgroundColor(getResources().getColor(R.color.colorAccentEnds));
 
                 break;
 
@@ -300,6 +361,12 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
         }
     }
 
+    private void chooseImageFile1() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction("android.intent.action.GET_CONTENT");
+        startActivityForResult(Intent.createChooser(intent, "Select Image"), PICK_IMAGE_PASSPORT);
+    }
 
     private void chooseImageFile() {
         Intent intent = new Intent();
@@ -325,7 +392,18 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
     }
 
 
+    private void chooseIdImage1_camera() {
 
+        try {
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(getContext(), BuildConfig.APPLICATION_ID + ".fileprovider", createImageFile()));
+            startActivityForResult(intent, CAM_IMAGE_PASSPORT);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            showMessage("Invalid Entry");
+            Log.i("Invalid_Cam_Entry", ex.getMessage());
+        }
+    }
     private void chooseIdImage_camera() {
 
         try {
@@ -352,14 +430,14 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
         if (networkConnection.isNetworkConnected(getContext())) {
             Random random=new Random();
             String rand= String.valueOf(random.nextInt());
-            if (requestCode == 1) {
+            if (requestCode == 11) {
                 receipt_info_img_uri = data.getData();
 
                 try {
                     if (receipt_info_img_uri != null) {
-                        String name = mSerialNumA2.getText().toString()+rand;
+                        String name = userPreferences.getAllRiskIPhoneNum() + rand;
                         if (name.equals("")) {
-                            showMessage("Enter your Serial Number first");
+                            showMessage("Enter your phone number first");
 
                         } else {
 
@@ -369,7 +447,7 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
                                         @Override
                                         public void onStart(String requestId) {
                                             // your code here
-                                            mVNextBtn2A2.setVisibility(View.GONE);
+                                            mBtnLayout2A2.setVisibility(View.GONE);
                                             mProgressbar.setVisibility(View.VISIBLE);
 
                                         }
@@ -383,7 +461,7 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
                                             mProgressbar.setVisibility(View.VISIBLE);
                                             if(!networkConnection.isNetworkConnected(getContext())){
                                                 mProgressbar.setVisibility(View.GONE);
-                                                mVNextBtn2A2.setVisibility(View.VISIBLE);
+                                                mBtnLayout2A2.setVisibility(View.VISIBLE);
                                                 showMessage("Internet Connection Failed");
                                             }
 
@@ -397,7 +475,7 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
                                             Log.i("ImageRequestId ", requestId);
                                             Log.i("ImageUrl ", String.valueOf(resultData.get("url")));
                                             mProgressbar.setVisibility(View.GONE);
-                                            mVNextBtn2A2.setVisibility(View.VISIBLE);
+                                            mBtnLayout2A2.setVisibility(View.VISIBLE);
                                             receipt_img_url = String.valueOf(resultData.get("url"));
 
 
@@ -409,7 +487,7 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
                                             showMessage("Error: " + error.toString());
                                             Log.i("Error: ", error.toString());
 
-                                            mVNextBtn2A2.setVisibility(View.VISIBLE);
+                                            mBtnLayout2A2.setVisibility(View.VISIBLE);
                                             mProgressbar.setVisibility(View.GONE);
                                         }
 
@@ -429,14 +507,14 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
 
                 }
 
-            }else if(requestCode==2){
+            } else if (requestCode == 12) {
                 receipt_info_img_uri = Uri.parse(cameraFilePath);
 
                 try {
                     if (receipt_info_img_uri != null) {
-                        String name = mSerialNumA2.getText().toString()+rand;
+                        String name = userPreferences.getAllRiskIPhoneNum() + rand;
                         if (name.equals("")) {
-                            showMessage("Enter your email address first");
+                            showMessage("Enter your phone number first");
 
                         } else {
 
@@ -446,7 +524,7 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
                                         @Override
                                         public void onStart(String requestId) {
                                             // your code here
-                                            mVNextBtn2A2.setVisibility(View.GONE);
+                                            mBtnLayout2A2.setVisibility(View.GONE);
                                             mProgressbar.setVisibility(View.VISIBLE);
 
                                         }
@@ -460,7 +538,7 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
                                             mProgressbar.setVisibility(View.VISIBLE);
                                             if(!networkConnection.isNetworkConnected(getContext())){
                                                 mProgressbar.setVisibility(View.GONE);
-                                                mVNextBtn2A2.setVisibility(View.VISIBLE);
+                                                mBtnLayout2A2.setVisibility(View.VISIBLE);
                                                 showMessage("Internet Connection Failed");
                                             }
 
@@ -474,7 +552,7 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
                                             Log.i("ImageRequestId ", requestId);
                                             Log.i("ImageUrl ", String.valueOf(resultData.get("url")));
                                             mProgressbar.setVisibility(View.GONE);
-                                            mVNextBtn2A2.setVisibility(View.VISIBLE);
+                                            mBtnLayout2A2.setVisibility(View.VISIBLE);
                                             receipt_img_url = String.valueOf(resultData.get("url"));
 
 
@@ -486,7 +564,7 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
                                             showMessage("Error: " + error.toString());
                                             Log.i("Error: ", error.toString());
 
-                                            mVNextBtn2A2.setVisibility(View.VISIBLE);
+                                            mBtnLayout2A2.setVisibility(View.VISIBLE);
                                             mProgressbar.setVisibility(View.GONE);
                                         }
 
@@ -503,6 +581,158 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
                 } catch (Exception e) {
                     e.printStackTrace();
                     showMessage("Please Check your Image");
+
+                }
+            } else if (requestCode == 21) {
+                personal_info_img_uri = data.getData();
+
+                try {
+                    if (personal_info_img_uri != null) {
+                        String name = userPreferences.getAllRiskIPhoneNum() + rand;
+                        if (name.equals("")) {
+                            showMessage("Enter your phone number first");
+
+                        } else {
+
+                            String imageId = MediaManager.get().upload(Uri.parse(personal_info_img_uri.toString()))
+                                    .option("public_id", "user_registration/profile_photos/user_passport" + name)
+                                    .unsigned("xbiscrhh").callback(new UploadCallback() {
+                                        @Override
+                                        public void onStart(String requestId) {
+                                            // your code here
+                                            mBtnLayout2A2.setVisibility(View.GONE);
+                                            mProgressbar.setVisibility(View.VISIBLE);
+
+                                        }
+
+                                        @Override
+                                        public void onProgress(String requestId, long bytes, long totalBytes) {
+                                            // example code starts here
+                                            Double progress = (double) bytes / totalBytes;
+                                            // post progress to app UI (e.g. progress bar, notification)
+                                            // example code ends here
+                                            mProgressbar.setVisibility(View.VISIBLE);
+                                            if (!networkConnection.isNetworkConnected(getContext())) {
+                                                mBtnLayout2A2.setVisibility(View.VISIBLE);
+                                                mProgressbar.setVisibility(View.GONE);
+                                                showMessage("Internet Connection Failed");
+                                            }
+
+                                        }
+
+                                        @Override
+                                        public void onSuccess(String requestId, Map resultData) {
+                                            // your code here
+
+                                            showMessage("Image Uploaded Successfully");
+                                            Log.i("ImageRequestId ", requestId);
+                                            Log.i("ImageUrl ", String.valueOf(resultData.get("url")));
+                                            mBtnLayout2A2.setVisibility(View.VISIBLE);
+                                            mProgressbar.setVisibility(View.GONE);
+                                            personal_item_img_url = String.valueOf(resultData.get("url"));
+
+
+                                        }
+
+                                        @Override
+                                        public void onError(String requestId, ErrorInfo error) {
+                                            // your code here
+                                            showMessage("Error: " + error.toString());
+                                            Log.i("Error: ", error.toString());
+
+                                            mBtnLayout2A2.setVisibility(View.VISIBLE);
+                                            mProgressbar.setVisibility(View.GONE);
+                                        }
+
+                                        @Override
+                                        public void onReschedule(String requestId, ErrorInfo error) {
+                                            // your code here
+                                        }
+                                    })
+                                    .dispatch();
+
+                        }
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    showMessage("Please Check your Image");
+
+                }
+
+            } else if (requestCode == 22) {
+                personal_info_img_uri = Uri.parse(cameraFilePath);
+
+                try {
+                    if (personal_info_img_uri != null) {
+                        String name = userPreferences.getAllRiskIPhoneNum() + rand;
+                        if (name.equals("")) {
+                            showMessage("Enter your phone number first");
+
+                        } else {
+
+                            String imageId = MediaManager.get().upload(personal_info_img_uri)
+                                    .option("public_id", "user_registration/profile_photos/user_passport" + name)
+                                    .unsigned("xbiscrhh").callback(new UploadCallback() {
+                                        @Override
+                                        public void onStart(String requestId) {
+                                            // your code here
+                                            mBtnLayout2A2.setVisibility(View.GONE);
+                                            mProgressbar.setVisibility(View.VISIBLE);
+
+                                        }
+
+                                        @Override
+                                        public void onProgress(String requestId, long bytes, long totalBytes) {
+                                            // example code starts here
+                                            Double progress = (double) bytes / totalBytes;
+                                            // post progress to app UI (e.g. progress bar, notification)
+                                            // example code ends here
+                                            mProgressbar.setVisibility(View.VISIBLE);
+                                            if (!networkConnection.isNetworkConnected(getContext())) {
+                                                mBtnLayout2A2.setVisibility(View.GONE);
+                                                mProgressbar.setVisibility(View.VISIBLE);
+                                                showMessage("Internet Connection Failed");
+                                            }
+
+                                        }
+
+                                        @Override
+                                        public void onSuccess(String requestId, Map resultData) {
+                                            // your code here
+
+                                            showMessage("Image Uploaded Successfully");
+                                            Log.i("ImageRequestId ", requestId);
+                                            Log.i("ImageUrl ", String.valueOf(resultData.get("url")));
+                                            mBtnLayout2A2.setVisibility(View.VISIBLE);
+                                            mProgressbar.setVisibility(View.GONE);
+                                            personal_item_img_url = String.valueOf(resultData.get("url"));
+
+
+                                        }
+
+                                        @Override
+                                        public void onError(String requestId, ErrorInfo error) {
+                                            // your code here
+                                            showMessage("Error: " + error.toString());
+                                            Log.i("Error: ", error.toString());
+                                            mBtnLayout2A2.setVisibility(View.VISIBLE);
+                                            mProgressbar.setVisibility(View.GONE);
+                                        }
+
+                                        @Override
+                                        public void onReschedule(String requestId, ErrorInfo error) {
+                                            // your code here
+                                        }
+                                    })
+                                    .dispatch();
+
+                        }
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    showMessage("Image Error, Please Check your Image");
 
                 }
             }
@@ -515,32 +745,42 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
 
     private void validateUserInputs() {
 
-
         boolean isValid = true;
 
-        if (mItemDescA2.getText().toString().isEmpty()) {
-            mInputLayoutItemDescriptnA2.setError("Your Item Description is required!");
-
-            isValid = false;
-        } else if (mStartDateA2.getText().toString().isEmpty()) {
+        if (mStartDateA2.getText().toString().isEmpty()) {
             showMessage("Start Date is required!");
 
             isValid = false;
-        } else if (mSerialNumA2.getText().toString().isEmpty()) {
+        } else if (mSerialNumA2.getText().toString().isEmpty() && mInputLayoutSerialNoA2.isClickable()) {
             mInputLayoutSerialNoA2.setError("Serial Number is required!");
             isValid = false;
+        } else if (mImeiA2.getText().toString().isEmpty() && mInputLayoutItemImeiA2.isClickable()) {
+            mInputLayoutItemImeiA2.setError("IMEI Number is required!");
+            isValid = false;
         } else if (mItemValueA2.getText().toString().isEmpty()) {
-            mInputLayoutItemValueA2.setError("Chasis Number is required!");
+            mInputLayoutItemValueA2.setError("Item value is required!");
 
             isValid = false;
         } else {
             mInputLayoutItemValueA2.setErrorEnabled(false);
             mInputLayoutSerialNoA2.setErrorEnabled(false);
             mInputLayoutItemDescriptnA2.setErrorEnabled(false);
+            mInputLayoutItemImeiA2.setErrorEnabled(false);
 
         }
+
+        if (personal_item_img_url == null) {
+            showMessage("Please upload the Item image");
+            isValid = false;
+        }
+
+        if (receipt_img_url == null) {
+            showMessage("Please upload the Item receipt");
+            isValid = false;
+        }
+
         itemTypeString = mItemTypeSpinnerA2.getSelectedItem().toString();
-        if (itemTypeString.equals("Select Item")) {
+        if (itemTypeString.equals("Select Item*")) {
             showMessage("Select Item");
             isValid = false;
         }
@@ -569,10 +809,20 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
             userPreferences.setAllRiskItemDesc(mItemDescA2.getText().toString());
             userPreferences.setAllRiskStartDate(mStartDateA2.getText().toString());
             userPreferences.setAllRiskItemType(itemTypeString);
-            userPreferences.setAllRiskSerialNo(mSerialNumA2.getText().toString());
+            if (mInputLayoutSerialNoA2.isClickable()) {
+                userPreferences.setAllRiskSerialNo(mSerialNumA2.getText().toString());
+            } else {
+                userPreferences.setAllRiskSerialNo(" ");
+            }
             userPreferences.setAllRiskItemValue(mItemValueA2.getText().toString());
-            userPreferences.setAllRiskItemImei(mImeiA2.getText().toString());
+            if (mInputLayoutSerialNoA2.isClickable()) {
+                userPreferences.setAllRiskItemImei(mImeiA2.getText().toString());
+            } else {
+                userPreferences.setAllRiskItemImei(" ");
+            }
             userPreferences.setAllRiskItemReceipt(receipt_img_url);
+            userPreferences.setAllRiskPersonalImage(personal_item_img_url);
+            
             sendAllRiskData();
 
         }catch (Exception e){
@@ -598,15 +848,23 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
                 Log.i("ResponseCode", String.valueOf(response.code()));
                 if(response.code()==400){
                     showMessage("Check your internet connection");
+                    mBtnLayout2A2.setVisibility(View.VISIBLE);
+                    mProgressbar.setVisibility(View.GONE);
                     return;
                 }else if(response.code()==429){
                     showMessage("Too many requests on database");
+                    mBtnLayout2A2.setVisibility(View.VISIBLE);
+                    mProgressbar.setVisibility(View.GONE);
                     return;
                 }else if(response.code()==500){
                     showMessage("Server Error");
+                    mBtnLayout2A2.setVisibility(View.VISIBLE);
+                    mProgressbar.setVisibility(View.GONE);
                     return;
                 }else if(response.code()==401){
                     showMessage("Unauthorized access, please try login again");
+                    mBtnLayout2A2.setVisibility(View.VISIBLE);
+                    mProgressbar.setVisibility(View.GONE);
                     return;
                 }
 
@@ -619,6 +877,8 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
                             showMessage("Invalid Entry: "+apiError.getErrors());
                             Log.i("Invalid EntryK",apiError.getErrors().toString());
                             Log.i("Invalid Entry",response.errorBody().toString());
+                            mBtnLayout2A2.setVisibility(View.VISIBLE);
+                            mProgressbar.setVisibility(View.GONE);
 
                         }catch (Exception e){
                             Log.i("InvalidEntry",e.getMessage());

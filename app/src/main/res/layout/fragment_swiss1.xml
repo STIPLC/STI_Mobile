@@ -85,7 +85,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/size_three"
                             android:background="@drawable/rounded_bg"
-                            android:hint="First Name"
+                            android:hint="First Name* (required)"
                             android:importantForAutofill="noExcludeDescendants"
                             android:inputType="text"
                             android:padding="@dimen/size_ten"
@@ -106,7 +106,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/size_three"
                             android:background="@drawable/rounded_bg"
-                            android:hint="Last Name"
+                            android:hint="Last Name* (required)"
                             android:importantForAutofill="noExcludeDescendants"
                             android:inputType="text"
                             android:padding="@dimen/size_ten"
@@ -114,6 +114,17 @@
                             />
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <EditText
+                        android:id="@+id/dob_editxt_s"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/size_five"
+                        android:background="@drawable/rounded_bg"
+                        android:hint="Date of Birth* (required)"
+                        android:inputType="none"
+                        android:focusable="false"
+                        android:padding="@dimen/size_ten"
+                        tools:targetApi="o" />
 
                     <Spinner
                         android:id="@+id/gender_spinner_s1"
@@ -137,7 +148,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/size_three"
                             android:background="@drawable/rounded_bg"
-                            android:hint="Residentail Address"
+                            android:hint="Residential Address* (required)"
                             android:importantForAutofill="noExcludeDescendants"
                             android:inputType="text"
                             android:padding="@dimen/size_ten"
@@ -154,6 +165,24 @@
                         />
 
                     <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/inputLayoutEmail_s1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <EditText
+                            android:id="@+id/email_editxt_s1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/size_three"
+                            android:background="@drawable/rounded_bg"
+                            android:hint="Email* (required)"
+                            android:importantForAutofill="noExcludeDescendants"
+                            android:inputType="textEmailAddress"
+                            android:padding="@dimen/size_ten"
+                            tools:targetApi="o" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/inputLayoutPhone_s1"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
@@ -164,7 +193,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/size_three"
                             android:background="@drawable/rounded_bg"
-                            android:hint="Phone Number"
+                            android:hint="Phone Number* (required)"
                             android:importantForAutofill="noExcludeDescendants"
                             android:inputType="number"
                             android:padding="@dimen/size_ten"
@@ -184,7 +213,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/size_three"
                             android:background="@drawable/rounded_bg"
-                            android:hint="Next of Kin"
+                            android:hint="Next of Kin* (required)"
                             android:importantForAutofill="noExcludeDescendants"
                             android:inputType="text"
                             android:padding="@dimen/size_ten"
@@ -205,7 +234,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/size_three"
                             android:background="@drawable/rounded_bg"
-                            android:hint="Next of Kin Address"
+                            android:hint="Next of Kin Address* (required)"
                             android:importantForAutofill="noExcludeDescendants"
                             android:inputType="text"
                             android:padding="@dimen/size_ten"
@@ -224,7 +253,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/size_three"
                             android:background="@drawable/rounded_bg"
-                            android:hint="Next of Kin Phone Number"
+                            android:hint="Next of Kin Phone Number* (required)"
                             android:importantForAutofill="noExcludeDescendants"
                             android:inputType="number"
                             android:padding="@dimen/size_ten"
@@ -234,18 +263,7 @@
 
 
 
-                        <EditText
-                            android:id="@+id/dob_editxt_s"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/size_five"
-                            android:background="@drawable/rounded_bg"
-                            android:hint="Date of Birth"
-                            android:importantForAutofill="noExcludeDescendants"
-                            android:inputType="date"
-                            android:padding="@dimen/size_ten"
-                            tools:targetApi="o"
-                            />
+
 
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -261,7 +279,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/size_three"
                             android:background="@drawable/rounded_bg"
-                            android:hint="Any form of Disability(Enter No! if No)"
+                            android:hint="Any form of Disability(Enter No! if No)* (required)"
                             android:importantForAutofill="noExcludeDescendants"
                             android:inputType="text"
                             android:padding="@dimen/size_ten"
@@ -294,15 +312,26 @@
                         android:background="@drawable/rounded_bg"
                         android:drawableEnd="@drawable/ic_camera_alt_black_24dp"
                         android:padding="@dimen/size_ten"
-                        android:text="Upload Passport"
+                        android:text="Upload Passport*"
                         android:layout_marginTop="@dimen/size_ten"
                         android:textColor="@android:color/darker_gray"
                         android:layout_marginBottom="@dimen/size_ten"
 
                         />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorPrimary"
+                        android:text="@string/privacy"
+                        android:textAlignment="textStart"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
                         android:orientation="horizontal">
 
                         <RadioButton
@@ -314,9 +343,10 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:textAlignment="textStart"
                             android:textColor="@color/colorPrimary"
                             android:text="I have review and agreed to the disclosure and the privacy policy"
-                            android:textStyle="italic"
+
                             />
                     </LinearLayout>
 

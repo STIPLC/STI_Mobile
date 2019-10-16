@@ -35,8 +35,11 @@ public class AdditionalInsuredPost implements Serializable
     @SerializedName("disability")
     @Expose
     private String disability;
+    @SerializedName("price")
+    @Expose
+    private String price;
 
-    public AdditionalInsuredPost(String firstName, String lastName, String email, String gender, String phone, String dateOfBirth, String maritalStatus, String picture, String disability) {
+    public AdditionalInsuredPost(String firstName, String lastName, String email, String gender, String phone, String dateOfBirth, String maritalStatus, String picture, String disability, String price) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -46,5 +49,6 @@ public class AdditionalInsuredPost implements Serializable
         this.maritalStatus = maritalStatus;
         this.picture = picture;
         this.disability = disability;
+        this.price = price;
     }
 }

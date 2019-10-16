@@ -45,6 +45,9 @@ public class SwissPersona implements Serializable
     @SerializedName("next_of_kin_phone")
     @Expose
     private String nextOfKinPhone;
+    @SerializedName("price")
+    @Expose
+    private String price;
     @SerializedName("next_of_kin_address")
     @Expose
     private String nextOfKinAddress;
@@ -55,7 +58,7 @@ public class SwissPersona implements Serializable
     @Expose
     private List<AdditionalInsuredPost> additionalInsuredPost = null;
 
-    public SwissPersona(String firstName, String lastName, String email, String gender, String dateOfBirth, String phone, String houseAddress, String accountNumber, String maritalStatus, String picture, String nextOfKin, String nextOfKinPhone, String nextOfKinAddress, String disability, List<AdditionalInsuredPost> additionalInsuredPost) {
+    public SwissPersona(String firstName, String lastName, String email, String gender, String dateOfBirth, String phone, String houseAddress, String accountNumber, String maritalStatus, String picture, String nextOfKin, String nextOfKinPhone, String price, String nextOfKinAddress, String disability, List<AdditionalInsuredPost> additionalInsuredPost) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -68,8 +71,29 @@ public class SwissPersona implements Serializable
         this.picture = picture;
         this.nextOfKin = nextOfKin;
         this.nextOfKinPhone = nextOfKinPhone;
+        this.price = price;
         this.nextOfKinAddress = nextOfKinAddress;
         this.disability = disability;
         this.additionalInsuredPost = additionalInsuredPost;
+    }
+
+
+    public SwissPersona(String firstName, String lastName, String email, String gender, String dateOfBirth, String phone, String houseAddress, String accountNumber, String maritalStatus, String picture, String nextOfKin, String nextOfKinPhone, String price, String nextOfKinAddress, String disability) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.gender = gender;
+        this.dateOfBirth = dateOfBirth;
+        this.phone = phone;
+        this.houseAddress = houseAddress;
+        this.accountNumber = accountNumber;
+        this.maritalStatus = maritalStatus;
+        this.picture = picture;
+        this.nextOfKin = nextOfKin;
+        this.nextOfKinPhone = nextOfKinPhone;
+        this.price = price;
+        this.nextOfKinAddress = nextOfKinAddress;
+        this.disability = disability;
+
     }
 }

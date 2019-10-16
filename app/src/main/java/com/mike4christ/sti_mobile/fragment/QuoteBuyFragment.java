@@ -121,8 +121,8 @@ public class QuoteBuyFragment extends Fragment {
                 R.drawable.swiss,
                 R.drawable.marine,
                 R.drawable.all_risk,
-                R.drawable.travel,
-                R.drawable.other
+                R.drawable.travel
+                /* R.drawable.other*/
         };
 
         QuoteBuyCard m = new QuoteBuyCard("Motor Insurance", image[0]);
@@ -140,8 +140,8 @@ public class QuoteBuyFragment extends Fragment {
         m = new QuoteBuyCard("ETIC Insurance", image[4]);
         cardList.add(m);
 
-        m = new QuoteBuyCard("Other Insurance", image[5]);
-        cardList.add(m);
+       /* m = new QuoteBuyCard("Other Insurance", image[5]);
+        cardList.add(m);*/
 
 
 

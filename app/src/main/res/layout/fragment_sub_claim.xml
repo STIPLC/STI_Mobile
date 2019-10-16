@@ -63,24 +63,27 @@
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/inputLayoutLastDescClaim"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
 
                         >
 
                         <EditText
                             android:id="@+id/descclaim_editxt_s1"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_height="100dp"
                             android:layout_marginTop="@dimen/size_three"
+                            android:singleLine="false"
+                            android:inputType="text|textMultiLine"
+                            android:maxLines="5"
+                            android:textAlignment="textStart"
+                            android:gravity="start"
                             android:background="@drawable/rounded_bg"
-                            android:hint="Describe your Claim"
+                            android:hint="Describe your Claim *(required)"
                             android:importantForAutofill="noExcludeDescendants"
-                            android:inputType="text"
                             android:padding="@dimen/size_ten"
                             tools:targetApi="o"
                             />
                     </com.google.android.material.textfield.TextInputLayout>
-
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/inputLayoutDateofLoss"
                         android:layout_width="match_parent"
@@ -94,24 +97,23 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/size_three"
                             android:background="@drawable/rounded_bg"
-                            android:hint="Date Loss (mm/dd/yy)"
-                            android:importantForAutofill="noExcludeDescendants"
-                            android:inputType="date"
+                            android:hint="Date of Loss*(required)"
+                            android:inputType="none"
+                            android:focusable="false"
                             android:padding="@dimen/size_ten"
                             tools:targetApi="o"
                             />
                     </com.google.android.material.textfield.TextInputLayout>
 
 
+                    <!--   <Spinner
+                           android:id="@+id/sti_est_spinner"
+                           android:layout_width="match_parent"
+                           android:layout_height="50dp"
+                           android:layout_marginTop="@dimen/size_three"
+                           android:background="@drawable/spinner_bg"
 
-                    <Spinner
-                        android:id="@+id/sti_est_spinner"
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:layout_marginTop="@dimen/size_three"
-                        android:background="@drawable/spinner_bg"
-
-                        />
+                           />-->
 
 
 
@@ -126,7 +128,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/size_three"
                             android:background="@drawable/rounded_bg"
-                            android:hint="Estimate Cost (e.g 1500)"
+                            android:hint="Cost of Estimate (e.g 1500)"
                             android:importantForAutofill="noExcludeDescendants"
                             android:inputType="number"
                             android:padding="@dimen/size_ten"
@@ -135,24 +137,24 @@
                     </com.google.android.material.textfield.TextInputLayout>
 
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/inputLayoutPin"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                    <!-- <com.google.android.material.textfield.TextInputLayout
+                         android:id="@+id/inputLayoutPin"
+                         android:layout_width="match_parent"
+                         android:layout_height="match_parent">
 
-                        <EditText
-                            android:id="@+id/pin_editxt"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/size_three"
-                            android:background="@drawable/rounded_bg"
-                            android:hint="Enter your Pin"
-                            android:importantForAutofill="noExcludeDescendants"
-                            android:inputType="text"
-                            android:padding="@dimen/size_ten"
-                            tools:targetApi="o"
-                            />
-                    </com.google.android.material.textfield.TextInputLayout>
+                         <EditText
+                             android:id="@+id/pin_editxt"
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:layout_marginTop="@dimen/size_three"
+                             android:background="@drawable/rounded_bg"
+                             android:hint="Enter your Pin"
+                             android:importantForAutofill="noExcludeDescendants"
+                             android:inputType="text"
+                             android:padding="@dimen/size_ten"
+                             tools:targetApi="o"
+                             />
+                     </com.google.android.material.textfield.TextInputLayout>-->
 
                     <Button
                         android:id="@+id/upload_estimate_cost"
@@ -176,7 +178,7 @@
                         android:background="@drawable/rounded_bg"
                         android:drawableEnd="@drawable/ic_camera_alt_black_24dp"
                         android:padding="@dimen/size_ten"
-                        android:text="Upload damage picture"
+                        android:text="Upload damaged picture*(required)"
                         android:layout_marginTop="@dimen/size_ten"
                         android:textColor="@android:color/darker_gray"
                         android:layout_marginBottom="@dimen/size_ten"
@@ -194,6 +196,13 @@
                         android:textColor="@android:color/darker_gray"
                         android:layout_marginBottom="@dimen/size_ten"
                         />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorPrimary"
+                        android:text="N.B: Claim will be settled within 5 working days after the receipt of executed discharge voucher"
+                        android:textStyle="italic" />
 
 
                     <Button

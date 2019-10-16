@@ -14,7 +14,7 @@ public class Constant {
     public static final int PRIVATE_MODE = 0;
     public static final String BASE_URL = "http://188.166.153.239/api/";
 
-//  User profile constant
+    //  ProfileImageUser profile constant
     public static final String FULLNAME = "fullname";
     public static final String EMAIL = "email";
     public static final String PHONE_NUMBER = "phone_number";

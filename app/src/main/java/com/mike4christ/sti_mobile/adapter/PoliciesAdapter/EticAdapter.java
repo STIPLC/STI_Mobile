@@ -20,7 +20,10 @@ import com.mike4christ.sti_mobile.activity.MyEticDetail;
 import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
 import com.mike4christ.sti_mobile.retrofit_interface.ItemClickListener;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,27 +51,51 @@ public class EticAdapter extends RecyclerView.Adapter<EticAdapter.MyViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int i) {
         Travel travelOption = travelList.get(i);
+        if (travelOption.getPrice() != null) {
+            holder.mPolicyNum.setText(travelOption.getPolicyNumber());
 
-        holder.mPolicyNum.setText(travelOption.getPolicyNumber());
-        holder.mPrice.setText(travelOption.getPrice());
-        holder.mDateTime.setText(travelOption.getCreatedAt());
-        holder.mStatus.setText(travelOption.getStatus());
-        holder.mPaymentStatus.setText(travelOption.getPaymentStatus());
-        holder.mPolicyType.setText(travelOption.getPolicyType());
+            NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
+            nf.setMaximumFractionDigits(2);
+            DecimalFormat df = (DecimalFormat) nf;
+            String v_price = "₦" + df.format(Double.valueOf(travelOption.getPrice()));
+
+            holder.mPrice.setText(v_price);
+            holder.mDateTime.setText(travelOption.getCreatedAt());
+            holder.mStatus.setText(travelOption.getStatus());
+            holder.mPaymentStatus.setText(travelOption.getPaymentStatus());
+            holder.mPolicyType.setText(travelOption.getPolicyType());
 
 
+            holder.setItemClickListener(pos -> {
 
-        holder.setItemClickListener(pos -> {
-
-            nextActivity(travelList.get(pos).getPolicyNumber(), travelList.get(pos).getTripDuration(),travelList.get(pos).getPlaceDeparture()
-                    ,travelList.get(pos).getPlaceArrival(),travelList.get(pos).getTravelMode(),travelList.get(pos).getPolicyType(),
-                    travelList.get(pos).getPrice(),travelList.get(pos).getStart(),travelList.get(pos).getEnd(),travelList.get(pos).getPaymentReference()
-                    ,travelList.get(pos).getStatus(),travelList.get(pos).getPaymentStatus(),travelList.get(pos).getAddressCountryOfVisit()
-                    , MyEticDetail.class);
-
+                nextActivity(travelList.get(pos).getPolicyNumber(), travelList.get(pos).getTripDuration(), travelList.get(pos).getPlaceDeparture()
+                        , travelList.get(pos).getPlaceArrival(), travelList.get(pos).getTravelMode(), travelList.get(pos).getPolicyType(),
+                        travelList.get(pos).getPrice(), travelList.get(pos).getStart(), travelList.get(pos).getEnd(), travelList.get(pos).getPaymentReference()
+                        , travelList.get(pos).getStatus(), travelList.get(pos).getPaymentStatus(), travelList.get(pos).getAddressCountryOfVisit()
+                        , MyEticDetail.class);
 
 
             });
+        } else {
+            holder.mPolicyNum.setText(travelOption.getPolicyNumber());
+            holder.mPrice.setText(travelOption.getPrice());
+            holder.mDateTime.setText(travelOption.getCreatedAt());
+            holder.mStatus.setText(travelOption.getStatus());
+            holder.mPaymentStatus.setText(travelOption.getPaymentStatus());
+            holder.mPolicyType.setText(travelOption.getPolicyType());
+
+
+            holder.setItemClickListener(pos -> {
+
+                nextActivity(travelList.get(pos).getPolicyNumber(), travelList.get(pos).getTripDuration(), travelList.get(pos).getPlaceDeparture()
+                        , travelList.get(pos).getPlaceArrival(), travelList.get(pos).getTravelMode(), travelList.get(pos).getPolicyType(),
+                        travelList.get(pos).getPrice(), travelList.get(pos).getStart(), travelList.get(pos).getEnd(), travelList.get(pos).getPaymentReference()
+                        , travelList.get(pos).getStatus(), travelList.get(pos).getPaymentStatus(), travelList.get(pos).getAddressCountryOfVisit()
+                        , MyEticDetail.class);
+
+
+            });
+        }
     }
 
     private void nextActivity(String policynum, String trip_duration,String departure_plc

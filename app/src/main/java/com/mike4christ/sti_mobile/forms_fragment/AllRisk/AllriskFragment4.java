@@ -1,9 +1,11 @@
 package com.mike4christ.sti_mobile.forms_fragment.AllRisk;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +19,9 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,14 +45,20 @@ import com.mike4christ.sti_mobile.Model.ServiceGenerator;
 import com.mike4christ.sti_mobile.NetworkConnection;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.activity.Dashboard;
 import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
 import com.mike4christ.sti_mobile.adapter.ItemListAdapter;
+import com.mike4christ.sti_mobile.fragment.DashboardFragment;
+import com.mike4christ.sti_mobile.fragment.TransactionHistoryFragment;
 import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.shuhart.stepview.StepView;
 import com.wang.avi.AVLoadingIndicatorView;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -60,7 +70,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-class AllriskFragment4 extends Fragment implements View.OnClickListener{
+public class AllriskFragment4 extends Fragment implements View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
 
     private static final String PRIMARY_KEY = "primaryKey";
@@ -80,10 +90,10 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
     TextView mPersonalInfoA4;
     @BindView(R.id.fabShowItemInfo_a4)
     FloatingActionButton mFabShowItemInfoA4;
-    @BindView(R.id.inputLayoutPin_a4)
-    TextInputLayout mInputLayoutPinA4;
-    @BindView(R.id.pin_txt_a4)
-    EditText mPinTxtA4;
+    /* @BindView(R.id.inputLayoutPin_a4)
+     TextInputLayout mInputLayoutPinA4;
+     @BindView(R.id.pin_txt_a4)
+     EditText mPinTxtA4;*/
     @BindView(R.id.modeOfPayment_spinner_a4)
     Spinner mModeOfPaymentSpinnerA4;
     @BindView(R.id.btn_layout4_a4)
@@ -171,6 +181,25 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
         modeofPaymentSpinner();
         setViewActions();
 
+
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+        view.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                Log.i("backPress_KeyCode", "keyCode: " + keyCode);
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    Log.i("backPress", "onKey Back listener is working!!!");
+
+                    asyncAllriskPolicy(primaryKey);
+                    userPreferences.setTempAllRiskQuotePrice("0.0");
+                    startActivity(new Intent(getActivity(), Dashboard.class));
+                    return true;
+                }
+                return false;
+            }
+        });
+
         return  view;
     }
 
@@ -212,20 +241,24 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
         personal_detail_allriskss=allriskPolicy.getPersonal_detail_allrisks();
 
 
+        NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
+        nf.setMaximumFractionDigits(2);
+        DecimalFormat df = (DecimalFormat) nf;
+        String v_price = df.format(Double.valueOf(total_quoteprice));
 
-
-        if(userPreferences.getMotorPtype().equals("Corporate")){
-            String corperate="Company Name: "+personal_detail_allriskss.get(0).getCompany_name()+"\n"+"\n"+"Phone Number: "+personal_detail_allriskss.get(0).getPhone()+"\n"+
+        if (userPreferences.getAllRiskPtype().equals("Corporate")) {
+            String corperate = "Company Name: " + personal_detail_allriskss.get(0).getCompany_name() + "\n" + "Phone Number: " + personal_detail_allriskss.get(0).getPhone() + "\n" +
                     "Office Address: "+personal_detail_allriskss.get(0).getOffice_address()+"\n"+"Contact Person: "+personal_detail_allriskss.get(0).getContact_person()+"\n"+
                     "Phone Number: "+personal_detail_allriskss.get(0).getPhone()+"\n"+"Email Address: "+personal_detail_allriskss.get(0).getEmail()+"\n"+"Mailing Address: "+personal_detail_allriskss.get(0).getMailing_addr()+"\n"+
-                    "Total Premium: "+total_quoteprice;
+                    "Total Premium: ₦" + v_price;
             mPersonalInfoA4.setText(corperate);
 
-        }else if (userPreferences.getMotorPtype().equals("Individual")){
+        } else if (userPreferences.getAllRiskPtype().equals("Individual")) {
             String individual="Prefix: "+personal_detail_allriskss.get(0).getPrefix()+"\n"+"First Name: "+personal_detail_allriskss.get(0).getFirst_name()+"\n"+
                     "Last Name: "+personal_detail_allriskss.get(0).getLast_name()+"\n"+"Phone Number: "+personal_detail_allriskss.get(0).getPhone()+"\n"+
                     "Gender: "+personal_detail_allriskss.get(0).getResident_address()+"\n"+"Mailing Address: "+personal_detail_allriskss.get(0).getMailing_addr()+"\n"+
-                    "Total Premium: "+total_quoteprice;
+                    "Total Premium: ₦" + v_price;
+
             mPersonalInfoA4.setText(individual);
 
         }
@@ -312,12 +345,12 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
         if (networkConnection.isNetworkConnected(getContext())) {
             boolean isValid = true;
 
-            if (mPinTxtA4.getText().toString().isEmpty()) {
+           /* if (mPinTxtA4.getText().toString().isEmpty()) {
                 mInputLayoutPinA4.setError("Pin is required!");
                 isValid = false;
             } else {
                 mInputLayoutPinA4.setErrorEnabled(false);
-            }
+            }*/
             //Prefix Spinner
             modeofPaymentString = mModeOfPaymentSpinnerA4.getSelectedItem().toString();
             if (modeofPaymentString.equals("Mode of Payment")) {
@@ -367,7 +400,7 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
             }
 
             AllRiskPostHead allriskPostHead=new AllRiskPostHead(allriskPersona,modeofPaymentString,total_quoteprice,
-                    mPinTxtA4.getText().toString(),results.size(),itemList_post);
+                    "0000", results.size(), itemList_post);
 
 
             sendPolicy(allriskPostHead);
@@ -391,7 +424,7 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
             }
 
             AllRiskPostHead allriskPostHead=new AllRiskPostHead(allriskPersona,modeofPaymentString,total_quoteprice,
-                    mPinTxtA4.getText().toString(),results.size(),itemList_post);
+                    "0000", results.size(), itemList_post);
 
 
             sendPolicy(allriskPostHead);
@@ -403,6 +436,7 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
 
         
     }
+
 
     private void sendPolicy(AllRiskPostHead allRiskPostHead){
 
@@ -417,16 +451,24 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
             public void onResponse(Call<BuyQuoteFormGetHead_AllRisk> call, Response<BuyQuoteFormGetHead_AllRisk> response) {
                 Log.i("ResponseCode", String.valueOf(response.code()));
                 if(response.code()==400){
-                    showMessage("Check your internet connection");
+                    failed_alert("Check your internet connection");
+                    mBtnLayout4A4.setVisibility(View.VISIBLE);
+                    mProgressbar4A4.setVisibility(View.GONE);
                     return;
                 }else if(response.code()==429){
-                    showMessage("Too many requests on database");
+                    failed_alert("Too many requests on database");
+                    mBtnLayout4A4.setVisibility(View.VISIBLE);
+                    mProgressbar4A4.setVisibility(View.GONE);
                     return;
                 }else if(response.code()==500){
-                    showMessage("Server Error");
+                    failed_alert("Server Error");
+                    mBtnLayout4A4.setVisibility(View.VISIBLE);
+                    mProgressbar4A4.setVisibility(View.GONE);
                     return;
                 }else if(response.code()==401){
-                    showMessage("Unauthorized access, please try login again");
+                    failed_alert("Unauthorized access, please try login again");
+                    mBtnLayout4A4.setVisibility(View.VISIBLE);
+                    mProgressbar4A4.setVisibility(View.GONE);
                     return;
                 }
 
@@ -436,14 +478,14 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
                         try{
                             APIError apiError= ErrorUtils.parseError(response);
 
-                            showMessage("Invalid Entry: "+apiError.getErrors());
+                            failed_alert("Invalid Entry \n" + apiError.getErrors());
                             Log.i("Invalid EntryK",apiError.getErrors().toString());
                             Log.i("Invalid Entry",response.errorBody().toString());
 
                         }catch (Exception e){
                             Log.i("InvalidEntry",e.getMessage());
                             Log.i("ResponseError",response.errorBody().string());
-                            showMessage("Failed to Register"+e.getMessage());
+                            failed_alert("Failed to Submit, try again\n" + e.getMessage());
                             mBtnLayout4A4.setVisibility(View.VISIBLE);
                             mProgressbar4A4.setVisibility(View.GONE);
 
@@ -465,12 +507,11 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
                     Log.i("totalPrice", total_price);
                     Log.i("ref", ref);
 
-                    showMessage("Submit Successful, Proceed to Payment");
-                    userPreferences.setTempAllRiskQuotePrice("0.0");
 
-                    mBtnLayout4A4.setVisibility(View.VISIBLE);
-                    mProgressbar4A4.setVisibility(View.GONE);
                     if (total_price != null) {
+                        mBtnLayout4A4.setVisibility(View.VISIBLE);
+                        mProgressbar4A4.setVisibility(View.GONE);
+                        userPreferences.setTempAllRiskQuotePrice("0.0");
                         asyncAllriskPolicy(primaryKey);
                         Intent intent = new Intent(getContext(), PolicyPaymentActivity.class);
                         intent.putExtra(Constant.TOTAL_PRICE, total_price);
@@ -481,50 +522,86 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
                         getActivity().finish();
 
                     } else {
-                        showMessage("Error: " + response.body());
+                        incomplete_alert(String.valueOf(response.body()));
                         mBtnLayout4A4.setVisibility(View.VISIBLE);
                         mProgressbar4A4.setVisibility(View.GONE);
-                        userPreferences.setTempAllRiskQuotePrice("0.0");
-                        asyncAllriskPolicy(primaryKey);
-                        Fragment allriskFragment2 = new AllriskFragment2();
-                        FragmentTransaction ft = getFragmentManager().beginTransaction();
-                        ft.replace(R.id.fragment_allrisk_form_container, allriskFragment2);
-                        ft.commit();
                     }
                 }catch (Exception e){
-                    showMessage("Submission Error: " + e.getMessage());
+                    incomplete_alert("Transaction not complete, check your internet and click continue\n" + e.getMessage());
                     Log.i("policyResponse", e.getMessage());
-                    userPreferences.setTempAllRiskQuotePrice("0.0");
-                    asyncAllriskPolicy(primaryKey);
-                    Fragment allriskFragment2 = new AllriskFragment2();
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.replace(R.id.fragment_allrisk_form_container, allriskFragment2);
-                    ft.commit();
+
                     mBtnLayout4A4.setVisibility(View.VISIBLE);
                     mProgressbar4A4.setVisibility(View.GONE);
                 }
 
             }
+
             @Override
             public void onFailure(Call<BuyQuoteFormGetHead_AllRisk> call, Throwable t) {
-                showMessage("Submission Failed "+t.getMessage());
-                Log.i("GetError",t.getMessage());
-                asyncAllriskPolicy(primaryKey);
+                failed_alert("Submission Failed, TRY AGAIN \n" + t.getMessage());
+                Log.i("GetError", t.getMessage());
+              /*  asyncAllriskPolicy(primaryKey);
                 userPreferences.setTempAllRiskQuotePrice("0.0");
                 Fragment allriskFragment2 = new AllriskFragment2();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_allrisk_form_container, allriskFragment2);
-                ft.commit();
+                ft.commit();*/
+
                 mBtnLayout4A4.setVisibility(View.VISIBLE);
                 mProgressbar4A4.setVisibility(View.GONE);
             }
         });
 
 
+    }
 
+    private void failed_alert(String msg) {
+
+        new AlertDialog.Builder(getContext())
+                .setIcon(R.drawable.ic_error_outline_black_24dp)
+                .setTitle("Error !")
+                .setMessage(msg)
+                .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int i) {
+                        dialog.dismiss();
+
+                    }
+                })
+                .show();
 
     }
 
+    private void incomplete_alert(String msg) {
+
+        new AlertDialog.Builder(getContext())
+                .setTitle("Error !")
+                .setIcon(R.drawable.ic_error_outline_black_24dp)
+                .setMessage(msg)
+                .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int i) {
+                        dialog.dismiss();
+                        asyncAllriskPolicy(primaryKey);
+                        userPreferences.setTempAllRiskQuotePrice("0.0");
+                        Fragment transactionHistoryFragment = new TransactionHistoryFragment();
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.replace(R.id.fragment_allrisk_form_container, transactionHistoryFragment);
+                        ft.commit();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int i) {
+                        dialog.dismiss();
+                        asyncAllriskPolicy(primaryKey);
+                        userPreferences.setTempAllRiskQuotePrice("0.0");
+                        startActivity(new Intent(getActivity(), Dashboard.class));
+                    }
+                })
+                .show();
+
+    }
 
     //To Delete vehicle
     private void asyncAllriskPolicy(final String id){
@@ -558,7 +635,7 @@ class AllriskFragment4 extends Fragment implements View.OnClickListener{
 
 
     private void showMessage(String s) {
-        Snackbar.make(mQbFormLayout4, s, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(mQbFormLayout4, s, Snackbar.LENGTH_LONG).show();
     }
 
 

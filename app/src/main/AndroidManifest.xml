@@ -22,12 +22,13 @@
     <application
         android:name=".BaseApplication"
         android:allowBackup="true"
-        android:icon="@drawable/sti__mobile_logo_dark"
+        android:icon="@mipmap/sti__mobile_logo_dark"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/sti__mobile_logo_dark"
+        android:roundIcon="@mipmap/sti__mobile_logo_round_dark"
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppThemeSuper"
+        android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
 
         <!--
@@ -164,6 +165,7 @@
         </activity>
         <activity android:name=".activity.PolicyPaymentActivity"
             android:parentActivityName=".activity.Dashboard"/>
+
         <activity android:name=".ForgetPassword" />
         <activity android:name=".activity.RenewPaymentActivity"
             android:parentActivityName=".activity.Dashboard"/>
@@ -173,6 +175,10 @@
         <activity android:name=".activity.MyVehicleDetail" />
         <activity android:name=".activity.MyMarineDetail" />
         <activity android:name=".activity.MyEticDetail" />
+        <activity
+            android:name=".activity.ProfileActivity"
+            android:label="My Account"
+            android:parentActivityName=".activity.Dashboard" />
 
         <uses-library
             android:name="org.apache.http.legacy"

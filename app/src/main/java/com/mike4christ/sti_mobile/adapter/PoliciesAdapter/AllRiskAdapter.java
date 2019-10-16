@@ -3,6 +3,7 @@ package com.mike4christ.sti_mobile.adapter.PoliciesAdapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,10 @@ import com.mike4christ.sti_mobile.activity.MyAllRiskDetail;
 import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
 import com.mike4christ.sti_mobile.retrofit_interface.ItemClickListener;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,23 +53,49 @@ public class AllRiskAdapter extends RecyclerView.Adapter<AllRiskAdapter.MyViewHo
     public void onBindViewHolder(@NonNull MyViewHolder holder, int i) {
         AllRisk allriskOption = allriskList.get(i);
 
-        holder.mPolicyNum.setText(allriskOption.getPolicyNumber());
-        holder.mPrice.setText(allriskOption.getPrice());
-        holder.mDateTime.setText(allriskOption.getCreatedAt());
-        holder.mStatus.setText(allriskOption.getStatus());
-        holder.mPaymentStatus.setText(allriskOption.getPaymentStatus());
-        holder.mPolicyType.setText(allriskOption.getPolicyType());
+        Log.i("PriceAllRisk", allriskOption.getPrice());
+
+        if (allriskOption.getPrice() != null) {
+
+            holder.mPolicyNum.setText(allriskOption.getPolicyNumber());
+            NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
+            nf.setMaximumFractionDigits(2);
+            DecimalFormat df = (DecimalFormat) nf;
+            String v_price = "₦" + df.format(Double.valueOf(allriskOption.getPrice()));
+
+            holder.mPrice.setText(v_price);
+            holder.mDateTime.setText(allriskOption.getCreatedAt());
+            holder.mStatus.setText(allriskOption.getStatus());
+            holder.mPaymentStatus.setText(allriskOption.getPaymentStatus());
+            holder.mPolicyType.setText(allriskOption.getPolicyType());
 
 
-
-        holder.setItemClickListener(pos -> {
-            nextActivity(allriskList.get(pos).getItem(),allriskList.get(pos).getValue(),allriskList.get(pos).getPeriod(),
-                    allriskList.get(pos).getPolicyNumber(),allriskList.get(pos).getPolicyType(),
-                    allriskList.get(pos).getPrice(),allriskList.get(pos).getStart(),allriskList.get(pos).getEnd(),allriskList.get(pos).getReceipt(),
-                    allriskList.get(pos).getPaymentStatus(),allriskList.get(pos).getStatus(),allriskList.get(pos).getPaymentReference(),
-                    allriskList.get(pos).getImei(), MyAllRiskDetail.class);
+            holder.setItemClickListener(pos -> {
+                nextActivity(allriskList.get(pos).getItem(), allriskList.get(pos).getValue(), allriskList.get(pos).getPeriod(),
+                        allriskList.get(pos).getPolicyNumber(), allriskList.get(pos).getPolicyType(),
+                        allriskList.get(pos).getPrice(), allriskList.get(pos).getStart(), allriskList.get(pos).getEnd(), allriskList.get(pos).getReceipt(),
+                        allriskList.get(pos).getPaymentStatus(), allriskList.get(pos).getStatus(), allriskList.get(pos).getPaymentReference(),
+                        allriskList.get(pos).getImei(), MyAllRiskDetail.class);
 
             });
+        } else {
+            holder.mPolicyNum.setText(allriskOption.getPolicyNumber());
+            holder.mPrice.setText(allriskOption.getPrice());
+            holder.mDateTime.setText(allriskOption.getCreatedAt());
+            holder.mStatus.setText(allriskOption.getStatus());
+            holder.mPaymentStatus.setText(allriskOption.getPaymentStatus());
+            holder.mPolicyType.setText(allriskOption.getPolicyType());
+
+
+            holder.setItemClickListener(pos -> {
+                nextActivity(allriskList.get(pos).getItem(), allriskList.get(pos).getValue(), allriskList.get(pos).getPeriod(),
+                        allriskList.get(pos).getPolicyNumber(), allriskList.get(pos).getPolicyType(),
+                        allriskList.get(pos).getPrice(), allriskList.get(pos).getStart(), allriskList.get(pos).getEnd(), allriskList.get(pos).getReceipt(),
+                        allriskList.get(pos).getPaymentStatus(), allriskList.get(pos).getStatus(), allriskList.get(pos).getPaymentReference(),
+                        allriskList.get(pos).getImei(), MyAllRiskDetail.class);
+
+            });
+        }
     }
 
     private void nextActivity(String Item,String value,String period,

@@ -1,9 +1,11 @@
 package com.mike4christ.sti_mobile.Forms;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -11,13 +13,18 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.mike4christ.sti_mobile.Constant;
+import com.mike4christ.sti_mobile.Model.AllRisk.AllriskPolicy;
+import com.mike4christ.sti_mobile.Model.AllRisk.ItemDetail;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
 import com.mike4christ.sti_mobile.forms_fragment.AllRisk.AllriskFragment1;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class AllRiskForm extends AppCompatActivity {
 
@@ -31,6 +38,7 @@ public class AllRiskForm extends AppCompatActivity {
 
 
     Fragment fragment;
+    Realm realm;
 
     String title="";
     UserPreferences userPreferences;
@@ -40,7 +48,8 @@ public class AllRiskForm extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_allrisk_form);
         ButterKnife.bind(this);
-        UserPreferences userPreferences=new UserPreferences(this);
+        userPreferences = new UserPreferences(this);
+
 
 
         Intent intent = getIntent();
@@ -57,10 +66,9 @@ public class AllRiskForm extends AppCompatActivity {
 
     private void applyToolbarChildren(String title) {
         setSupportActionBar(toolBar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(title);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_keyboard_arrow_left_black_24dp);
+        // getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_keyboard_arrow_left_black_24dp);
         //setting Elevation for > API 21
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             toolBar.setElevation(10f);
@@ -70,6 +78,7 @@ public class AllRiskForm extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         userPreferences.setTempAllRiskQuotePrice("0.0");
+        //  asyncAllriskPolicy();
         finish();
         return super.onOptionsItemSelected(item);
     }
@@ -80,4 +89,12 @@ public class AllRiskForm extends AppCompatActivity {
         ft.replace(R.id.fragment_allrisk_form_container, fragment);
         ft.commit();
     }
+
+
+    private void showMessage(String s) {
+        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
+    }
+
+
+
 }

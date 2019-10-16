@@ -206,11 +206,11 @@ public class MarineFragment2 extends Fragment implements View.OnClickListener{
 
         mProfInvoiceTxtM2.setText(userPreferences.getMarineIProfInvNO());
 
-        mProfInvoiceDateTxtM2.setText(userPreferences.getMarineIDateProfInv());
+        //mProfInvoiceDateTxtM2.setText(userPreferences.getMarineIDateProfInv());
 
         mDescGoodsM2.setText(userPreferences.getMarineIDescOfGoods());
 
-        start_date_cover_m2.setText(userPreferences.getMarineIStartDateCover());
+        //start_date_cover_m2.setText(userPreferences.getMarineIStartDateCover());
 
         mQuantityTxtM2.setText(userPreferences.getMarineIQuantity());
 
@@ -459,7 +459,7 @@ public class MarineFragment2 extends Fragment implements View.OnClickListener{
                                         @Override
                                         public void onStart(String requestId) {
                                             // your code here
-                                            mVNextBtn2M2.setVisibility(View.GONE);
+                                            mBtnLayout2M2.setVisibility(View.GONE);
                                             mProgressbar2M2.setVisibility(View.VISIBLE);
 
                                         }
@@ -481,7 +481,7 @@ public class MarineFragment2 extends Fragment implements View.OnClickListener{
                                             Log.i("ImageRequestId ", requestId);
                                             Log.i("ImageUrl ", String.valueOf(resultData.get("url")));
                                             mProgressbar2M2.setVisibility(View.GONE);
-                                            mVNextBtn2M2.setVisibility(View.VISIBLE);
+                                            mBtnLayout2M2.setVisibility(View.VISIBLE);
                                             doc_img_url = String.valueOf(resultData.get("url"));
 
 
@@ -493,7 +493,7 @@ public class MarineFragment2 extends Fragment implements View.OnClickListener{
                                             showMessage("Error: " + error.toString());
                                             Log.i("Error: ", error.toString());
 
-                                            mVNextBtn2M2.setVisibility(View.VISIBLE);
+                                            mBtnLayout2M2.setVisibility(View.VISIBLE);
                                             mProgressbar2M2.setVisibility(View.GONE);
                                         }
 
@@ -531,7 +531,7 @@ public class MarineFragment2 extends Fragment implements View.OnClickListener{
                                         @Override
                                         public void onStart(String requestId) {
                                             // your code here
-                                            mVNextBtn2M2.setVisibility(View.GONE);
+                                            mBtnLayout2M2.setVisibility(View.GONE);
                                             mProgressbar2M2.setVisibility(View.VISIBLE);
 
                                         }
@@ -553,7 +553,7 @@ public class MarineFragment2 extends Fragment implements View.OnClickListener{
                                             Log.i("ImageRequestId ", requestId);
                                             Log.i("ImageUrl ", String.valueOf(resultData.get("url")));
                                             mProgressbar2M2.setVisibility(View.GONE);
-                                            mVNextBtn2M2.setVisibility(View.VISIBLE);
+                                            mBtnLayout2M2.setVisibility(View.VISIBLE);
                                             doc_img_url = String.valueOf(resultData.get("url"));
 
 
@@ -565,7 +565,7 @@ public class MarineFragment2 extends Fragment implements View.OnClickListener{
                                             showMessage("Error: " + error.toString());
                                             Log.i("Error: ", error.toString());
 
-                                            mVNextBtn2M2.setVisibility(View.VISIBLE);
+                                            mBtnLayout2M2.setVisibility(View.VISIBLE);
                                             mProgressbar2M2.setVisibility(View.GONE);
                                         }
 
@@ -655,20 +655,20 @@ public class MarineFragment2 extends Fragment implements View.OnClickListener{
         //currency spinner
         currencyString = mCurrencySpinnerM2.getSelectedItem().toString();
         if (currencyString.equals("Select Currency")) {
-            showMessage("Select Currency Type");
-            isValid = false;
+            currencyString = "--";
+            //  isValid = false;
         }
         //mode of convey Spinner
         conveyString = mModeOfConveySpinnerM2.getSelectedItem().toString();
         if (conveyString.equals("Mode of Conveyance")) {
-            showMessage("Select your Mode of Conveyance");
-            isValid = false;
+            conveyString = "--";
+            //isValid = false;
         }
 
         coverString = cover_spinner.getSelectedItem().toString();
         if (coverString.equals("Select Cover")) {
-            showMessage("Select Cover");
-            isValid = false;
+            coverString = "--";
+            //isValid = false;
         }
 
 
@@ -780,7 +780,7 @@ public class MarineFragment2 extends Fragment implements View.OnClickListener{
 
 
                     Log.i("quote_price", String.valueOf(roundOff));
-                    showMessage("Successfully Fetched Quote");
+
                     mBtnLayout2M2.setVisibility(View.VISIBLE);
                     mProgressbar2M2.setVisibility(View.GONE);
 
@@ -789,6 +789,7 @@ public class MarineFragment2 extends Fragment implements View.OnClickListener{
                     FragmentTransaction ft = getFragmentManager().beginTransaction();
                     ft.replace(R.id.fragment_marine_form_container, MarineFragment3.newInstance("Price", String.valueOf(roundOff)), MarineFragment3.class.getSimpleName());
                     ft.commit();
+                    showMessage("Successfully Fetched Quote");
                 }catch (Exception e){
                     Log.i("policyResponse", e.getMessage());
                     mBtnLayout2M2.setVisibility(View.VISIBLE);

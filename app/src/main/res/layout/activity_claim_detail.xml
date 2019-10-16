@@ -160,41 +160,41 @@
                 android:textSize="13sp"
                 />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:orientation="horizontal">
+            <!--        <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:orientation="horizontal">
 
-                <TextView
+                        <TextView
 
-                    android:gravity="bottom"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Date Loss: "
-                    android:textSize="12sp"
-                    android:layout_margin="2dp"
-                    android:fontFamily="@font/montserrat_medium"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textAlignment="center"
+                            android:gravity="bottom"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="Date Loss: "
+                            android:textSize="12sp"
+                            android:layout_margin="2dp"
+                            android:fontFamily="@font/montserrat_medium"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textAlignment="center"
 
-                    />
-                <TextView
-                    android:id="@+id/date_loss"
-                    android:gravity="bottom"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="14-0-2019"
-                    android:textSize="12sp"
-                    android:layout_margin="2dp"
-                    android:fontFamily="@font/montserrat_medium"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textAlignment="center"
+                            />
+                        <TextView
+                            android:id="@+id/date_loss"
+                            android:gravity="bottom"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="14-0-2019"
+                            android:textSize="12sp"
+                            android:layout_margin="2dp"
+                            android:fontFamily="@font/montserrat_medium"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textAlignment="center"
 
-                    />
+                            />
 
 
-            </LinearLayout>
+                    </LinearLayout>-->
 
             <LinearLayout
                 android:layout_width="wrap_content"

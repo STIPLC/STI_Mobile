@@ -1,5 +1,6 @@
 package com.mike4christ.sti_mobile.activity;
 
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,20 +16,26 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.material.card.MaterialCardView;
 import com.mike4christ.sti_mobile.Constant;
 import com.mike4christ.sti_mobile.Model.Errors.APIError;
 import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
 import com.mike4christ.sti_mobile.Model.RenewPolicyGet;
 import com.mike4christ.sti_mobile.Model.ServiceGenerator;
+import com.mike4christ.sti_mobile.Model.Swiss.QouteHeadSwiss;
 import com.mike4christ.sti_mobile.NetworkConnection;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.forms_fragment.Swiss.SwissFragment3;
 import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.wang.avi.AVLoadingIndicatorView;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -81,12 +88,19 @@ public class MySwissDetail extends AppCompatActivity {
     TextView mRenew;
     @BindView(R.id.progress)
     AVLoadingIndicatorView mProgress;
+    @BindView(R.id.user_policy_btn)
+    MaterialCardView user_policy_btn;
     /** ButterKnife Code **/
 
-    Animation slide_front_left, blink;
+    Animation slide_front_left, blink, slide_front_right;
+    String policynum, dob, quote_price, category;
+    ;
+    double roundOff;
 
     private UserPreferences userPreferences;
     NetworkConnection networkConnection=new NetworkConnection();
+    //get client and call object for request
+    ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
 
 
     @Override
@@ -106,7 +120,7 @@ public class MySwissDetail extends AppCompatActivity {
         String start_date=intent.getStringExtra("start_date");
         String end_date=intent.getStringExtra("end_date");
         String price=intent.getStringExtra("price");
-        String dob=intent.getStringExtra("dob");
+        dob = intent.getStringExtra("dob");
         String payment_status=intent.getStringExtra("payment_status");
         String status=intent.getStringExtra("status");
         String category=intent.getStringExtra("category");
@@ -115,8 +129,13 @@ public class MySwissDetail extends AppCompatActivity {
         String next_of_phonenum=intent.getStringExtra("next_of_phonenum");
         String gender=intent.getStringExtra("gender");
         String marital_status=intent.getStringExtra("marital_status");
-        String policynum=intent.getStringExtra("policynum");
+        policynum = intent.getStringExtra("policynum");
 
+
+        NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
+        nf.setMaximumFractionDigits(2);
+        DecimalFormat df = (DecimalFormat) nf;
+        String v_price = "₦" + df.format(Double.valueOf(price));
 
         mFirstname.setText(firstname);
         mStatus.setText(status);
@@ -126,7 +145,7 @@ public class MySwissDetail extends AppCompatActivity {
         mAddr.setText(getAddr);
         mStartDate.setText(start_date);
         mEndDate.setText(end_date);
-        mPrice.setText(price);
+        mPrice.setText(v_price);
         mDob.setText(dob);
         mPaymentStatus.setText(payment_status);
         mCategory.setText(category);
@@ -136,6 +155,9 @@ public class MySwissDetail extends AppCompatActivity {
         mGender.setText(gender);
         mMaritalStatus.setText(marital_status);
 
+        slide_front_right = AnimationUtils.loadAnimation(getApplicationContext(),
+                R.anim.slide_to_right);
+        user_policy_btn.startAnimation(slide_front_right);
 
         slide_front_left = AnimationUtils.loadAnimation(getApplicationContext(),
                 R.anim.slide_from_left);
@@ -167,93 +189,10 @@ public class MySwissDetail extends AppCompatActivity {
                         mProgress.setVisibility(View.VISIBLE);
 
 
-                        //get client and call object for request
-                        ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
+                            sendSwissData();
 
 
-                        Call<RenewPolicyGet> call=client.renew_policy("Token "+userPreferences.getUserToken(),policynum,price,"paystack");
-
-                        call.enqueue(new Callback<RenewPolicyGet>() {
-                            @Override
-                            public void onResponse(Call<RenewPolicyGet> call, Response<RenewPolicyGet> response) {
-                                Log.i("ResponseCode", String.valueOf(response.code()));
-
-                                if(response.code()==400){
-                                    showShortMsg("Check your internet connection");
-                                    mRenew.setVisibility(View.VISIBLE);
-                                    mProgress.setVisibility(View.GONE);
-                                    return;
-                                }else if(response.code()==429){
-                                    showShortMsg("Too many requests on database");
-                                    mRenew.setVisibility(View.VISIBLE);
-                                    mProgress.setVisibility(View.GONE);
-                                    return;
-                                }else if(response.code()==500){
-                                    showShortMsg("Server Error");
-                                    mRenew.setVisibility(View.VISIBLE);
-                                    mProgress.setVisibility(View.GONE);
-                                    return;
-                                }else if(response.code()==401){
-                                    showShortMsg("Unauthorized access, please try login again");
-                                    mRenew.setVisibility(View.VISIBLE);
-                                    mProgress.setVisibility(View.GONE);
-                                    return;
-                                }
-                                try {
-                                    if (!response.isSuccessful()) {
-
-                                        try{
-                                            APIError apiError= ErrorUtils.parseError(response);
-
-                                            showShortMsg("Invalid Entry: "+apiError.getErrors());
-                                            Log.i("Invalid EntryK",apiError.getErrors().toString());
-                                            Log.i("Invalid Entry",response.errorBody().toString());
-
-                                        }catch (Exception e){
-                                            Log.i("InvalidEntry",e.getMessage());
-                                            Log.i("ResponseError",response.errorBody().string());
-                                            showShortMsg("Failed to Renew"+e.getMessage());
-                                            mRenew.setVisibility(View.VISIBLE);
-                                            mProgress.setVisibility(View.GONE);
-
-                                        }
-                                        mRenew.setVisibility(View.VISIBLE);
-                                        mProgress.setVisibility(View.GONE);
-                                        return;
-                                    }
-
-
-                                    String amount=response.body().getAmount();
-                                    String policyNumber=response.body().getPolicyNumber();
-                                    String reference=response.body().getReference();
-
-
-                                    Intent i = new Intent(MySwissDetail.this, PolicyPaymentActivity.class);
-                                    i.putExtra(Constant.POLICY_NUM, policyNumber);
-                                    i.putExtra(Constant.TOTAL_PRICE, amount);
-                                    i.putExtra(Constant.POLICY_TYPE, "swiss");
-                                    i.putExtra(Constant.REF, reference);
-                                    startActivity(i);
-
-                                    mRenew.setVisibility(View.VISIBLE);
-                                    mProgress.setVisibility(View.GONE);
-
-                                }catch (Exception e){
-                                    Log.i("PolicyRenewError", e.getMessage());
-                                    mRenew.setVisibility(View.VISIBLE);
-                                    mProgress.setVisibility(View.GONE);
-                                }
-
-                            }
-                            @Override
-                            public void onFailure(Call<RenewPolicyGet> call, Throwable t) {
-                                showShortMsg("Renewed Failed "+t.getMessage());
-                                Log.i("GetError",t.getMessage());
-                                mRenew.setVisibility(View.VISIBLE);
-                                mProgress.setVisibility(View.GONE);
-                            }
-                        });
-                        }else{
+                        } else {
                             showShortMsg("No Internet Connection");
                         }
 
@@ -262,18 +201,197 @@ public class MySwissDetail extends AppCompatActivity {
                 });
 
 
-
             }
 
 
         } catch (ParseException e) {
             e.printStackTrace();
-            showShortMsg("Error: "+e.getMessage());
+            showShortMsg("Error: " + e.getMessage());
         }
 
 
+    }
+
+    private void sendSwissData() {
+
+        //get client and call object for request
+        ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
+
+
+        Call<QouteHeadSwiss> call = client.swiss_quote("Token " + userPreferences.getUserToken(), dob);
+
+        call.enqueue(new Callback<QouteHeadSwiss>() {
+            @Override
+            public void onResponse(Call<QouteHeadSwiss> call, Response<QouteHeadSwiss> response) {
+                Log.i("ResponseCode", String.valueOf(response.code()));
+
+                if (response.code() == 400) {
+                    showShortMsg("Check your internet connection");
+                    mRenew.setVisibility(View.VISIBLE);
+                    mProgress.setVisibility(View.GONE);
+                    return;
+                } else if (response.code() == 429) {
+                    showShortMsg("Too many requests on database");
+                    mRenew.setVisibility(View.VISIBLE);
+                    mProgress.setVisibility(View.GONE);
+                    return;
+                } else if (response.code() == 500) {
+                    showShortMsg("Server Error");
+                    mRenew.setVisibility(View.VISIBLE);
+                    mProgress.setVisibility(View.GONE);
+                    return;
+                } else if (response.code() == 401) {
+                    showShortMsg("Unauthorized access, please try login again");
+                    mRenew.setVisibility(View.VISIBLE);
+                    mProgress.setVisibility(View.GONE);
+                    return;
+                }
+                try {
+                    if (!response.isSuccessful()) {
+
+                        try {
+                            APIError apiError = ErrorUtils.parseError(response);
+
+                            showShortMsg("Invalid Entry: " + apiError.getErrors());
+                            Log.i("Invalid EntryK", apiError.getErrors().toString());
+                            Log.i("Invalid Entry", response.errorBody().toString());
+
+                        } catch (Exception e) {
+                            Log.i("InvalidEntry", e.getMessage());
+                            Log.i("ResponseError", response.errorBody().string());
+                            showShortMsg("Failed to Fetch Quote" + e.getMessage());
+                            mRenew.setVisibility(View.VISIBLE);
+                            mProgress.setVisibility(View.GONE);
+
+                        }
+                        mRenew.setVisibility(View.VISIBLE);
+                        mProgress.setVisibility(View.GONE);
+                        return;
+                    }
+
+                    quote_price = response.body().getData().getPrice();
+                    category = response.body().getData().getCategory();
+                    switch (category) {
+                        case "Adult":
+                            quote_price = "1500";
+                            break;
+                        case "Child":
+                            quote_price = "250";
+                            break;
+
+                        default:
+                            quote_price = "0.0";
+                            break;
+
+                    }
+
+                    roundOff = Math.round(Double.valueOf(quote_price) * 100) / 100.00;
+
+                    Log.i("quote_price", quote_price);
+                    Call<RenewPolicyGet> call2 = client.renew_policy("Token " + userPreferences.getUserToken(), policynum, String.valueOf(roundOff), "paystack");
+
+                    call2.enqueue(new Callback<RenewPolicyGet>() {
+                        @Override
+                        public void onResponse(Call<RenewPolicyGet> call, Response<RenewPolicyGet> response) {
+                            Log.i("ResponseCode", String.valueOf(response.code()));
+
+                            if (response.code() == 400) {
+                                showShortMsg("Check your internet connection");
+                                mRenew.setVisibility(View.VISIBLE);
+                                mProgress.setVisibility(View.GONE);
+                                return;
+                            } else if (response.code() == 429) {
+                                showShortMsg("Too many requests on database");
+                                mRenew.setVisibility(View.VISIBLE);
+                                mProgress.setVisibility(View.GONE);
+                                return;
+                            } else if (response.code() == 500) {
+                                showShortMsg("Server Error");
+                                mRenew.setVisibility(View.VISIBLE);
+                                mProgress.setVisibility(View.GONE);
+                                return;
+                            } else if (response.code() == 401) {
+                                showShortMsg("Unauthorized access, please try login again");
+                                mRenew.setVisibility(View.VISIBLE);
+                                mProgress.setVisibility(View.GONE);
+                                return;
+                            }
+                            try {
+                                if (!response.isSuccessful()) {
+
+                                    try {
+                                        APIError apiError = ErrorUtils.parseError(response);
+
+                                        showShortMsg("Invalid Entry: " + apiError.getErrors());
+                                        Log.i("Invalid EntryK", apiError.getErrors().toString());
+                                        Log.i("Invalid Entry", response.errorBody().toString());
+
+                                    } catch (Exception e) {
+                                        Log.i("InvalidEntry", e.getMessage());
+                                        Log.i("ResponseError", response.errorBody().string());
+                                        showShortMsg("Failed to Renew" + e.getMessage());
+                                        mRenew.setVisibility(View.VISIBLE);
+                                        mProgress.setVisibility(View.GONE);
+
+                                    }
+                                    mRenew.setVisibility(View.VISIBLE);
+                                    mProgress.setVisibility(View.GONE);
+                                    return;
+                                }
+
+
+                                String amount = response.body().getAmount();
+                                String policyNumber = response.body().getPolicyNumber();
+                                String reference = response.body().getReference();
+
+
+                                Intent i = new Intent(MySwissDetail.this, PolicyPaymentActivity.class);
+                                i.putExtra(Constant.POLICY_NUM, policyNumber);
+                                i.putExtra(Constant.TOTAL_PRICE, amount);
+                                i.putExtra(Constant.POLICY_TYPE, "swiss");
+                                i.putExtra(Constant.REF, reference);
+                                startActivity(i);
+
+                                mRenew.setVisibility(View.VISIBLE);
+                                mProgress.setVisibility(View.GONE);
+
+                            } catch (Exception e) {
+                                Log.i("PolicyRenewError", e.getMessage());
+                                mRenew.setVisibility(View.VISIBLE);
+                                mProgress.setVisibility(View.GONE);
+                            }
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<RenewPolicyGet> call, Throwable t) {
+                            showShortMsg("Renewed Failed " + t.getMessage());
+                            Log.i("GetError", t.getMessage());
+                            mRenew.setVisibility(View.VISIBLE);
+                            mProgress.setVisibility(View.GONE);
+                        }
+                    });
+
+
+                } catch (Exception e) {
+                    Log.i("policyResponse", e.getMessage());
+                    mRenew.setVisibility(View.VISIBLE);
+                    mProgress.setVisibility(View.GONE);
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<QouteHeadSwiss> call, Throwable t) {
+                showShortMsg("Submission Failed " + t.getMessage());
+                Log.i("GEtError", t.getMessage());
+                mRenew.setVisibility(View.VISIBLE);
+                mProgress.setVisibility(View.GONE);
+            }
+        });
 
     }
+
 
     private void applyToolbarChildren(String title) {
         setSupportActionBar(mToolbar);

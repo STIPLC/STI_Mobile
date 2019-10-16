@@ -1,6 +1,7 @@
 package com.mike4christ.sti_mobile.forms_fragment.Swiss;
 
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -33,24 +34,34 @@ import com.mike4christ.sti_mobile.BuildConfig;
 import com.mike4christ.sti_mobile.Model.Errors.APIError;
 import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
 import com.mike4christ.sti_mobile.Model.ServiceGenerator;
+import com.mike4christ.sti_mobile.Model.Swiss.AdditionInsured;
+import com.mike4christ.sti_mobile.Model.Swiss.Personal_Detail_swiss;
 import com.mike4christ.sti_mobile.Model.Swiss.QouteHeadSwiss;
+import com.mike4christ.sti_mobile.Model.Swiss.SwissInsured;
 import com.mike4christ.sti_mobile.NetworkConnection;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.activity.Dashboard;
+import com.mike4christ.sti_mobile.fragment.TransactionHistoryFragment;
 import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.shuhart.stepview.StepView;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.Realm;
+import io.realm.RealmList;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -107,6 +118,13 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
     TextInputLayout mInputLayoutNextKinAddrS1;
     @BindView(R.id.next_kin_editxt_addr_s1)
     EditText mNextKinEditxtAddrS1;
+
+    @BindView(R.id.inputLayoutEmail_s1)
+    TextInputLayout mInputLayoutEmailAddrS1;
+    @BindView(R.id.email_editxt_s1)
+    EditText mEmailAddrS1;
+
+
     @BindView(R.id.inputLayoutPhoneNextKin_s1)
     TextInputLayout mInputLayoutPhoneNextKinS1;
     @BindView(R.id.phone_Nextkin_editxt_s1)
@@ -129,6 +147,7 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
     String maritalString,genderString,prifixString,benefitString,DobString,cameraFilePath,stateString;
     DatePickerDialog datePickerDialog1;
     private int currentStep = 0;
+    int benefit_count = 0;
 
     int PICK_IMAGE_PASSPORT = 1;
     int CAM_IMAGE_PASSPORT = 2;
@@ -137,6 +156,10 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
     Uri personal_info_img_uri;
     String personal_img_url;
     UserPreferences userPreferences;
+    String quote_price, category;
+    Realm realm;
+    SwissInsured id = new SwissInsured();
+    String primaryKey = id.getId();
 
 
     public SwissFragment1() {
@@ -179,6 +202,7 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
 
         mStepView.go(currentStep, true);
         userPreferences=new UserPreferences(getContext());
+        realm = Realm.getDefaultInstance();
 
 
 
@@ -211,9 +235,10 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
         mResidentsAddrEditxtS1.setText(userPreferences.getSwissIResAdrr());
         mNextKinEditxtS1.setText(userPreferences.getSwissINextKin());
         mNextKinEditxtAddrS1.setText(userPreferences.getSwissINextKinAddr());
+        mEmailAddrS1.setText(userPreferences.getSwissIEmail());
         mPhoneNextkinEditxtS1.setText(userPreferences.getSwissINextKinPhoneNum());
         mPhoneNoEditxtS1.setText(userPreferences.getSwissIPhoneNum());
-        mDobEditxtS.setText(userPreferences.getSwissIDob());
+        //mDobEditxtS.setText(userPreferences.getSwissIDob());
 
         mDisabiltyEditxtS1.setText(userPreferences.getSwissIDisable());
 
@@ -236,8 +261,22 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
-                String stringText = (String) parent.getItemAtPosition(position);
+                String benefitTypeString = (String) parent.getItemAtPosition(position);
+                switch (benefitTypeString) {
+                    case "Single":
+                        benefit_count = 1;
+                        break;
+                    case "Double":
+                        benefit_count = 2;
+                        break;
+                    case "Triple":
+                        benefit_count = 3;
+                        break;
+                    default:
 
+                        break;
+
+                }
 
             }
 
@@ -649,6 +688,16 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
 
             }
 
+        if (mEmailAddrS1.getText().toString().isEmpty()) {
+            mInputLayoutEmailAddrS1.setError("Email is required!");
+            isValid = false;
+        } /*else if (!isValidEmailAddress(email_editxt.getText().toString())) {
+                    inputLayoutEmail.setError("Valid Email is required!");
+                    isValid = false;
+                }*/ else {
+            mInputLayoutEmailAddrS1.setErrorEnabled(false);
+        }
+
             
             if (mPhoneNoEditxtS1.getText().toString().isEmpty()) {
                 mInputLayoutPhoneS1.setError("Phone number is required");
@@ -702,13 +751,13 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
             }
 
             if (personal_img_url==null) {
-                showMessage("Please upload an image: passport,company license..etc");
+                showMessage("Please upload an image: Passport.");
                 isValid = false;
             }
 
             //Type Spinner
             maritalString = mMaritalSpinnerS1.getSelectedItem().toString();
-            if (maritalString.equals("Select Marital Status")) {
+        if (maritalString.equals("Select Marital Status*")) {
 
                 showMessage("Select Marital Status");
                 isValid = false;
@@ -716,26 +765,26 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
 
             //State Spinner
             stateString = state_spinner.getSelectedItem().toString();
-            if (stateString.equals("Geographical Location")&&state_spinner.isClickable()) {
+        if (stateString.equals("Geographical Location*") && state_spinner.isClickable()) {
                 showMessage("Select your Geographical Location");
                 isValid = false;
             }
 
         //Prefix Spinner
             prifixString = mPrefixSpinnerS.getSelectedItem().toString();
-            if (prifixString.equals("Select Prefix")) {
+        if (prifixString.equals("Select Prefix*")) {
                 showMessage("Select your Prefix e.g Mr.");
                 isValid = false;
             }
 
             genderString = mGenderSpinnerS1.getSelectedItem().toString();
-            if (genderString.equals("Gender")) {
+        if (genderString.equals("Gender*")) {
                 showMessage("Don't forget to Select Gender");
                 isValid = false;
             }
 
             benefitString = mBenefitSpinnerS.getSelectedItem().toString();
-            if (benefitString.equals("Select Benefit Category")) {
+        if (benefitString.equals("Select Benefit Category*")) {
                 showMessage("Don't forget to Select Benefit Category");
                 isValid = false;
             }
@@ -763,7 +812,7 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
             userPreferences.setSwissIPrefix(prifixString);
             userPreferences.setSwissIFirstName(mFirstnameEditxtS1.getText().toString());
             userPreferences.setSwissILastName(mLastnameEditxtS1.getText().toString());
-            userPreferences.setSwissIEmail(userPreferences.getEmail());
+            userPreferences.setSwissIEmail(mEmailAddrS1.getText().toString());
             userPreferences.setSwissIGender(genderString);
             userPreferences.setSwissIState(stateString);
             userPreferences.setSwissIResAdrr(mResidentsAddrEditxtS1.getText().toString());
@@ -884,11 +933,29 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
                         return;
                     }
 
-                    String quote_price=response.body().getData().getPrice();
-                    String category=response.body().getData().getCategory();
+                    quote_price = response.body().getData().getPrice();
+                    category = response.body().getData().getCategory();
+                    switch (category) {
+                        case "Adult":
+                            int mul_price_adult = 1500 * benefit_count;
+                            quote_price = String.valueOf(mul_price_adult);
+                            break;
+                        case "Child":
+                            int mul_price_child = 250 * benefit_count;
+                            quote_price = String.valueOf(mul_price_child);
+                            break;
+
+                        default:
+                            quote_price = "0.0";
+                            break;
+
+                    }
+                    double roundOff = Math.round(Double.valueOf(quote_price) * 100) / 100.00;
+
                     userPreferences.setSwissIPersonal_QuotePrice(Integer.parseInt(quote_price));
                     userPreferences.setSwissIPersonal_Category(category);
 
+                    userPreferences.setPersonalInitSwissQuotePrice(String.valueOf(roundOff));
 
 
                     Log.i("quote_price",quote_price);
@@ -896,10 +963,16 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
                     mNextBtn1S1.setVisibility(View.VISIBLE);
                     mProgressbar1S1.setVisibility(View.GONE);
 
-                    Fragment swissFragment2 = new SwissFragment2();
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.replace(R.id.fragment_swiss_form_container, swissFragment2);
-                    ft.commit();
+                    NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
+                    nf.setMaximumFractionDigits(2);
+                    DecimalFormat df = (DecimalFormat) nf;
+                    String v_price = "₦" + df.format(Double.valueOf(quote_price));
+
+                    String p_payable = category + ": --->> " + v_price;
+
+                    first_insured_price_alert(p_payable);
+
+
                 }catch (Exception e){
                     Log.i("policyResponse", e.getMessage());
                     mNextBtn1S1.setVisibility(View.VISIBLE);
@@ -917,6 +990,111 @@ public class SwissFragment1 extends Fragment implements View.OnClickListener{
         });
 
     }
+
+    private void first_insured_price_alert(String msg) {
+
+        new AlertDialog.Builder(getContext())
+                .setTitle("First Insured Premium Payable")
+                .setIcon(R.drawable.ic_bookmark_black_24dp)
+                .setMessage(msg)
+                .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int i) {
+                        dialog.dismiss();
+                        dataProcessed();
+                    }
+                })
+                .setNeutralButton("Add More", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int i) {
+                        dialog.dismiss();
+                        Fragment swissFragment2 = new SwissFragment2();
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.replace(R.id.fragment_swiss_form_container, swissFragment2);
+                        ft.commit();
+
+                    }
+                })
+
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int i) {
+                        dialog.dismiss();
+
+                    }
+                })
+                .show();
+
+    }
+
+    private void dataProcessed() {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+
+                Personal_Detail_swiss personal_detail_swiss = new Personal_Detail_swiss();
+
+
+                personal_detail_swiss.setPrefix(userPreferences.getSwissIPrefix());
+                personal_detail_swiss.setFirst_name(userPreferences.getSwissIFirstName());
+                personal_detail_swiss.setLast_name(userPreferences.getSwissILastName());
+                personal_detail_swiss.setEmail(userPreferences.getSwissIEmail());
+                personal_detail_swiss.setGender(userPreferences.getSwissIGender());
+                personal_detail_swiss.setMarital_status(userPreferences.getSwissIMaritalStatus());
+                personal_detail_swiss.setPhone(userPreferences.getSwissIPhoneNum());
+                personal_detail_swiss.setState(userPreferences.getSwissIState());
+                personal_detail_swiss.setResident_address(userPreferences.getSwissIResAdrr());
+                personal_detail_swiss.setNext_of_kin(userPreferences.getSwissINextKin());
+                personal_detail_swiss.setNext_of_kin_address(userPreferences.getSwissINextKinAddr());
+                personal_detail_swiss.setNext_of_kin_phone(userPreferences.getSwissINextKinPhoneNum());
+                personal_detail_swiss.setDate_of_birth(userPreferences.getSwissIDob());
+                personal_detail_swiss.setDisability(userPreferences.getSwissIDisable());
+                personal_detail_swiss.setBenefit_category(userPreferences.getSwissIBenefit());
+                personal_detail_swiss.setPicture(userPreferences.getSwissIPersonal_image());
+                personal_detail_swiss.setPrice(userPreferences.getPersonalInitSwissQuotePrice());
+
+               /* //Additional Insured List
+                AdditionInsured additionInsured=new AdditionInsured();
+                additionInsured.setFirst_name(userPreferences.getSwissIAddFirstName());
+                additionInsured.setLast_name(userPreferences.getSwissIAddLastName());
+                additionInsured.setDate_of_birth(userPreferences.getSwissIAddDOB());
+                additionInsured.setGender(userPreferences.getSwissIAddGender());
+                additionInsured.setPhone(userPreferences.getSwissIAddPhoneNum());
+                additionInsured.setEmail(userPreferences.getSwissIAddEmail());
+                additionInsured.setDisability(userPreferences.getSwissIAddDisability());
+                additionInsured.setBenefit_category(userPreferences.getSwissIAddBenefitCat());
+                additionInsured.setMarital_status(userPreferences.getSwissIAddMaritalStatus());
+                additionInsured.setPicture(userPreferences.getSwissIAddOtherImage());
+                additionInsured.setPrice(userPreferences.getInitSwissQuotePrice());
+                RealmList<AdditionInsured> additionInsuredList=new RealmList<>();
+                additionInsuredList.add(additionInsured);
+
+                personal_detail_swiss.setAdditionInsureds(additionInsuredList);*/
+
+
+                final Personal_Detail_swiss personal_detail_swiss1 = realm.copyToRealm(personal_detail_swiss);
+
+                SwissInsured swissInsured = realm.createObject(SwissInsured.class, primaryKey);
+                swissInsured.setAgent_id(userPreferences.getUserId());
+                swissInsured.setQuote_price(String.valueOf(userPreferences.getPersonalInitSwissQuotePrice()));
+                swissInsured.setPayment_source("paystack");
+                swissInsured.setPin("0000");
+
+                Log.i("Primary1", primaryKey);
+
+                swissInsured.getPersonal_detail_swisses().add(personal_detail_swiss1);
+            }
+
+        });
+        userPreferences.setSwissIPersonal_QuotePrice(0);
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_swiss_form_container, SwissFragment4.newInstance(primaryKey));
+        ft.commit();
+
+
+    }
+
+
 
 
 

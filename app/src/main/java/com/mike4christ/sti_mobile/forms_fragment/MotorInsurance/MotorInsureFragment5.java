@@ -1,9 +1,11 @@
 package com.mike4christ.sti_mobile.forms_fragment.MotorInsurance;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -42,14 +45,19 @@ import com.mike4christ.sti_mobile.Model.Vehicle.VehiclePost.VehiclePostHead;
 import com.mike4christ.sti_mobile.NetworkConnection;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.activity.Dashboard;
 import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
 import com.mike4christ.sti_mobile.adapter.VehiclesListAdapter;
+import com.mike4christ.sti_mobile.fragment.TransactionHistoryFragment;
 import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.shuhart.stepview.StepView;
 import com.wang.avi.AVLoadingIndicatorView;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -61,7 +69,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
+public class MotorInsureFragment5 extends Fragment implements View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
 
     private static final String PRIMARY_KEY = "primaryKey";
@@ -84,11 +92,11 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
     @BindView(R.id.personal_info)
     TextView personal_info;
 
-    @BindView(R.id.inputLayoutPin_m5)
+    /*@BindView(R.id.inputLayoutPin_m5)
     TextInputLayout inputLayoutPin_m5;
 
     @BindView(R.id.pin_txt_m5)
-    EditText pin_txt_m5;
+    EditText pin_txt_m5;*/
 
     @BindView(R.id.modeOfPayment_spinner_m5)
     Spinner modeOfPayment_spinner_m5;
@@ -175,6 +183,24 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
         modeofPaymentSpinner();
         setViewActions();
 
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+        view.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                Log.i("backPress_KeyCode", "keyCode: " + keyCode);
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    Log.i("backPress", "onKey Back listener is working!!!");
+                    asyncVehiclePolicy(primaryKey);
+                    userPreferences.setTempQuotePrice("0.0");
+                    startActivity(new Intent(getActivity(), Dashboard.class));
+                    return true;
+                }
+                return false;
+            }
+        });
+
+
         return  view;
     }
 //Mode of Payment
@@ -222,23 +248,26 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
 
         Log.i("price",total_quoteprice);
 
-
+        NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
+        nf.setMaximumFractionDigits(2);
+        DecimalFormat df = (DecimalFormat) nf;
+        String v_price = "₦" + df.format(Double.valueOf(total_quoteprice));
 
 
         if(userPreferences.getMotorPtype().equals("Corporate")){
 
-            String corperate="Comapany Name: "+personal_details.get(0).getCompany_name()+"\n"+"TIN Number: "+personal_details.get(0).getTin_number()+"\n"+
-                    "\n"+"Phone Number: "+personal_details.get(0).getPhone()+"\n"+
+            String corperate = "Company Name: " + personal_details.get(0).getCompany_name() + "\n" + "TIN Number: " + personal_details.get(0).getTin_number() + "\n" +
+                    "Phone Number: " + personal_details.get(0).getPhone() + "\n" +
                     "Office Address: "+personal_details.get(0).getOffice_address()+"\n"+"Contact Person: "+personal_details.get(0).getContact_person()+"\n"+
                     "\n"+"Email Address: "+personal_details.get(0).getEmail()+"\n"+
-                    "Total Premium: "+total_quoteprice;
+                    "Total Premium: " + v_price;
             personal_info.setText(corperate);
 
         }else if (userPreferences.getMotorPtype().equals("Individual")){
             String individual="Prefix: "+personal_details.get(0).getPrefix()+"\n"+"First Name: "+personal_details.get(0).getFirst_name()+"\n"+
                     "Last Name: "+personal_details.get(0).getLast_name()+"\n"+"Phone Number: "+personal_details.get(0).getPhone()+"\n"+
                     "Gender: "+personal_details.get(0).getResident_address()+"\n"+"Mailing Address: "+personal_details.get(0).getMailing_address()+"\n"+
-                    "Total Premium: "+total_quoteprice;
+                    "Total Premium: " + v_price;
             personal_info.setText(individual);
 
         }
@@ -335,12 +364,12 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
         if (networkConnection.isNetworkConnected(getContext())) {
             boolean isValid = true;
 
-            if (pin_txt_m5.getText().toString().isEmpty()) {
+            /*if (pin_txt_m5.getText().toString().isEmpty()) {
                 inputLayoutPin_m5.setError("Pin is required!");
                 isValid = false;
             } else {
                 inputLayoutPin_m5.setErrorEnabled(false);
-            }
+            }*/
             //Prefix Spinner
             modeofPaymentString = modeOfPayment_spinner_m5.getSelectedItem().toString();
             if (modeofPaymentString.equals("Mode of Payment")) {
@@ -377,7 +406,8 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
         //String title;
         picture_results=realm.where(VehiclePictures.class).findAll();
 
-        Log.i("pix_result",results.toString());
+        Log.i("vehicle_result", results.toString());
+        Log.i("pictures_result", picture_results.toString());
 
 
 
@@ -402,17 +432,30 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
 
             for(int i=0;i<results.size();i++) {
                 VehicleDetails vehicleDetails=results.get(i);
-                Vehicle vehicle=new Vehicle(vehicleDetails.getPeriod(),vehicleDetails.getPolicy_select_type(),vehicleDetails.getEnhanced_third_party(),
-                        vehicleDetails.getPrivate_com_type(),"",vehicleDetails.getVehicle_make(),
-                        vehicleDetails.getBody_type(),vehicleDetails.getYear(),"null",vehicleDetails.getRegistration_number(),
-                        vehicleDetails.getChasis_number(),vehicleDetails.getEngine_number(),vehicleDetails.getVehicle_value(),vehiclePictureList_post);
-                vehiclesList_post.add(vehicle);
+                if (!vehicleDetails.getVehicle_type().equals("Motor Cycle")) {
+                    Vehicle vehicle = new Vehicle(vehicleDetails.getPeriod(), vehicleDetails.getStartDate(), vehicleDetails.getPolicy_select_type(), vehicleDetails.getEnhanced_third_party(),
+                            vehicleDetails.getPrivate_com_type(), "", vehicleDetails.getVehicle_make() + " " + vehicleDetails.getVehicle_type(),
+                            vehicleDetails.getBody_type(), vehicleDetails.getYear(), "null", vehicleDetails.getRegistration_number(),
+                            vehicleDetails.getChasis_number(), vehicleDetails.getEngine_number(), vehicleDetails.getVehicle_value(), vehicleDetails.getPrice(), vehiclePictureList_post);
+                    vehiclesList_post.add(vehicle);
 
+                    Log.i("final_pri", vehicleDetails.getPrivate_com_type());
+                    Log.i("InitPricing", vehicleDetails.getPrice());
+                } else {
+                    Vehicle vehicle = new Vehicle(vehicleDetails.getPeriod(), vehicleDetails.getStartDate(), vehicleDetails.getPolicy_select_type(), vehicleDetails.getEnhanced_third_party(),
+                            vehicleDetails.getPrivate_com_type(), "", vehicleDetails.getVehicle_make(),
+                            vehicleDetails.getBody_type(), vehicleDetails.getYear(), "null", vehicleDetails.getRegistration_number(),
+                            vehicleDetails.getChasis_number(), vehicleDetails.getEngine_number(), vehicleDetails.getVehicle_value(), vehicleDetails.getPrice(), vehiclePictureList_post);
+                    vehiclesList_post.add(vehicle);
+
+                    Log.i("final_pri", vehicleDetails.getPrivate_com_type());
+                    Log.i("InitPricing", vehicleDetails.getPrice());
+                }
 
             }
 
             VehiclePostHead vehiclePostHead=new VehiclePostHead(persona,vehiclesList_post,total_quoteprice,
-                    pin_txt_m5.getText().toString(),modeofPaymentString,userPreferences.getUserId());
+                    "0000", modeofPaymentString, userPreferences.getUserId());
 
             Log.i("policyPostPix1",vehiclePictureList_post.toString());
             Log.i("policyPostVec1",vehiclesList_post.toString());
@@ -442,16 +485,27 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
 
 
             for(int i=0;i<results.size();i++) {
-                VehicleDetails vehicleDetails=results.get(i);
-                vehiclesList_post.add(new Vehicle(vehicleDetails.getPeriod(),vehicleDetails.getPolicy_select_type(),vehicleDetails.getEnhanced_third_party(),
-                        vehicleDetails.getPrivate_com_type(),"",vehicleDetails.getVehicle_make(),
-                        vehicleDetails.getBody_type(),vehicleDetails.getYear(),"null",vehicleDetails.getRegistration_number(),
-                        vehicleDetails.getChasis_number(),vehicleDetails.getEngine_number(),vehicleDetails.getVehicle_value(),vehiclePictureList_post));
+                VehicleDetails vehicleDetails = results.get(i);
+                if (!vehicleDetails.getVehicle_type().equals("Motor Cycle")) {
+                    vehiclesList_post.add(new Vehicle(vehicleDetails.getPeriod(), vehicleDetails.getStartDate(), vehicleDetails.getPolicy_select_type(), vehicleDetails.getEnhanced_third_party(),
+                            vehicleDetails.getPrivate_com_type(), "", vehicleDetails.getVehicle_make() + " " + vehicleDetails.getVehicle_type(),
+                            vehicleDetails.getBody_type(), vehicleDetails.getYear(), "null", vehicleDetails.getRegistration_number(),
+                            vehicleDetails.getChasis_number(), vehicleDetails.getEngine_number(), vehicleDetails.getVehicle_value(), vehicleDetails.getPrice(), vehiclePictureList_post));
+                    Log.i("InitPricing", vehicleDetails.getPrice());
+
+                } else {
+                    vehiclesList_post.add(new Vehicle(vehicleDetails.getPeriod(), vehicleDetails.getStartDate(), vehicleDetails.getPolicy_select_type(), vehicleDetails.getEnhanced_third_party(),
+                            vehicleDetails.getPrivate_com_type(), "", vehicleDetails.getVehicle_make(),
+                            vehicleDetails.getBody_type(), vehicleDetails.getYear(), "null", vehicleDetails.getRegistration_number(),
+                            vehicleDetails.getChasis_number(), vehicleDetails.getEngine_number(), vehicleDetails.getVehicle_value(), vehicleDetails.getPrice(), vehiclePictureList_post));
+                    Log.i("InitPricing", vehicleDetails.getPrice());
+                }
 
 
             }
+
             VehiclePostHead vehiclePostHead=new VehiclePostHead(persona,vehiclesList_post,total_quoteprice,
-                    pin_txt_m5.getText().toString(),modeofPaymentString,userPreferences.getUserId());
+                    "0000", modeofPaymentString, userPreferences.getUserId());
 
                 Log.i("policyPost2",vehiclePostHead.toString());
             Log.i("policyTotalPrice",total_quoteprice);
@@ -481,22 +535,22 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
                 Log.i("ResponseCode", String.valueOf(response.code()));
 
                 if(response.code()==400){
-                    showMessage("Check your internet connection");
+                    failed_alert("Check your internet connection");
                     btn_layout3.setVisibility(View.VISIBLE);
                     progressbar.setVisibility(View.GONE);
                     return;
                 }else if(response.code()==429){
-                    showMessage("Too many requests on database");
+                    failed_alert("Too many requests on database");
                     btn_layout3.setVisibility(View.VISIBLE);
                     progressbar.setVisibility(View.GONE);
                     return;
                 }else if(response.code()==500){
-                    showMessage("Server Error");
+                    failed_alert("Server Error");
                     btn_layout3.setVisibility(View.VISIBLE);
                     progressbar.setVisibility(View.GONE);
                     return;
                 }else if(response.code()==401){
-                    showMessage("Unauthorized access, please try login again");
+                    failed_alert("Unauthorized access, please try login again");
                     btn_layout3.setVisibility(View.VISIBLE);
                     progressbar.setVisibility(View.GONE);
                     return;
@@ -514,7 +568,7 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
                         }catch (Exception e){
                             Log.i("InvalidEntry",e.getMessage());
                             Log.i("ResponseError",response.errorBody().string());
-                            showMessage("Failed to Register"+e.getMessage());
+                            failed_alert("Failed to Submit, try again\n" + e.getMessage());
                             btn_layout3.setVisibility(View.VISIBLE);
                             progressbar.setVisibility(View.GONE);
 
@@ -538,12 +592,10 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
                     Log.i("ref", ref);
                     showMessage("Ref:"+ref);
 
-                    showMessage("Submit Successful, Proceed to Payment");
-                    userPreferences.setTempQuotePrice("0.0");
-
-                    btn_layout3.setVisibility(View.VISIBLE);
-                    progressbar.setVisibility(View.GONE);
                     if (total_price != null) {
+                        userPreferences.setTempQuotePrice("0.0");
+                        btn_layout3.setVisibility(View.VISIBLE);
+                        progressbar.setVisibility(View.GONE);
                         asyncVehiclePolicy(primaryKey);
                         Intent intent = new Intent(getContext(), PolicyPaymentActivity.class);
                         intent.putExtra(Constant.TOTAL_PRICE, total_price);
@@ -554,45 +606,79 @@ class MotorInsureFragment5 extends Fragment implements View.OnClickListener{
                         getActivity().finish();
 
                     } else {
-                        showMessage("Error: " + response.body());
-                        asyncVehiclePolicy(primaryKey);
-                        userPreferences.setTempQuotePrice("0.0");
-                        Fragment quoteBuyFragment2 = new MotorInsureFragment2();
-                        FragmentTransaction ft = getFragmentManager().beginTransaction();
-                        ft.replace(R.id.fragment_motor_form_container, quoteBuyFragment2);
-                        ft.commit();
+                        incomplete_alert(String.valueOf(response.body()));
+                        btn_layout3.setVisibility(View.VISIBLE);
+                        progressbar.setVisibility(View.GONE);
+
                     }
                 }catch (Exception e){
-                    showMessage("Submission Error: " + e.getMessage());
+                    incomplete_alert("Transaction not complete, check your internet and click continue\n" + e.getMessage());
                     Log.i("policyResponse", e.getMessage());
                     btn_layout3.setVisibility(View.VISIBLE);
                     progressbar.setVisibility(View.GONE);
-                    asyncVehiclePolicy(primaryKey);
-                    userPreferences.setTempQuotePrice("0.0");
-                    Fragment quoteBuyFragment2 = new MotorInsureFragment2();
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.replace(R.id.fragment_motor_form_container, quoteBuyFragment2);
-                    ft.commit();
+
                 }
 
             }
             @Override
             public void onFailure(Call<BuyQuoteFormGetHead> call, Throwable t) {
-                showMessage("Submission Failed "+t.getMessage());
+                failed_alert("Submission Failed, TRY AGAIN \n" + t.getMessage());
                 Log.i("GEtError",t.getMessage());
                 btn_layout3.setVisibility(View.VISIBLE);
                 progressbar.setVisibility(View.GONE);
-                asyncVehiclePolicy(primaryKey);
-                userPreferences.setTempQuotePrice("0.0");
-                Fragment quoteBuyFragment2 = new MotorInsureFragment2();
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_motor_form_container, quoteBuyFragment2);
-                ft.commit();
+
             }
         });
 
 
+    }
 
+
+    private void failed_alert(String msg) {
+
+        new AlertDialog.Builder(getContext())
+                .setIcon(R.drawable.ic_error_outline_black_24dp)
+                .setTitle("Error !")
+                .setMessage(msg)
+                .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int i) {
+                        dialog.dismiss();
+
+                    }
+                })
+                .show();
+
+    }
+
+    private void incomplete_alert(String msg) {
+
+        new AlertDialog.Builder(getContext())
+                .setTitle("Error !")
+                .setIcon(R.drawable.ic_error_outline_black_24dp)
+                .setMessage(msg)
+                .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int i) {
+                        dialog.dismiss();
+                        asyncVehiclePolicy(primaryKey);
+                        userPreferences.setTempQuotePrice("0.0");
+                        Fragment transactionHistoryFragment = new TransactionHistoryFragment();
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.replace(R.id.fragment_motor_form_container, transactionHistoryFragment);
+                        ft.commit();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int i) {
+                        dialog.dismiss();
+                        asyncVehiclePolicy(primaryKey);
+                        userPreferences.setTempQuotePrice("0.0");
+                        startActivity(new Intent(getActivity(), Dashboard.class));
+                    }
+                })
+                .show();
 
     }
 

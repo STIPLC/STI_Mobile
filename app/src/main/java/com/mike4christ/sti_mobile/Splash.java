@@ -61,7 +61,7 @@ public class Splash extends AppCompatActivity {
         }
 
 //        check for first time launch
-        if (!userPreferences.isFirstTimeLaunch()) {
+
             // load the animation
             slide_front_left = AnimationUtils.loadAnimation(getApplicationContext(),
                     R.anim.slide_from_left);
@@ -89,12 +89,8 @@ public class Splash extends AppCompatActivity {
                 }
             };
             myThread.start();
-        }else {
-            userPreferences.setFirstTimeLaunch(false);
-            //Goto Sign Up
-            startActivity(new Intent(getApplicationContext(), SignUp.class));
-            finish();
-        }
+
     }
+
 
 }

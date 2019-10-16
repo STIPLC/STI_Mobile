@@ -783,7 +783,7 @@ public class OtherInsureFragment1 extends Fragment implements View.OnClickListen
 
         //Tyepe Spinner
         typeString = mTypeSpinnerO1.getSelectedItem().toString();
-        if (typeString.equals("Select Type")&&mTypeSpinnerO1.isClickable()) {
+        if (typeString.equals("Select Type*") && mTypeSpinnerO1.isClickable()) {
 
             showMessage("Select Product Type");
             isValid = false;
@@ -796,7 +796,7 @@ public class OtherInsureFragment1 extends Fragment implements View.OnClickListen
         }
 
         genderString = mGenderSpinnerO1.getSelectedItem().toString();
-        if (genderString.equals("Gender")&&mGenderSpinnerO1.isClickable()) {
+        if (genderString.equals("Gender*") && mGenderSpinnerO1.isClickable()) {
             showMessage("Don't forget to Select Gender");
             isValid = false;
         }

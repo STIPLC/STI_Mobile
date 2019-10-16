@@ -1,21 +1,18 @@
 package com.mike4christ.sti_mobile.activity;
 
 import android.Manifest;
-import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Paint;
-import android.os.Build;
 import android.os.Bundle;
 
 
-import android.util.AttributeSet;
-import android.view.Gravity;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
@@ -26,22 +23,28 @@ import android.view.MenuItem;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.mike4christ.sti_mobile.Forms.Claim;
 import com.mike4christ.sti_mobile.MainActivity;
+import com.mike4christ.sti_mobile.Model.Auth.ChangePassPost;
+import com.mike4christ.sti_mobile.Model.Auth.UserPassword;
+import com.mike4christ.sti_mobile.Model.Errors.APIError;
+import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
+import com.mike4christ.sti_mobile.Model.ServiceGenerator;
 import com.mike4christ.sti_mobile.R;
-import com.mike4christ.sti_mobile.SignUp;
+import com.mike4christ.sti_mobile.SignIn;
 import com.mike4christ.sti_mobile.UserPreferences;
-import com.mike4christ.sti_mobile.forms_fragment.Claim.SubFragment_Claim;
 import com.mike4christ.sti_mobile.forms_fragment.Claim.Track_Claim;
 import com.mike4christ.sti_mobile.forms_fragment.Pin.PinFragment;
 import com.mike4christ.sti_mobile.fragment.DashboardFragment;
 import com.mike4christ.sti_mobile.fragment.EmailUsFragment;
 import com.mike4christ.sti_mobile.fragment.MyClaimFragment;
 import com.mike4christ.sti_mobile.fragment.MyPoliciesFragment;
-import com.mike4christ.sti_mobile.fragment.ProfileFragment;
 import com.mike4christ.sti_mobile.fragment.QuoteBuyFragment;
 import com.mike4christ.sti_mobile.fragment.TransactionHistoryFragment;
 import com.mike4christ.sti_mobile.fragment.ValidatePolicyFragment;
+import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
+import com.wang.avi.AVLoadingIndicatorView;
 
 
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -53,15 +56,18 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.view.Menu;
+import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 /*
@@ -99,6 +105,7 @@ public class Dashboard extends AppCompatActivity
 
     UserPreferences userPreferences;
 
+
     Fragment fragment;
     String personal_img_url;
 
@@ -112,12 +119,9 @@ public class Dashboard extends AppCompatActivity
         userPreferences=new UserPreferences(this);
        // customizeToolbar(mToolbar);
         setClick();
-        personal_img_url=userPreferences.getProfileImg();
 
         fragment = new DashboardFragment();
         showFragment(fragment);
-
-
 
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -125,6 +129,7 @@ public class Dashboard extends AppCompatActivity
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
+
 
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
@@ -135,20 +140,20 @@ public class Dashboard extends AppCompatActivity
         nav_lastname=navigationView.getHeaderView(0).findViewById(R.id.nav_lastname);
         nav_lastname.setText(userPreferences.getLastName());
 
-
+        personal_img_url = userPreferences.getProfileImg();
 
         if(personal_img_url==null) {
             Glide.with(this).load(userPreferences.getProfileImg()).apply(new RequestOptions().fitCenter().circleCrop()).into(mProfileIcon);
         }else{
-            Glide.with(this).load(personal_img_url).apply(new RequestOptions().fitCenter().circleCrop()).into(mProfileIcon);
-
+            Glide.with(this).load(userPreferences.getProfileImg()).apply(new RequestOptions().fitCenter().circleCrop()).into(mProfileIcon);
         }
 
         mProfileIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                fragment = new ProfileFragment();
-                showFragment(fragment);
+                startActivity(new Intent(Dashboard.this, ProfileActivity.class));
+                DrawerLayout drawer = findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
             }
         });
 
@@ -268,13 +273,12 @@ public class Dashboard extends AppCompatActivity
         }
         else if (id == R.id.nav_account) {
 
-            fragment = new ProfileFragment();
-            showFragment(fragment);
+            startActivity(new Intent(Dashboard.this, ProfileActivity.class));
 
-        }else if (id == R.id.set_change_pin) {
-
-            fragment = new PinFragment();
-            showFragment(fragment);
+        } else if (id == R.id.change_pass) {
+            DrawerLayout drawer = findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
+            changePassword();
 
         }
         else if (id == R.id.log_out) {
@@ -348,6 +352,116 @@ public class Dashboard extends AppCompatActivity
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    private void changePassword() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Change Password");
+        builder.setIcon(R.drawable.ic_vpn_key_black_24dp);
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.change_pass, null);
+        builder.setView(dialogView);
+        EditText oldPassword = dialogView.findViewById(R.id.oldpass);
+        EditText newPassword = dialogView.findViewById(R.id.newpass);
+        AVLoadingIndicatorView progressBar = dialogView.findViewById(R.id.progressbar);
+
+        builder.setPositiveButton("Change", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+
+                if (oldPassword.getText().toString().isEmpty() || oldPassword.getText().toString().trim().length() < 6) {
+                    showMessage("Invalid Password, ensure at least 6 characters");
+                    return;
+                } else if (oldPassword.getText().toString().isEmpty() || oldPassword.getText().toString().trim().length() < 6) {
+                    showMessage("Invalid Password, ensure at least 6 characters");
+                    return;
+                }
+
+                progressBar.setVisibility(View.VISIBLE);
+
+
+                UserPassword userPassword = new UserPassword(oldPassword.getText().toString().trim(), newPassword.getText().toString().trim());
+
+                ChangePassPost changePassPost = new ChangePassPost(userPassword);
+
+                ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
+                Call<ResponseBody> call = client.change_password("Token " + userPreferences.getUserToken(), changePassPost);
+
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (!response.isSuccessful()) {
+                            if (response.code() == 400) {
+                                showMessage("Check your internet connection");
+                                progressBar.setVisibility(View.GONE);
+                                return;
+                            } else if (response.code() == 429) {
+                                showMessage("Too many requests on database");
+                                progressBar.setVisibility(View.GONE);
+                                return;
+                            } else if (response.code() == 500) {
+                                showMessage("Server Error");
+                                progressBar.setVisibility(View.GONE);
+                                return;
+                            } else if (response.code() == 401) {
+                                showMessage("Unauthorized access, please try login again");
+                                progressBar.setVisibility(View.GONE);
+                                return;
+                            }
+                            try {
+                                APIError apiError = ErrorUtils.parseError(response);
+
+                                showMessage("Failed Entry: " + apiError.getErrors());
+                                Log.i("Invalid EntryK", apiError.getErrors().toString());
+                                Log.i("Invalid Entry", response.errorBody().toString());
+                                progressBar.setVisibility(View.GONE);
+
+                            } catch (Exception e) {
+                                Log.i("InvalidEntry", e.getMessage());
+                                showMessage("Failed Entry");
+
+                                progressBar.setVisibility(View.GONE);
+
+                            }
+
+                            progressBar.setVisibility(View.GONE);
+                            return;
+                        }
+                        progressBar.setVisibility(View.GONE);
+                        dialog.dismiss();
+                        showMessage("Password Changed Successfully, Re-Login! ");
+                        startActivity(new Intent(Dashboard.this, SignIn.class));
+                        finish();
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        showMessage("Change Password Failed: " + t.getMessage());
+                        Log.i("GEtError", t.getMessage());
+                        //progressBar.setVisibility(View.GONE);
+                    }
+                });
+
+
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.create().show();
+    }
+
+
+    private void showMessage(String s) {
+        Snackbar.make(mContentDashLayout, s, Snackbar.LENGTH_LONG).show();
     }
 
 

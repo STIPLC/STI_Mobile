@@ -26,7 +26,7 @@ public class ClaimPost implements Serializable
     private Integer lossEstimate;
     @SerializedName("cost_estimate")
     @Expose
-    private Integer costEstimate;
+    private String costEstimate;
     @SerializedName("pictures")
     @Expose
     private List<String> pictures = null;
@@ -35,13 +35,23 @@ public class ClaimPost implements Serializable
     private String pin;
 
 
-    public ClaimPost(String description, String claimType, String paymentStatus, String policyNumber, Integer lossEstimate, Integer costEstimate, List<String> pictures, String pin) {
+    public ClaimPost(String description, String claimType, String paymentStatus, String policyNumber, Integer lossEstimate, String costEstimate, List<String> pictures, String pin) {
         this.description = description;
         this.claimType = claimType;
         this.paymentStatus = paymentStatus;
         this.policyNumber = policyNumber;
         this.lossEstimate = lossEstimate;
         this.costEstimate = costEstimate;
+        this.pictures = pictures;
+        this.pin = pin;
+    }
+
+    public ClaimPost(String description, String claimType, String paymentStatus, String policyNumber, Integer lossEstimate, List<String> pictures, String pin) {
+        this.description = description;
+        this.claimType = claimType;
+        this.paymentStatus = paymentStatus;
+        this.policyNumber = policyNumber;
+        this.lossEstimate = lossEstimate;
         this.pictures = pictures;
         this.pin = pin;
     }

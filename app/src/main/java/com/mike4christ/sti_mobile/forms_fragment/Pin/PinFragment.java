@@ -263,15 +263,24 @@ public class PinFragment extends Fragment implements View.OnClickListener{
 
                 if(response.code()==400){
                     showMessage("Check your internet connection");
+                    mSetPinBtn.setVisibility(View.VISIBLE);
+                    mSetPinProgressbar.setVisibility(View.GONE);
                     return;
+
                 }else if(response.code()==429){
                     showMessage("Too many requests on database");
+                    mSetPinBtn.setVisibility(View.VISIBLE);
+                    mSetPinProgressbar.setVisibility(View.GONE);
                     return;
                 }else if(response.code()==500){
                     showMessage("Server Error");
+                    mSetPinBtn.setVisibility(View.VISIBLE);
+                    mSetPinProgressbar.setVisibility(View.GONE);
                     return;
                 }else if(response.code()==401){
                     showMessage("Unauthorized access, please try login again");
+                    mSetPinBtn.setVisibility(View.VISIBLE);
+                    mSetPinProgressbar.setVisibility(View.GONE);
                     return;
                 }
 
@@ -300,6 +309,9 @@ public class PinFragment extends Fragment implements View.OnClickListener{
 
                     showMessage("Pin Successfully set");
 
+                    userPreferences.setPin(mPinEditxt.getText().toString());
+                    mSetPinBtn.setVisibility(View.VISIBLE);
+                    mSetPinProgressbar.setVisibility(View.GONE);
 
 
                 }catch (Exception e){
@@ -373,7 +385,7 @@ public class PinFragment extends Fragment implements View.OnClickListener{
                     }
 
                     showMessage("Pin Successfully changed");
-
+                    userPreferences.setPin(mPinEditxt.getText().toString());
 
 
                 }catch (Exception e){

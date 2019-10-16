@@ -19,7 +19,10 @@ import com.mike4christ.sti_mobile.activity.MyMarineDetail;
 import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
 import com.mike4christ.sti_mobile.retrofit_interface.ItemClickListener;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,49 +51,54 @@ public class MarineAdapter extends RecyclerView.Adapter<MarineAdapter.MyViewHold
     public void onBindViewHolder(@NonNull MyViewHolder holder, int i) {
         Marine marineOption = marineList.get(i);
 
-        holder.mPolicyNum.setText(marineOption.getPolicyNumber());
-        holder.mPrice.setText(marineOption.getPrice());
-        holder.mDateTime.setText(marineOption.getCreatedAt());
-        holder.mStatus.setText(marineOption.getStatus());
-        holder.mPaymentStatus.setText(marineOption.getPaymentStatus());
-        holder.mPolicyType.setText(marineOption.getPolicyType());
 
-       /* "id": 331,
-                "customer_id": "478",
-                "policy_number": "MAR/MA/09/19/SA/00105",
-                "period": "365",
-                "policy_type": "Marine Insurance",
-                "description": "sddsds",
-                "pfi_number": "dssd",
-                "pfi_date": "2019-09-18",
-                "quantity": "1",
-                "created_at": "2019-09-18 16:46:49",
-                "updated_at": "2019-09-18 16:49:04",
-                "value": "500",
-                "conversion_rate": "2",
-                "loading_port": "sccs",
-                "discharge_port": "cs",
-                "conveyance_mode": "Air",
-                "start": "2019-09-18",
-                "end": "2020-09-17",
-                "status": "Active",
-                "payment_reference": "15688252098274942250E",
-                "payment_status": "paid",
-                "user_id": "89",
-                "interest": null,
-                "price": "1.1"*/
-       
-        holder.setItemClickListener(pos -> {
+        if (marineOption.getPrice() != null) {
+            holder.mPolicyNum.setText(marineOption.getPolicyNumber());
 
-            nextActivity(marineList.get(pos).getPolicyNumber(), marineList.get(pos).getDescription(),marineList.get(pos).getValue()
-                    ,marineList.get(pos).getLoadingPort(),marineList.get(pos).getDischargePort(),marineList.get(pos).getPolicyType(),
-                    marineList.get(pos).getPrice(),marineList.get(pos).getStart(),marineList.get(pos).getEnd(),marineList.get(pos).getPaymentReference()
-                    ,marineList.get(pos).getStatus(),marineList.get(pos).getPfiDate(),marineList.get(pos).getPfiNumber(),marineList.get(pos).getConveyanceMode(),marineList.get(pos).getPaymentStatus(),marineList.get(pos).getConversionRate()
-                    , MyMarineDetail.class);
+            NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
+            nf.setMaximumFractionDigits(2);
+            DecimalFormat df = (DecimalFormat) nf;
+            String v_price = "₦" + df.format(Double.valueOf(marineOption.getPrice()));
 
+            holder.mPrice.setText(v_price);
+            holder.mDateTime.setText(marineOption.getCreatedAt());
+            holder.mStatus.setText(marineOption.getStatus());
+            holder.mPaymentStatus.setText(marineOption.getPaymentStatus());
+            holder.mPolicyType.setText(marineOption.getPolicyType());
+
+
+            holder.setItemClickListener(pos -> {
+
+                nextActivity(marineList.get(pos).getPolicyNumber(), marineList.get(pos).getDescription(), marineList.get(pos).getValue()
+                        , marineList.get(pos).getLoadingPort(), marineList.get(pos).getDischargePort(), marineList.get(pos).getPolicyType(),
+                        marineList.get(pos).getPrice(), marineList.get(pos).getStart(), marineList.get(pos).getEnd(), marineList.get(pos).getPaymentReference()
+                        , marineList.get(pos).getStatus(), marineList.get(pos).getPfiDate(), marineList.get(pos).getPfiNumber(), marineList.get(pos).getConveyanceMode(), marineList.get(pos).getPaymentStatus(), marineList.get(pos).getConversionRate()
+                        , MyMarineDetail.class);
 
 
             });
+
+        } else {
+            holder.mPolicyNum.setText(marineOption.getPolicyNumber());
+
+            holder.mPrice.setText(marineOption.getPrice());
+            holder.mDateTime.setText(marineOption.getCreatedAt());
+            holder.mStatus.setText(marineOption.getStatus());
+            holder.mPaymentStatus.setText(marineOption.getPaymentStatus());
+            holder.mPolicyType.setText(marineOption.getPolicyType());
+
+
+            holder.setItemClickListener(pos -> {
+
+                nextActivity(marineList.get(pos).getPolicyNumber(), marineList.get(pos).getDescription(), marineList.get(pos).getValue()
+                        , marineList.get(pos).getLoadingPort(), marineList.get(pos).getDischargePort(), marineList.get(pos).getPolicyType(),
+                        marineList.get(pos).getPrice(), marineList.get(pos).getStart(), marineList.get(pos).getEnd(), marineList.get(pos).getPaymentReference()
+                        , marineList.get(pos).getStatus(), marineList.get(pos).getPfiDate(), marineList.get(pos).getPfiNumber(), marineList.get(pos).getConveyanceMode(), marineList.get(pos).getPaymentStatus(), marineList.get(pos).getConversionRate()
+                        , MyMarineDetail.class);
+
+
+            });
+        }
     }
 
     private void nextActivity(String policy_num, String desc,String value

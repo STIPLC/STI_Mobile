@@ -18,7 +18,10 @@ import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
 import com.mike4christ.sti_mobile.retrofit_interface.ItemClickListener;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,7 +51,13 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         History transactionOption = transactionList.get(i);
 
         holder.mPolicyNum.setText(transactionOption.getPolicyNumber());
-        holder.mAmount.setText(transactionOption.getAmount());
+
+        NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
+        nf.setMaximumFractionDigits(2);
+        DecimalFormat df = (DecimalFormat) nf;
+        String v_amount = "₦" + df.format(Double.valueOf(transactionOption.getAmount()));
+
+        holder.mAmount.setText(v_amount);
         holder.mDateTime.setText(transactionOption.getCreatedAt());
         holder.mDecription.setText(transactionOption.getDescription());
 

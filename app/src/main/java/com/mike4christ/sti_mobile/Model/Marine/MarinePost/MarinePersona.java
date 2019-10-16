@@ -56,7 +56,7 @@ public class MarinePersona implements Serializable
     @SerializedName("customer_type")
     @Expose
     private String customerType;
-    @SerializedName("company_name")
+    @SerializedName("company")
     @Expose
     private String companyName;
     @SerializedName("mailing_address")

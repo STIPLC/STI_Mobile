@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -124,13 +125,13 @@ public class OtherInsureFragment3 extends Fragment implements View.OnClickListen
             String format = p_amount + ".00";
             mAmountO3.setText(format);
         }else {
-            String format = p_amount + ".00";
+            String format = p_amount;
             mAmountO3.setText(format);
         }
 
 
         setViewActions();
-
+        Toast.makeText(getActivity(), "Click the Add Button, to add more Insurance", Toast.LENGTH_LONG).show();
         return  view;
     }
 

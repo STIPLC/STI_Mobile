@@ -51,7 +51,6 @@ public class Claim extends AppCompatActivity {
     private void applyToolbarChildren(String title) {
         setSupportActionBar(toolBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle(title);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_keyboard_arrow_left_black_24dp);
         //setting Elevation for > API 21

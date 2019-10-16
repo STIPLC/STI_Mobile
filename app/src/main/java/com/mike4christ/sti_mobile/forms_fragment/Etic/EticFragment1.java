@@ -84,10 +84,10 @@ public class EticFragment1 extends Fragment implements View.OnClickListener{
     TextInputLayout mInputLayoutResAddrE1;
     @BindView(R.id.residents_addr_editxt_e1)
     EditText mResidentsAddrEditxtE1;
-    @BindView(R.id.inputLayoutNextKin_e1)
-    TextInputLayout mInputLayoutNextKinE1;
-    @BindView(R.id.next_kin_editxt_e1)
-    EditText mNextKinEditxtE1;
+    /* @BindView(R.id.inputLayoutNextKin_e1)
+     TextInputLayout mInputLayoutNextKinE1;
+     @BindView(R.id.next_kin_editxt_e1)
+     EditText mNextKinEditxtE1;*/
     @BindView(R.id.inputLayoutPhone_e1)
     TextInputLayout mInputLayoutPhoneE1;
     @BindView(R.id.phone_no_editxt_e1)
@@ -118,10 +118,6 @@ public class EticFragment1 extends Fragment implements View.OnClickListener{
     TextInputLayout mInputLayoutEmailE1;
     @BindView(R.id.email_editxt_e1)
     EditText mEmailEditxtE1;
-    @BindView(R.id.inputLayoutMailingAddr_e1)
-    TextInputLayout mInputLayoutMailingAddrE1;
-    @BindView(R.id.mail_addr_editxt_e1)
-    EditText mMailAddrEditxtE1;
     @BindView(R.id.state_spinner)
     Spinner mStateSpinner;
     @BindView(R.id.upload_img_btn_e1)
@@ -214,18 +210,18 @@ public class EticFragment1 extends Fragment implements View.OnClickListener{
         mLastnameEditxtE1.setText(userPreferences.getEticILastName());
 
         mResidentsAddrEditxtE1.setText(userPreferences.getEticIResAdrr());
-        mNextKinEditxtE1.setText(userPreferences.getEticINextKin());
+        //mNextKinEditxtE1.setText(userPreferences.getEticINextKin());
         mPhoneNoEditxtE1.setText(userPreferences.getEticIPhoneNum());
         mEmailEditxtE1.setText(userPreferences.getEticIEmail());
-        mMailAddrEditxtE1.setText(userPreferences.getEticIMailingAddr());
+        //mMailAddrEditxtE1.setText(userPreferences.getEticIMailingAddr());
 
         mBusinessEditxtE1.setText(userPreferences.getEticIBusiness());
         mNationalityEditxtE1.setText(userPreferences.getEticINationality());
         mEmployerNameEditxtE1.setText(userPreferences.getEticIEmployerName());
         mAddrAddrEditxtE1.setText(userPreferences.getEticIMailingAddr());
 
-        mIntendDateEditxtE1.setText(userPreferences.getEticIIntendStartDate());
-        mEndDateCoverE1.setText(userPreferences.getEticIEndDate());
+        //mIntendDateEditxtE1.setText(userPreferences.getEticIIntendStartDate());
+        // mEndDateCoverE1.setText(userPreferences.getEticIEndDate());
 
     }
 
@@ -593,23 +589,23 @@ public class EticFragment1 extends Fragment implements View.OnClickListener{
         } else if (mLastnameEditxtE1.getText().toString().isEmpty()) {
             mInputLayoutLastNameE1.setError("Your LastName is required!");
             isValid = false;
-        } else if (mNextKinEditxtE1.getText().toString().isEmpty()) {
+        }/* else if (mNextKinEditxtE1.getText().toString().isEmpty()) {
             mInputLayoutNextKinE1.setError("Next of Kin is required!");
             isValid = false;
-        }else{
+        }*/ else {
             mInputLayoutFirstNameE1.setErrorEnabled(false);
             mInputLayoutLastNameE1.setErrorEnabled(false);
-            mInputLayoutNextKinE1.setErrorEnabled(false);
+            // mInputLayoutNextKinE1.setErrorEnabled(false);
 
         }
 
             if (mEmailEditxtE1.getText().toString().isEmpty()) {
                 mInputLayoutEmailE1.setError("Email is required!");
                 isValid = false;
-            } else if (!isValidEmailAddress(mEmailEditxtE1.getText().toString())) {
+            } /*else if (!isValidEmailAddress(mEmailEditxtE1.getText().toString())) {
                 mInputLayoutEmailE1.setError("Valid Email is required!");
                 isValid = false;
-            } else {
+            } */ else {
                 mInputLayoutEmailE1.setErrorEnabled(false);
             }
 
@@ -632,7 +628,7 @@ public class EticFragment1 extends Fragment implements View.OnClickListener{
         }
 
         stateString = mStateSpinner.getSelectedItem().toString();
-        if (stateString.equals("Geographical Location")&&mStateSpinner.isClickable()) {
+        if (stateString.equals("Geographical Location*") && mStateSpinner.isClickable()) {
             showMessage("Select your Geographical Location");
             isValid = false;
         }
@@ -644,19 +640,19 @@ public class EticFragment1 extends Fragment implements View.OnClickListener{
         }
         //Prefix Spinner
         prifixString = mPrefixSpinnerE1.getSelectedItem().toString();
-        if (prifixString.equals("Select Prefix")) {
+        if (prifixString.equals("Select Prefix*")) {
             showMessage("Select your Prefix e.g Mr.");
             isValid = false;
         }
 
         genderString = mGenderSpinnerE1.getSelectedItem().toString();
-        if (genderString.equals("Gender")) {
+        if (genderString.equals("Gender*")) {
             showMessage("Don't forget to Select Gender");
             isValid = false;
         }
 
         if (personal_img_url==null) {
-            showMessage("Please upload an image: passport,company license..etc");
+            showMessage("Please upload an image: Passport");
             isValid = false;
         }
 
@@ -701,10 +697,10 @@ public class EticFragment1 extends Fragment implements View.OnClickListener{
             userPreferences.setEticILastName(mLastnameEditxtE1.getText().toString());
             userPreferences.setEticIGender(genderString);
             userPreferences.setEticIResAdrr(mResidentsAddrEditxtE1.getText().toString());
-            userPreferences.setEticINextKin(mNextKinEditxtE1.getText().toString());
+            //userPreferences.setEticINextKin(mNextKinEditxtE1.getText().toString());
             userPreferences.setEticIPhoneNum(mPhoneNoEditxtE1.getText().toString());
             userPreferences.setEticIEmail(mEmailEditxtE1.getText().toString());
-            userPreferences.setEticIMailingAddr(mMailAddrEditxtE1.getText().toString());
+            //userPreferences.setEticIMailingAddr(mMailAddrEditxtE1.getText().toString());
 
             userPreferences.setEticIBusiness(mBusinessEditxtE1.getText().toString());
             userPreferences.setEticINationality(mNationalityEditxtE1.getText().toString());

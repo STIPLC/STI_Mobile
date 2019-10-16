@@ -59,10 +59,10 @@ class OtherInsureFragment4 extends Fragment implements View.OnClickListener{
     TextView mPersonalInfoTxtO4;
     @BindView(R.id.fabShowProdDetail_o4)
     FloatingActionButton mFabShowProdDetailO4;
-    @BindView(R.id.inputLayoutPin_o4)
-    TextInputLayout mInputLayoutPinO4;
-    @BindView(R.id.pin_txt_o4)
-    EditText mPinTxtO4;
+    /* @BindView(R.id.inputLayoutPin_o4)
+     TextInputLayout mInputLayoutPinO4;
+     @BindView(R.id.pin_txt_o4)
+     EditText mPinTxtO4;*/
     @BindView(R.id.modeOfPayment_spinner_o4)
     Spinner mModeOfPaymentSpinnerO4;
     @BindView(R.id.btn_layout4_o4)
@@ -290,6 +290,7 @@ class OtherInsureFragment4 extends Fragment implements View.OnClickListener{
 
 
     }
+
 
     //To Delete vehicle
     private void asyncOtherPolicy(final String id){

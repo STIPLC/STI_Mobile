@@ -51,10 +51,12 @@ import com.mike4christ.sti_mobile.Model.ServiceGenerator;
 import com.mike4christ.sti_mobile.NetworkConnection;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.activity.Dashboard;
 import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
 import com.mike4christ.sti_mobile.forms_fragment.AllRisk.AllriskFragment2;
 import com.mike4christ.sti_mobile.fragment.DashboardFragment;
 import com.mike4christ.sti_mobile.fragment.MyPoliciesFragment;
+import com.mike4christ.sti_mobile.fragment.TransactionHistoryFragment;
 import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -101,16 +103,16 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
     TextInputLayout mInputLayoutDateofLoss;
     @BindView(R.id.dateloss_editxt_s1)
     EditText mDateLossEditxtS1;
-    @BindView(R.id.sti_est_spinner)
-    Spinner mStiEstSpinner;
+    /* @BindView(R.id.sti_est_spinner)
+     Spinner mStiEstSpinner;*/
     @BindView(R.id.inputLayoutEstimateCost)
     TextInputLayout mInputLayoutEstimateCost;
     @BindView(R.id.est_cost_editxt_s1)
     EditText mEstCostEditxtS1;
-    @BindView(R.id.inputLayoutPin)
+    /*@BindView(R.id.inputLayoutPin)
     TextInputLayout mInputLayoutPin;
     @BindView(R.id.pin_editxt)
-    EditText mPinEditxt;
+    EditText mPinEditxt;*/
     @BindView(R.id.upload_estimate_cost)
     Button mUploadEstimateCost;
     @BindView(R.id.upload_damage_pix)
@@ -138,10 +140,10 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
     NetworkConnection networkConnection=new NetworkConnection();
 
     Uri estimate_img_uri;
-    String estimate_img_url;
+    String estimate_img_url = "null";
 
     Uri otherdoc_img_uri;
-    String otherdoc_img_url;
+    String otherdoc_img_url = "null";
 
     Uri damage_img_uri;
     String damage_img_url;
@@ -163,6 +165,7 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
     ArrayList<String> marineTypeString=new ArrayList<>();
     ArrayList<String> travelTypeString=new ArrayList<>();
     ArrayList<String> allriskTypeString=new ArrayList<>();
+    ArrayList<String> emptypeString = new ArrayList<>();
     
     ApiInterface client= ServiceGenerator.createService(ApiInterface.class);
 
@@ -208,20 +211,18 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
         ButterKnife.bind(this,view);
         userPreferences=new UserPreferences(getContext());
 
-        policySpinnerList.add("Select Claim Type");
+        policySpinnerList.add("Select Claim Type*");
         policySpinnerList.add("Motor");
         policySpinnerList.add("Swiss-F");
         policySpinnerList.add("Marine");
         policySpinnerList.add("Travel");
         policySpinnerList.add("All Risk");
 
-       
-
 
         getPolicies();
         userClaimType();
-        
-        stiEsttypeSpinner();
+
+        //stiEsttypeSpinner();
         showDatePicker();
 
         setViewActions();
@@ -282,34 +283,44 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
 
                 //policySpinnerList.add("Select Policy Number");
                 if(count_vehicle!=0){
-                    for(int i=0; i<vehicleList.size();i++){
+                    for(int i = 0; i<vehicleList.size(); i++){
                         // policySpinnerList.add(vehicleList.get(i).getPolicyNumber());
                         vehicleTypeString.add(vehicleList.get(i).getPolicyNumber());
                     }
+                } else {
+                    vehicleTypeString.add("No Vehicle Policy");
                 }
                 if(count_swis!=0) {
                     for (int i = 0; i < swisList.size(); i++) {
                         //policySpinnerList.add(swisList.get(i).getPolicyNumber());
                         swissTypeString.add(swisList.get(i).getPolicyNumber());
                     }
+                } else {
+                    swissTypeString.add("No Swis-F Policy");
                 }
                 if(count_travel!=0) {
                     for (int i = 0; i < travelList.size(); i++) {
                         // policySpinnerList.add(travelList.get(i).getPolicyNumber());
                         travelTypeString.add(travelList.get(i).getPolicyNumber());
                     }
+                } else {
+                    travelTypeString.add("No Travel Policy");
                 }
                 if(count_marine!=0) {
                     for (int i = 0; i < marineList.size(); i++) {
                         //policySpinnerList.add(marineList.get(i).getPolicyNumber());
                         marineTypeString.add(marineList.get(i).getPolicyNumber());
                     }
+                } else {
+                    marineTypeString.add("No Marine Policy");
                 }
                 if(count_allrisk!=0) {
                     for (int i = 0; i < allRiskList.size(); i++) {
                         //policySpinnerList.add(allRiskList.get(i).getPolicyNumber());
                         allriskTypeString.add(allRiskList.get(i).getPolicyNumber());
                     }
+                } else {
+                    allriskTypeString.add("No All-Risk Policy");
                 }
 
                 if(count_allrisk==0&&count_marine==0&&count_swis==0&&count_travel==0&&count_vehicle==0){
@@ -346,20 +357,25 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
 
                 if(position!=0) {
                     if(policy_type.equals("Motor")){
+                        claimTypeString = "vehicle";
                         vehiclePolicy();
 
                     }else if(policy_type.equals("Swiss-F")){
+                        claimTypeString = "swiss_f";
                         swissPolicy();
                     }
                     else if(policy_type.equals("Marine")){
+                        claimTypeString = "marine";
                         marinePolicy();
 
                     }
                     else if(policy_type.equals("Travel")){
+                        claimTypeString = "travel";
                         travelPolicy();
 
                     }
                     else if(policy_type.equals("All Risk")){
+                        claimTypeString = "all_risk";
                         allriskPolicy();
 
                     }
@@ -386,7 +402,7 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 int monthofYear=monthOfYear+1;
-                dateLossString = monthofYear + "/" + dayOfMonth + "/" + year;
+                dateLossString = year + "-" + monthofYear + "-" + dayOfMonth;
                 mDateLossEditxtS1.setText(dateLossString);
                 datePickerDialog1.dismiss();
             }
@@ -395,8 +411,8 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
 
 
 
-    private void stiEsttypeSpinner() {
-        // Create an ArrayAdapter using the string array and a default spinner
+    /*private void stiEsttypeSpinner() {
+         Create an ArrayAdapter using the string array and a default spinner
         ArrayAdapter<CharSequence> staticAdapter = ArrayAdapter
                 .createFromResource(getContext(), R.array.sti_est_array,
                         android.R.layout.simple_spinner_item);
@@ -425,7 +441,7 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
             }
         });
 
-    }
+    }*/
 
     private void vehiclePolicy() {
         // Create an ArrayAdapter using the string array and a default spinner
@@ -1240,12 +1256,13 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
                 mInputLayoutLastDescClaim.setError("Claim Description is required!");
                 isValid = false;
             } else if (mDateLossEditxtS1.getText().toString().isEmpty()) {
-                mInputLayoutDateofLoss.setError("Loss Date is required!");
+                mInputLayoutDateofLoss.setError("Date of Loss is required!");
                 isValid = false;
-            } else if (mEstCostEditxtS1.getText().toString().isEmpty()) {
-                mInputLayoutEstimateCost.setError("Put your own estimate, even if you want STI to provide estimate");
+            } /*else if (mEstCostEditxtS1.getText().toString().isEmpty()) {
+                mInputLayoutEstimateCost.setError("Put your own estimate");
                 isValid = false;
-            }else if (mPinEditxt.getText().toString().isEmpty()) {
+            }*/
+            /*else if (mPinEditxt.getText().toString().isEmpty()) {
                 mInputLayoutPin.setError("Your Pin is required!");
                 isValid = false;
             } else if (mPinEditxt.getText().toString().trim().length() >4 ||mPinEditxt.getText().toString().trim().length() <4 || mPinEditxt.getText().toString().isEmpty()) {
@@ -1261,42 +1278,81 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
                 });
                 snackbar.show();
                 isValid = false;
-            }else{
+            }*/
+            else {
                 mInputLayoutLastDescClaim.setErrorEnabled(false);
                 mInputLayoutDateofLoss.setErrorEnabled(false);
-                mInputLayoutEstimateCost.setErrorEnabled(false);
-                mInputLayoutPin.setErrorEnabled(false);
+                //mInputLayoutEstimateCost.setErrorEnabled(false);
+                //mInputLayoutPin.setErrorEnabled(false);
 
             }
 
 
             //Claim Type Spinner
             claimTypeString = mClaimTypeSpinner.getSelectedItem().toString();
-            if (claimTypeString.equals("Select Claim Type")) {
+        switch (claimTypeString) {
+            case "Motor":
+                claimTypeString = "vehicle";
+                break;
+            case "Swiss-F":
+                claimTypeString = "swiss";
+                break;
+            case "Travel":
+                claimTypeString = "travel";
+                break;
+            case "All Risk":
+                claimTypeString = "all_risk";
+                break;
+        }
+        if (claimTypeString.equals("Select Claim Type*")) {
                 showMessage("Select Claim Type");
                 isValid = false;
             }
             //Policy type Spinner
             policyTypeString = mPolynumTypeSpinner.getSelectedItem().toString();
-            if (policyTypeString.equals("Policy Number")) {
+        switch (policyTypeString) {
+            case "No Vehicle Policy":
                 showMessage("Select your Policy Number");
                 isValid = false;
+                break;
+
+            case "No Swis-F Policy":
+                showMessage("Select your Policy Number");
+                isValid = false;
+                break;
+
+            case "No Marine Policy":
+                showMessage("Select your Policy Number");
+                isValid = false;
+                break;
+
+            case "No Travel Policy":
+                showMessage("Select your Policy Number");
+                isValid = false;
+                break;
+            case "No All-Risk Policy":
+                showMessage("Select your Policy Number");
+                isValid = false;
+                break;
+
             }
 
-            stiEstTypeString = mStiEstSpinner.getSelectedItem().toString();
+            /*stiEstTypeString = mStiEstSpinner.getSelectedItem().toString();
             if (stiEstTypeString.equals("Should STI Provide Estimate")) {
                 showMessage("Don't forget to Select Yes or No for STI estimate");
                 isValid = false;
-            }
+            }*/
 
             if (estimate_img_url==null) {
-                showMessage("Please upload an estimate as image");
-                isValid = false;
+                estimate_img_url = "no image submitted";
+                //showMessage("Please upload an estimate as image");
+                //isValid = false;
             }
 
             if (otherdoc_img_url==null) {
-                showMessage("Please try to upload One related Document image");
-                isValid = false;
+                otherdoc_img_url = "no image submitted";
+                //showMessage("Please try to upload One related Document image");
+                //isValid = false;
             }
 
             if (damage_img_url==null) {
@@ -1317,7 +1373,7 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
 
     }
 
-    private void setPin() {
+   /* private void setPin() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Set Your Pin");
@@ -1351,16 +1407,16 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
         });
 
         builder.show();
-    }
+    }*/
 
 
-    private void initFragmentSetPin() {
+  /*  private void initFragmentSetPin() {
 
         UserPin userPin=new UserPin(mPinEditxt.getText().toString());
         setPin setPin=new setPin(userPin);
         sendPinData(setPin);
 
-    }
+    }*/
 
     private void sendPinData(setPin setPin){
 
@@ -1427,13 +1483,18 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
         claimPictureList_post.add(damage_img_url);
         claimPictureList_post.add(otherdoc_img_url);
 
-        ClaimPost claimPost=new ClaimPost(mDescclaimEditxtS1.getText().toString(),claimTypeString,"Paid",policyTypeString,
-                Integer.parseInt(mDateLossEditxtS1.getText().toString()),Integer.parseInt(mEstCostEditxtS1.getText().toString()),claimPictureList_post,mPinEditxt.getText().toString());
+        if (!mEstCostEditxtS1.getText().toString().isEmpty()) {
 
-        sendClaimData(claimPost);
+            ClaimPost claimPost = new ClaimPost(mDescclaimEditxtS1.getText().toString(), claimTypeString, "Paid", policyTypeString,
+                    2000, mEstCostEditxtS1.getText().toString(), claimPictureList_post, "0000");
 
+            sendClaimData(claimPost);
+        } else {
+            ClaimPost claimPost = new ClaimPost(mDescclaimEditxtS1.getText().toString(), claimTypeString, "Paid", policyTypeString,
+                    2000, claimPictureList_post, "0000");
 
-
+            sendClaimData(claimPost);
+        }
 
     }
 
@@ -1456,8 +1517,6 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
                     mProgressbar1S1.setVisibility(View.GONE);
                     return;
                 }
-
-
                 try {
                     if (!response.isSuccessful()) {
 
@@ -1482,13 +1541,10 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
                     }
 
                     String claim_response=response.body().string();
-                    showMessage("Claim Successfully Submitted");
-                    Log.i("claim_response",claim_response);
 
-                    Fragment dashboardFragment = new DashboardFragment();
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.replace(R.id.fragment_container, dashboardFragment);
-                    ft.commit();
+                    Log.i("claim_response",claim_response);
+                    claim_success_alert();
+
 
 
                 }catch (Exception e){
@@ -1513,6 +1569,23 @@ public class SubFragment_Claim extends Fragment implements View.OnClickListener{
 
     }
 
+    private void claim_success_alert() {
+
+        new AlertDialog.Builder(getContext())
+                .setTitle("Successful !")
+                .setIcon(R.drawable.ic_bookmark_black_24dp)
+                .setMessage("Claim recorded successfully! Our team will get in touch very soon")
+                .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int i) {
+                        dialog.dismiss();
+                        startActivity(new Intent(getActivity(), Dashboard.class));
+                        getActivity().finish();
+                    }
+                })
+                .show();
+
+    }
 
 
 

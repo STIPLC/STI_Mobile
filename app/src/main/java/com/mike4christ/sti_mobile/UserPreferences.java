@@ -31,7 +31,7 @@ public class UserPreferences {
         return sharedPreferences.getBoolean(Constant.IS_FIRST_TIME_LAUNCH, true);
     }
 
-//    User login preferences
+    //    ProfileImageUser login preferences
     public void setUserLogged(boolean usLg) {
         editor.putBoolean(Constant.IS_USER_LOGGED, usLg);
         editor.apply();
@@ -461,6 +461,15 @@ public class UserPreferences {
     }
 
 
+    public void setInitQuotePrice(String quotePrice) {
+        editor.putString("init_quote", quotePrice);
+        editor.apply();
+    }
+
+    public String getInitQuotePrice() {
+        return sharedPreferences.getString("init_quote", "0.0");
+    }
+
     public void setTempQuotePrice(String quotePrice) {
         editor.putString(Constant.MOTOR_QUOTE_PRICE, quotePrice);
         editor.apply();
@@ -479,7 +488,7 @@ public class UserPreferences {
     }
 
     public String getSwissIPrefix() {
-        return sharedPreferences.getString(Constant.SWISS_INSURED_PERSONAL_TYPE, "");
+        return sharedPreferences.getString(Constant.SWISS_INSURED_PREFIX, "");
     }
 
 
@@ -642,6 +651,15 @@ public class UserPreferences {
         return sharedPreferences.getString("Personal_Category", "");
     }
 
+    public void setPersonalInitSwissQuotePrice(String initSwissQuotePrice) {
+        editor.putString("p_init_price", initSwissQuotePrice);
+        editor.apply();
+    }
+
+    public String getPersonalInitSwissQuotePrice() {
+        return sharedPreferences.getString("p_init_price", "0.0");
+    }
+
 
     //Swiss Additional Insured
     public void setSwissIAddFirstName(String firstName) {
@@ -737,12 +755,12 @@ public class UserPreferences {
         return sharedPreferences.getString(Constant.SWISS_AddOTHER_IMAGE, "");
     }
 
-    public void setTempInitSwissQuotePrice(String initSwissQuotePrice) {
+    public void setInitSwissQuotePrice(String initSwissQuotePrice) {
         editor.putString(Constant.SWISS_QUOTE_PRICE_INIT, initSwissQuotePrice);
         editor.apply();
     }
 
-    public String getTempInitSwissQuotePrice() {
+    public String getInitSwissQuotePrice() {
         return sharedPreferences.getString(Constant.SWISS_QUOTE_PRICE_INIT, "0.0");
     }
 

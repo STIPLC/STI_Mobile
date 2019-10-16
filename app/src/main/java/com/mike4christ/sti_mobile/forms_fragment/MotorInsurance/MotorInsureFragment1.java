@@ -225,6 +225,7 @@ public class MotorInsureFragment1 extends Fragment implements View.OnClickListen
         next_kin_editxt.setText(userPreferences.getMotorINextKin());
         phone_no_editxt.setText(userPreferences.getMotorIPhoneNum());
         email_editxt.setText(userPreferences.getMotorIEmail());
+        business_prof_editxt.setText(userPreferences.getMotorIBusiness());
         mail_addr_editxt.setText(userPreferences.getMotorIMailingAddr());
 
     }
@@ -745,10 +746,10 @@ public class MotorInsureFragment1 extends Fragment implements View.OnClickListen
             if (email_editxt.getText().toString().isEmpty()&&inputLayoutEmail.isClickable()) {
                 inputLayoutEmail.setError("Email is required!");
                 isValid = false;
-            } else if (!isValidEmailAddress(email_editxt.getText().toString())) {
+            } /*else if (!isValidEmailAddress(email_editxt.getText().toString())) {
                 inputLayoutEmail.setError("Valid Email is required!");
                 isValid = false;
-            } else {
+            }*/ else {
                 inputLayoutEmail.setErrorEnabled(false);
             }
 
@@ -807,26 +808,26 @@ public class MotorInsureFragment1 extends Fragment implements View.OnClickListen
 
             //Tyepe Spinner
             typeString = typeSpinner.getSelectedItem().toString();
-            if (typeString.equals("Select Type")&&typeSpinner.isClickable()) {
+        if (typeString.equals("Select Type*") && typeSpinner.isClickable()) {
 
                 showMessage("Select Product Type");
                 isValid = false;
             }
             //Prefix Spinner
             prifixString = prefixSpinner.getSelectedItem().toString();
-            if (prifixString.equals("Select Prefix")&&prefixSpinner.isClickable()) {
+        if (prifixString.equals("Select Prefix*") && prefixSpinner.isClickable()) {
                 showMessage("Select your Prefix e.g Mr.");
                 isValid = false;
             }
 
             genderString = genderSpinner.getSelectedItem().toString();
-            if (genderString.equals("Gender")&&genderSpinner.isClickable()) {
+        if (genderString.equals("Gender*") && genderSpinner.isClickable()) {
                 showMessage("Don't forget to Select Gender");
                 isValid = false;
             }
 
                 stateString = state_spinner.getSelectedItem().toString();
-                if (stateString.equals("Geographical Location")&&state_spinner.isClickable()) {
+        if (stateString.equals("Geographical Location*") && state_spinner.isClickable()) {
                     showMessage("Select your Geographical Location");
                     isValid = false;
                 }

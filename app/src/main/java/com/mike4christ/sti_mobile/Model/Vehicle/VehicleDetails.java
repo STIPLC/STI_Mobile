@@ -24,6 +24,9 @@ public class VehicleDetails extends RealmObject {
     String chasis_number;
     String engine_number;
     String vehicle_value;
+    String price;
+
+
 
     String motorcylce_value;
 
@@ -157,6 +160,14 @@ public class VehicleDetails extends RealmObject {
 
     public void setVehicle_value(String vehicle_value) {
         this.vehicle_value = vehicle_value;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
     }
 
     public VehiclePictures getVehiclePictures() {

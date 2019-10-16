@@ -178,6 +178,54 @@
 
     </com.google.android.material.card.MaterialCardView>
 
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/transaction_notify"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_marginBottom="4dp"
+        app:cardElevation="@dimen/size_four"
+        app:cardPreventCornerOverlap="true"
+        app:cardCornerRadius="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/transact_note"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Hi Name, you have an incomplete transaction"
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:layout_margin="@dimen/size_eight"
+                android:textColor="@color/colorBlack"
+                android:fontFamily="@font/montserrat_regular" />
+
+            <Button
+                android:id="@+id/transactn_notify_btn"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Check History"
+                android:textSize="10sp"
+                android:padding="4dp"
+                android:layout_margin="4dp"
+                android:textColor="@color/colorPrimary"
+                android:fontFamily="@font/montserrat_semibold"
+                android:background="@drawable/spinner_bg"
+                android:layout_gravity="center_vertical" />
+
+        </LinearLayout>
+
+
+    </com.google.android.material.card.MaterialCardView>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

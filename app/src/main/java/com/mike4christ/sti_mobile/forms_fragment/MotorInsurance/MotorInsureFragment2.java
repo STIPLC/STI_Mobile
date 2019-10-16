@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -34,9 +35,12 @@ import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.shuhart.stepview.StepView;
 import com.wang.avi.AVLoadingIndicatorView;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -73,6 +77,8 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
     EditText motor_cycle_value;
     @BindView(R.id.vehicle_value)
     EditText vehicle_value;
+    @BindView(R.id.vehicletype_tag)
+    TextView vehicletype_tag;
 
     @BindView(R.id.qb_form_layout2)
     FrameLayout qb_form_layout2;
@@ -187,6 +193,7 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
 
         stepView.go(currentStep, true);
 
+
         init();
 
         private_CommSpinner();
@@ -211,7 +218,7 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
         //Temporal save and go to next Operation
 
 
-        start_date.setText(userPreferences.getMotorStartDate());
+        //start_date.setText(userPreferences.getMotorStartDate());
 
         vehicle_year.setText(userPreferences.getMotorVehicleYear());
 
@@ -254,7 +261,7 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
 
                     private_comm_spinner.setVisibility(View.VISIBLE);
                     private_comm_spinner.setClickable(true);
-                    private_commString="private";
+                    //private_commString="private";
 
 
                     //De-Visualizing the corporate form
@@ -268,6 +275,7 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
                     start_date.setClickable(true);
                     poly_select_type_spinner.setVisibility(View.VISIBLE);
                     poly_select_type_spinner.setClickable(true);
+                    vehicletype_tag.setVisibility(View.VISIBLE);
 
                     covers.clear();
                     covers.add("Select Covers");
@@ -300,10 +308,11 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
 
                     private_comm_spinner.setVisibility(View.VISIBLE);
                     private_comm_spinner.setClickable(true);
-                    private_commString="commercial";
+                    // private_commString="commercial";
 
                     poly_select_type_spinner.setVisibility(View.VISIBLE);
                     poly_select_type_spinner.setClickable(true);
+                    vehicletype_tag.setVisibility(View.VISIBLE);
 
 
                     covers.clear();
@@ -343,11 +352,13 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
                 }else if(stringText.equals("Motor Cycle")){
                     private_comm_spinner.setVisibility(View.VISIBLE);
                     private_comm_spinner.setClickable(true);
-                    private_commString="motor_cycle";
+                    //private_commString="motor_cycle";
                     vehicleTypeString="motor_cycle";
 
                     poly_select_type_spinner.setVisibility(View.VISIBLE);
                     poly_select_type_spinner.setClickable(true);
+
+                    vehicletype_tag.setVisibility(View.GONE);
 
                     covers.clear();
                     covers.add("Select Covers");
@@ -393,10 +404,16 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
             public void onNothingSelected(AdapterView<?> parent) {
                 private_comm_spinner.getItemAtPosition(0);
                 //De-Visualizing the individual form
+                vehicletype_tag.setVisibility(View.GONE);
                 poly_select_type_spinner.setVisibility(View.GONE);
                 poly_select_type_spinner.setClickable(false);
                 vehicle_body_type_spinner.setVisibility(View.GONE);
                 vehicle_body_type_spinner.setClickable(false);
+                vehicle_make_spinner.setVisibility(View.GONE);
+                vehicle_make_spinner.setClickable(false);
+                vehicle_type_spinner.setVisibility(View.GONE);
+                vehicle_type_spinner.setClickable(false);
+
                 inputLayoutMotorCyValue.setVisibility(View.GONE);
                 inputLayoutMotorCyValue.setClickable(false);
 
@@ -405,10 +422,6 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
                 start_date.setClickable(true);
                 private_comm_spinner.setVisibility(View.VISIBLE);
                 private_comm_spinner.setClickable(true);
-                vehicle_make_spinner.setVisibility(View.VISIBLE);
-                vehicle_make_spinner.setClickable(true);
-                vehicle_type_spinner.setVisibility(View.VISIBLE);
-                vehicle_type_spinner.setClickable(true);
                 inputLayoutYear.setVisibility(View.VISIBLE);
                 inputLayoutYear.setClickable(true);
                 inputLayoutRegNum.setVisibility(View.VISIBLE);
@@ -445,7 +458,7 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
                 }else{
                     prEnhance_type_spinner.setVisibility(View.GONE);
                     prEnhance_type_spinner.setClickable(false);
-                    prEnhanceString="null";
+
                 }
 
 
@@ -626,12 +639,12 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
         //policyType validation
         private_commString = private_comm_spinner.getSelectedItem().toString();
         if (private_commString.equals("Select Policy Type")&&private_comm_spinner.isClickable()) {
-            showMessage("Select Policy Type");
+            showMessage("Select Policy Type*");
             isValid = false;
         }
         //Private Spinner
         prEnhanceString = prEnhance_type_spinner.getSelectedItem().toString();
-        if (prEnhanceString.equals("Select Enhanced 3rd Party")&&prEnhance_type_spinner.isClickable()) {
+        if (prEnhanceString.equals("Select Enhanced 3rd Party*") && prEnhance_type_spinner.isClickable()) {
             showMessage("Select your Enhance Party Category");
             isValid = false;
         }
@@ -639,31 +652,34 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
         //Private Spinner
         polySelectTypeString = poly_select_type_spinner.getSelectedItem().toString();
 
-        if (polySelectTypeString.equals("Select Cover")&&poly_select_type_spinner.isClickable()) {
+        if (polySelectTypeString.equals("Select Cover*") && poly_select_type_spinner.isClickable()) {
             showMessage("Select your Covers");
             isValid = false;
         }
+        private_commString = private_comm_spinner.getSelectedItem().toString();
+        if (!private_commString.equals("Motor Cycle")) {
+            //VehincleMaker Spinner
+            vehicleMakeString = vehicle_make_spinner.getSelectedItem().toString();
+            if (vehicleMakeString.equals("Select Vehicle Maker*") && vehicle_make_spinner.isClickable()) {
+                showMessage("Select your Motor Vehicle Maker");
+                isValid = false;
+            }
+
+            //VehicleType Spinner
+
+            vehicleTypeString = vehicle_type_spinner.getSelectedItem().toString();
+            if (vehicleTypeString.equals("Select Brand*") && vehicle_type_spinner.isClickable()) {
+                showMessage("Select your Motor Brand");
+                isValid = false;
+            }
 
 
-        //VehincleMaker Spinner
-        vehicleMakeString = vehicle_make_spinner.getSelectedItem().toString();
-        if (vehicleMakeString.equals("Select Vehicle Maker")&&vehicle_make_spinner.isClickable()) {
-            showMessage("Select your Motor Vehicle Maker");
-            isValid = false;
-        }
-
-        //VehicleType Spinner
-        vehicleTypeString = vehicle_type_spinner.getSelectedItem().toString();
-        if (vehicleTypeString.equals("Select Brand")&&vehicle_type_spinner.isClickable()) {
-            showMessage("Select your Motor Brand");
-            isValid = false;
-        }
-
-        //VehicleBody Spinner
-        vehincleBodyString = vehicle_body_type_spinner.getSelectedItem().toString();
-        if (vehincleBodyString.equals("Select Body Type")&&vehicle_body_type_spinner.isClickable()) {
-            showMessage("Select your Vehicle Body Type");
-            isValid = false;
+            //VehicleBody Spinner
+            vehincleBodyString = vehicle_body_type_spinner.getSelectedItem().toString();
+            if (vehincleBodyString.equals("Select Body Type*") && vehicle_body_type_spinner.isClickable()) {
+                showMessage("Select your Vehicle Body Type");
+                isValid = false;
+            }
         }
 
 
@@ -737,15 +753,23 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
 
                     double roundOff = Math.round(Double.valueOf(quote_price)*100)/100.00;
 
+
                     Log.i("quote_price",quote_price);
                     showMessage("Successfully Fetched Quote");
                     btn_layout2.setVisibility(View.VISIBLE);
                     progressbar.setVisibility(View.GONE);
 
-                    // Fragment quoteBuyFragment3 = new MotorInsureFragment3();
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.replace(R.id.fragment_motor_form_container, MotorInsureFragment3.newInstance(userPreferences.getMotorVehicleMake(), String.valueOf(roundOff)), MotorInsureFragment3.class.getSimpleName());
-                    ft.commit();
+                    userPreferences.setInitQuotePrice(String.valueOf(roundOff));
+                    if (!private_commString.equals("motor_cycle")) {
+                        // Fragment quoteBuyFragment3 = new MotorInsureFragment3();
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.replace(R.id.fragment_motor_form_container, MotorInsureFragment3.newInstance(userPreferences.getMotorVehicleMake(), String.valueOf(roundOff)), MotorInsureFragment3.class.getSimpleName());
+                        ft.commit();
+                    } else {
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.replace(R.id.fragment_motor_form_container, MotorInsureFragment3.newInstance("Motor Cycle ", String.valueOf(roundOff)), MotorInsureFragment3.class.getSimpleName());
+                        ft.commit();
+                    }
                 }catch (Exception e){
                     Log.i("policyResponse", e.getMessage());
                     btn_layout2.setVisibility(View.VISIBLE);
@@ -770,25 +794,6 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
         progressbar.setVisibility(View.VISIBLE);
 
         try {
-
-
-            //Temporal save and go to next Operation
-
-            userPreferences.setMotorStartDate(start_date.getText().toString());
-            userPreferences.setMotorPolicyType(private_commString);
-            userPreferences.setMotorPolySelectType(polySelectTypeString);
-            userPreferences.setMotorPEnhanceType(prEnhanceString);
-            userPreferences.setMotorCycleType(motorCycleTypeString);
-            userPreferences.setMotorVehicleMake(vehicleMakeString);
-            userPreferences.setMotorVehicleType(vehicleTypeString);
-            userPreferences.setMotorVehicleBody(vehincleBodyString);
-            userPreferences.setMotorVehicleYear(vehicle_year.getText().toString());
-            userPreferences.setMotorVehicleRegNum(vehicle_reg_num.getText().toString());
-            userPreferences.setMotorVehicleChasisNum(vehicle_chasis_num.getText().toString());
-            userPreferences.setMotorVehicleEngNum(vehicle_engine_num.getText().toString());
-            userPreferences.setMotorVehicleValue(vehicle_value.getText().toString());
-            userPreferences.setMotorCycleValue(motor_cycle_value.getText().toString());
-
             switch (private_commString) {
                 case "Private":
                     private_commString = "private";
@@ -802,6 +807,7 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
                     private_commString = "motor_cycle";
                     vehicleTypeString="motor_cycle";
                     userPreferences.setMotorVehicleMake("Motor Cycle");
+                    userPreferences.setMotorVehicleBody(" ");
                     value=motor_cycle_value.getText().toString();
 
                     break;
@@ -814,12 +820,15 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
                 switch (polySelectTypeString) {
                     case "3rd Party Only":
                         polySelectTypeString = "third_party_only";
+                        prEnhanceString = "third_party_only";
                         break;
                     case "3rd Party Fire & Theft":
                         polySelectTypeString = "third_party_fire_theft";
+                        prEnhanceString = "third_party_fire_theft";
                         break;
                     case "Comprehensive":
                         polySelectTypeString = "comprehensive";
+                        prEnhanceString = "comprehensive";
                         break;
 
                     case "Enhanced 3rd Party":
@@ -842,18 +851,35 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
                             prEnhanceString="Third_Party";
                             break;
                     }
-                }else{
-                    prEnhanceString=polySelectTypeString;
                 }
 
                 Log.i("Testing",private_commString+":"+polySelectTypeString+":"+prEnhanceString+":"+vehicleTypeString);
 
-                    PostVehicleData postVehicleData = new PostVehicleData(value, private_commString,
-                            polySelectTypeString, prEnhanceString, vehicleTypeString);
+                PostVehicleData postVehicleData = new PostVehicleData(value, private_commString,
+                        polySelectTypeString, prEnhanceString, vehicleTypeString);
 
-                    sendVehicleData(postVehicleData);
+                sendVehicleData(postVehicleData);
 
             }
+
+            //Temporal save and go to next Operation
+
+            userPreferences.setMotorStartDate(start_date.getText().toString());
+            userPreferences.setMotorPolicyType(private_commString);
+            userPreferences.setMotorPolySelectType(polySelectTypeString);
+            userPreferences.setMotorPEnhanceType(prEnhanceString);
+            userPreferences.setMotorCycleType(motorCycleTypeString);
+            userPreferences.setMotorVehicleMake(vehicleMakeString);
+            userPreferences.setMotorVehicleType(vehicleTypeString);
+            userPreferences.setMotorVehicleBody(vehincleBodyString);
+            userPreferences.setMotorVehicleYear(vehicle_year.getText().toString());
+            userPreferences.setMotorVehicleRegNum(vehicle_reg_num.getText().toString());
+            userPreferences.setMotorVehicleChasisNum(vehicle_chasis_num.getText().toString());
+            userPreferences.setMotorVehicleEngNum(vehicle_engine_num.getText().toString());
+            userPreferences.setMotorVehicleValue(vehicle_value.getText().toString());
+            userPreferences.setMotorCycleValue(motor_cycle_value.getText().toString());
+
+
 
 
 
@@ -876,6 +902,7 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
 
         //Create datePickerDialog with initial date which is current and decide what happens when a date is selected.
         datePickerDialog1 = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
+
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 //When a date is selected, it comes here.
@@ -991,7 +1018,8 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
                 String VehicleMakerString = (String) parent.getItemAtPosition(position);
-                vehicleId=position+1;
+                if (position != 0) {
+                    vehicleId = position;
                 //get client and call object for request
 
                 showMessage("Please wait...");
@@ -1076,6 +1104,7 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
                     }
                 });
 
+                }
             }
 
             @Override

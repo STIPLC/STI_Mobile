@@ -60,13 +60,10 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
     TextInputLayout mInputLayoutTripDuratnE2;
     @BindView(R.id.trip_duration_e2)
     EditText mTripDurationE2;
-
     @BindView(R.id.start_date_e2)
     EditText mStartDateE2;
-    @BindView(R.id.inputLayoutTravelMode_e2)
-    TextInputLayout mInputLayoutTravelModeE2;
-    @BindView(R.id.travel_mode_e2)
-    EditText mTravelModeE2;
+    @BindView(R.id.travel_mode_spinner_e2)
+    Spinner travel_mode_spinner_e2;
     @BindView(R.id.disability_spinner_e2)
     Spinner mDisabilitySpinnerE2;
     @BindView(R.id.inputLayoutDisabilityDetail_e2)
@@ -100,7 +97,7 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
 
     private int currentStep = 1;
 
-    String disabilityString,startDateStrg;
+    String disabilityString, startDateStrg, disable_DetailString, travelModeString;
     DatePickerDialog datePickerDialog1;
     UserPreferences userPreferences;
 
@@ -153,6 +150,7 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
         init();
 
         disabilitytypeSpinner();
+        travelModetypeSpinner();
         setViewActions();
         showDatePicker();
 
@@ -168,9 +166,8 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
 
         mTripDurationE2.setText(userPreferences.getEticITripDuration());
 
-        mStartDateE2.setText(userPreferences.getEticStartDate());
+        //mStartDateE2.setText(userPreferences.getEticStartDate());
 
-        mTravelModeE2.setText(userPreferences.getEticITravelMode());
 
         mDisableDetailE2.setText(userPreferences.getEticIDisabilityDetail());
 
@@ -209,13 +206,16 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
                 String stringText = (String) parent.getItemAtPosition(position);
-
+                boolean valid_disable = true;
                 if(stringText.equals("Yes")){
                     mDisableDetailE2.setVisibility(View.VISIBLE);
                     mDisableDetailE2.setClickable(true);
+
+
                 }else if(stringText.equals("No")){
                     mDisableDetailE2.setVisibility(View.GONE);
                     mDisableDetailE2.setClickable(false);
+                    disable_DetailString = "null";
                 }
 
             }
@@ -231,6 +231,40 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
         });
 
     }
+
+
+    private void travelModetypeSpinner() {
+        // Create an ArrayAdapter using the string array and a default spinner
+        ArrayAdapter<CharSequence> staticAdapter = ArrayAdapter
+                .createFromResource(getContext(), R.array.travel_mode_array,
+                        android.R.layout.simple_spinner_item);
+
+        // Specify the layout to use when the list of choices appears
+        staticAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Apply the adapter to the spinner
+        travel_mode_spinner_e2.setAdapter(staticAdapter);
+
+        travel_mode_spinner_e2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                String travelModeString = (String) parent.getItemAtPosition(position);
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                //De-Visualizing the individual form
+                travel_mode_spinner_e2.getItemAtPosition(0);
+
+
+            }
+        });
+
+    }
+
 
 
     @Override
@@ -273,13 +307,6 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
         } else if (mStartDateE2.getText().toString().isEmpty()) {
             showMessage("Start Date is required!");
             isValid = false;
-        } else if (mTravelModeE2.getText().toString().isEmpty()) {
-            mInputLayoutTravelModeE2.setError("Travel Mode is required!");
-
-            isValid = false;
-        } else if (mDisableDetailE2.getText().toString().isEmpty()&&mDisableDetailE2.isClickable()) {
-            mInputLayoutDisabilityDetailE2.setError("Disability detail is required!");
-            isValid = false;
         } else if (mDeptPlaceTxtE2.getText().toString().isEmpty()) {
             mInputLayoutDeptPlaceE2.setError("Departure Place is required!");
 
@@ -290,8 +317,6 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
         }else {
             mInputLayoutCountryVisitAddrE2.setErrorEnabled(false);
             mInputLayoutDeptPlaceE2.setErrorEnabled(false);
-            mInputLayoutDisabilityDetailE2.setErrorEnabled(false);
-            mInputLayoutTravelModeE2.setErrorEnabled(false);
             mInputLayoutTripDuratnE2.setErrorEnabled(false);
         }
 
@@ -305,10 +330,29 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
                 // Spinner Validations
 
         disabilityString = mDisabilitySpinnerE2.getSelectedItem().toString();
-        if (disabilityString.equals("Select Disability")) {
+        if (disabilityString.equals("Yes")) {
+            if (mDisableDetailE2.getText().toString().isEmpty() && mDisableDetailE2.isClickable()) {
+                mInputLayoutDisabilityDetailE2.setError("Disability detail is required!");
+                isValid = false;
+            } else {
+                mInputLayoutDisabilityDetailE2.setErrorEnabled(false);
+            }
+        }
+
+        if (disabilityString.equals("Select Disability*")) {
             showMessage("Select Yes or No for disability");
             isValid = false;
         }
+
+        //mode of travel validation
+        travelModeString = travel_mode_spinner_e2.getSelectedItem().toString();
+        if (travelModeString.equals("Select Mode of Travel*")) {
+            showMessage("Select mode of travel");
+            isValid = false;
+        }
+
+
+
 
         if (isValid) {
 //            send inputs to next next page
@@ -333,9 +377,14 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
             userPreferences.setEticITripDuration(mTripDurationE2.getText().toString());
             userPreferences.setEticIDisability(disabilityString);
             userPreferences.setEticStartDate(mStartDateE2.getText().toString());
-            userPreferences.setEticITravelMode(mTravelModeE2.getText().toString());
-            userPreferences.setEticIDisabilityDetail(mDisableDetailE2.getText().toString());
+            userPreferences.setEticITravelMode(travelModeString);
             userPreferences.setEticIDeparturePlc(mDeptPlaceTxtE2.getText().toString());
+            if (disabilityString.equals("Yes")) {
+                userPreferences.setEticIDisabilityDetail(mDisableDetailE2.getText().toString());
+
+            } else {
+                userPreferences.setEticIDisabilityDetail("null");
+            }
             userPreferences.setEticIArrivalPlc(mArrivalPlaceTxtE2.getText().toString());
             userPreferences.setEticICountryOfVisit(mCountryVisitAddrE2.getText().toString());
 
@@ -424,7 +473,7 @@ public class EticFragment2 extends Fragment implements View.OnClickListener{
 
 
                     FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.replace(R.id.fragment_etic_form_container, EticFragment3.newInstance(mArrivalPlaceTxtE2.getText().toString(), String.valueOf(roundOff)), EticFragment3.class.getSimpleName());
+                    ft.replace(R.id.fragment_etic_form_container, EticFragment3.newInstance(travelModeString, String.valueOf(roundOff)), EticFragment3.class.getSimpleName());
                     ft.commit();
                 }catch (Exception e){
                     Log.i("policyResponse", e.getMessage());

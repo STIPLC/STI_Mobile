@@ -74,7 +74,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
                 <TextView
+                    android:id="@+id/vehicle_count"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
@@ -82,6 +84,7 @@
                     android:layout_margin="4dp"
                     android:textColor="@color/colorPrimaryDark"
                     android:fontFamily="@font/montserrat_semibold"/>
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recycler_vehicle"
                     android:layout_width="match_parent"
@@ -95,6 +98,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
                 <TextView
+                    android:id="@+id/swiss_count"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
@@ -116,6 +120,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
                 <TextView
+                    android:id="@+id/marine_count"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
@@ -136,6 +141,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
                 <TextView
+                    android:id="@+id/travel_count"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
@@ -156,10 +162,11 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
                 <TextView
+                    android:id="@+id/allrisk_count"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
-                    android:text="All Risk Insurance"
+                    android:text="All-Risk Insurance"
                     android:layout_margin="4dp"
                     android:textColor="@color/colorPrimaryDark"
                     android:fontFamily="@font/montserrat_semibold"/>

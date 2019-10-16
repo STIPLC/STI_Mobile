@@ -1,10 +1,12 @@
 package com.mike4christ.sti_mobile.Forms;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -13,12 +15,17 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.snackbar.Snackbar;
 import com.mike4christ.sti_mobile.Constant;
+import com.mike4christ.sti_mobile.Model.Vehicle.VehicleDetails;
+import com.mike4christ.sti_mobile.Model.Vehicle.VehiclePictures;
+import com.mike4christ.sti_mobile.Model.Vehicle.VehiclePolicy;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
 import com.mike4christ.sti_mobile.forms_fragment.MotorInsurance.MotorInsureFragment1;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class MotorInsuredForm extends AppCompatActivity {
 
@@ -38,6 +45,7 @@ public class MotorInsuredForm extends AppCompatActivity {
 
     String title="";
     UserPreferences userPreferences;
+    Realm realm;
 
     //public int PICK_FILE = 5;
 
@@ -47,6 +55,7 @@ public class MotorInsuredForm extends AppCompatActivity {
         setContentView(R.layout.activity_motorinsured_form);
         ButterKnife.bind(this);
         userPreferences=new UserPreferences(this);
+
 
         Intent intent = getIntent();
         title=intent.getStringExtra(Constant.CARD_OPTION_TITLE);
@@ -61,10 +70,10 @@ public class MotorInsuredForm extends AppCompatActivity {
 
     private void applyToolbarChildren(String title) {
         setSupportActionBar(toolBar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle(title);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_keyboard_arrow_left_black_24dp);
+        //getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_keyboard_arrow_left_black_24dp);
         //setting Elevation for > API 21
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             toolBar.setElevation(10f);
@@ -77,6 +86,7 @@ public class MotorInsuredForm extends AppCompatActivity {
         finish();
         return super.onOptionsItemSelected(item);
     }
+
 
     private void showFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();

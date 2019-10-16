@@ -1,7 +1,9 @@
 package com.mike4christ.sti_mobile.forms_fragment.Etic;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +22,12 @@ import com.mike4christ.sti_mobile.Model.Etic.Personal_Detail_etic;
 import com.mike4christ.sti_mobile.Model.Etic.Travel_Info;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.activity.Dashboard;
 import com.wang.avi.AVLoadingIndicatorView;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -127,14 +134,30 @@ public class EticFragment3 extends Fragment implements View.OnClickListener{
             String format = p_amount + ".00";
             mAmountE3.setText(format);
         }else {
-            String format = p_amount;
-            mAmountE3.setText(format);
+            //String format = p_amount;
+            NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
+            nf.setMaximumFractionDigits(2);
+            DecimalFormat df = (DecimalFormat) nf;
+            String v_price = "₦" + df.format(Double.valueOf(p_amount));
+            mAmountE3.setText(v_price);
         }
 
-
-
-
         setViewActions();
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+        view.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                Log.i("backPress_KeyCode", "keyCode: " + keyCode);
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    Log.i("backPress", "onKey Back listener is working!!!");
+                    userPreferences.setTempEticQuotePrice("0.0");
+                    startActivity(new Intent(getActivity(), Dashboard.class));
+                    return true;
+                }
+                return false;
+            }
+        });
 
         return  view;
     }

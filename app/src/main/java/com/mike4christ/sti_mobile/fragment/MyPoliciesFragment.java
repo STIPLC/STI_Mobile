@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
@@ -81,6 +82,24 @@ public class MyPoliciesFragment extends Fragment{
     RecyclerView mRecyclerAllrisk;
     @BindView(R.id.allPolicyLayout)
     ScrollView mAllPolicyLayout;
+
+    @BindView(R.id.vehicle_count)
+    TextView vehicle_count;
+    @BindView(R.id.swiss_count)
+    TextView swiss_count;
+    @BindView(R.id.marine_count)
+    TextView marine_count;
+    @BindView(R.id.allrisk_count)
+    TextView allrisk_count;
+    @BindView(R.id.travel_count)
+    TextView travel_count;
+
+
+
+
+
+
+
     /** ButterKnife Code **/
 
     //Adapters
@@ -196,20 +215,30 @@ public class MyPoliciesFragment extends Fragment{
                 mAvi1.setVisibility(View.GONE);
 
                 if(count_vehicle==0){
-                    mVehiclePolicyLayout.setVisibility(View.GONE);
-                }else if(count_swis==0){
-                    mSwissPolicyLayout.setVisibility(View.GONE);
-                }else if(count_travel==0){
-                    mEticPolicyLayout.setVisibility(View.GONE);
-                }else if(count_allrisk==0){
-                    mAllriskPolicyLayout.setVisibility(View.GONE);
-                }else if(count_marine==0){
-                    mMarinePolicyLayout.setVisibility(View.GONE);
+                    //mVehiclePolicyLayout.setVisibility(View.GONE);
+                    vehicle_count.setText("Vehicle Insurance(0)");
+                }
+                if (count_swis == 0) {
+                    // mSwissPolicyLayout.setVisibility(View.GONE);
+                    swiss_count.setText("SWIS-F Insurance(0)");
+                }
+                if (count_travel == 0) {
+                    // mEticPolicyLayout.setVisibility(View.GONE);
+                    travel_count.setText("ETIC(Travel) Insurance(0)");
+                }
+                if (count_allrisk == 0) {
+                    //mAllriskPolicyLayout.setVisibility(View.GONE);
+                    allrisk_count.setText("All-Risk Insurance(0)");
+                }
+                if (count_marine == 0) {
+                    //mMarinePolicyLayout.setVisibility(View.GONE);
+                    marine_count.setText("Marine Insurance(0)");
                 }
 
                 if(count_allrisk==0&&count_marine==0&&count_swis==0&&count_travel==0&&count_vehicle==0){
                     mSearchNotFoundLayout.setVisibility(View.VISIBLE);
-                    mAllPolicyLayout.setVisibility(View.GONE);
+                    //mAllPolicyLayout.setVisibility(View.GONE);
+                    return;
                 }
 
                 //vehicle

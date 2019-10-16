@@ -135,6 +135,30 @@ public class MyClaimFragment extends Fragment{
             @Override
             public void onResponse(Call<ClaimHead> call, Response<ClaimHead> response) {
 
+                if (response.code() == 400) {
+                    showMessage("Check your internet connection");
+
+                    mAvi1.setVisibility(View.GONE);
+                    return;
+                } else if (response.code() == 429) {
+                    showMessage("Too many requests on database");
+
+                    mAvi1.setVisibility(View.GONE);
+                    return;
+                } else if (response.code() == 500) {
+                    showMessage("Server Error");
+
+                    mAvi1.setVisibility(View.GONE);
+                    return;
+                } else if (response.code() == 401) {
+                    showMessage("Unauthorized access, please try login again");
+
+                    mAvi1.setVisibility(View.GONE);
+                    return;
+                }
+
+
+
                 if(!response.isSuccessful()){
                     try {
                         APIError apiError = ErrorUtils.parseError(response);
@@ -142,6 +166,7 @@ public class MyClaimFragment extends Fragment{
                         showMessage("Fetch Failed: " + apiError.getErrors());
                         Log.i("Invalid Fetch", String.valueOf(apiError.getErrors()));
                         //Log.i("Invalid Entry", response.errorBody().toString());
+                        mAvi1.setVisibility(View.GONE);
 
                     } catch (Exception e) {
                         Log.i("Fetch Failed", e.getMessage());
@@ -163,16 +188,19 @@ public class MyClaimFragment extends Fragment{
                 mAvi1.setVisibility(View.GONE);
 
                 if(count_claims==0){
-                    mMyClaimsLayout.setVisibility(View.GONE);
+                    //mMyClaimsLayout.setVisibility(View.GONE);
                     mSearchNotFoundLayout.setVisibility(View.VISIBLE);
+                    showMessage("Empty Claim");
+
+                } else {
+
+                    //adapter for claims
+                    layoutManager = new LinearLayoutManager(getContext());
+                    mRecyclerClaims.setLayoutManager(layoutManager);
+                    myClaimsAdapter = new MyClaimsAdapter(getContext(), claimLst);
+                    mRecyclerClaims.setAdapter(myClaimsAdapter);
+                    myClaimsAdapter.notifyDataSetChanged();
                 }
-                
-                //adapter for claims
-                layoutManager = new LinearLayoutManager(getContext());
-                mRecyclerClaims.setLayoutManager(layoutManager);
-                myClaimsAdapter = new MyClaimsAdapter(getContext(), claimLst);
-                mRecyclerClaims.setAdapter(myClaimsAdapter);
-                myClaimsAdapter.notifyDataSetChanged();
 
 
             }

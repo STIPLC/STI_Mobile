@@ -25,6 +25,8 @@ import com.mike4christ.sti_mobile.Model.Marine.QouteHeadMarine;
 import com.mike4christ.sti_mobile.Model.MyPolicies.PolicyHead;
 import com.mike4christ.sti_mobile.Model.Pin.changePin;
 import com.mike4christ.sti_mobile.Model.Pin.setPin;
+import com.mike4christ.sti_mobile.Model.ProfileUpdate.ProfileImage.ProfileGetHead;
+import com.mike4christ.sti_mobile.Model.ProfileUpdate.ProfileImage.ProfileImagePostHead;
 import com.mike4christ.sti_mobile.Model.ProfileUpdate.UserEditHead;
 import com.mike4christ.sti_mobile.Model.ProfileUpdate.UserGetUpdateHead;
 import com.mike4christ.sti_mobile.Model.RenewPolicyGet;
@@ -146,7 +148,9 @@ public interface ApiInterface {
     @POST("change-pin")
     Call<ResponseBody> change_pin(@Header("Authorization") String token, @Body changePin change_pin);
 
-    @FormUrlEncoded
+    @POST("user/change-picture")
+    Call<ProfileGetHead> change_profile_image(@Header("Authorization") String token, @Body ProfileImagePostHead profileImagePostHead);
+
     @PUT("user")
     Call<UserGetUpdateHead> update_profile(@Header("Authorization") String token, @Body UserEditHead userEditHead);
 

@@ -1,6 +1,7 @@
 package com.mike4christ.sti_mobile.fragment;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -42,14 +44,19 @@ import com.mike4christ.sti_mobile.Model.MyPolicies.Swis;
 import com.mike4christ.sti_mobile.Model.MyPolicies.Travel;
 import com.mike4christ.sti_mobile.Model.MyPolicies.Vehicle;
 import com.mike4christ.sti_mobile.Model.ServiceGenerator;
+import com.mike4christ.sti_mobile.Model.TransactionHistroy.History;
+import com.mike4christ.sti_mobile.Model.TransactionHistroy.TransactionHead;
 import com.mike4christ.sti_mobile.Model.Vehicle.VehicleBrand.VehicleData;
 import com.mike4christ.sti_mobile.R;
+import com.mike4christ.sti_mobile.SignIn;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.activity.Dashboard;
 import com.mike4christ.sti_mobile.adapter.PoliciesAdapter.AllRiskAdapter;
 import com.mike4christ.sti_mobile.adapter.PoliciesAdapter.EticAdapter;
 import com.mike4christ.sti_mobile.adapter.PoliciesAdapter.MarineAdapter;
 import com.mike4christ.sti_mobile.adapter.PoliciesAdapter.SwissAdapter;
 import com.mike4christ.sti_mobile.adapter.PoliciesAdapter.VehicleAdapter;
+import com.mike4christ.sti_mobile.adapter.TransactionAdapter;
 import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 
 import java.util.ArrayList;
@@ -68,6 +75,12 @@ public class DashboardFragment extends Fragment implements BaseSliderView.OnSlid
     /** ButterKnife Code **/
     @BindView(R.id.dashboard_layout)
     FrameLayout mDashboardLayout;
+    @BindView(R.id.transaction_notify)
+    MaterialCardView mTransactnNotify;
+    @BindView(R.id.transactn_notify_btn)
+    Button mTrasactnNotifyBtn;
+    @BindView(R.id.transact_note)
+    TextView mTrasactnNote;
     @BindView(R.id.user_policy_btn)
     MaterialCardView mUserPolicyBtn;
     @BindView(R.id.firstname_txt)
@@ -94,6 +107,7 @@ public class DashboardFragment extends Fragment implements BaseSliderView.OnSlid
     ImageView refresh_policy;
     /** ButterKnife Code **/
     String policyNumString;
+    String checkIncomplete;
 
     Fragment fragment;
     UserPreferences userPreferences;
@@ -104,6 +118,7 @@ public class DashboardFragment extends Fragment implements BaseSliderView.OnSlid
     List<Marine> marineList;
     List<Travel> travelList;
     List<AllRisk> allRiskList;
+    List<History> policy_item;
     ArrayList<String> policySpinnerList=new ArrayList<>();
     
     
@@ -139,8 +154,19 @@ public class DashboardFragment extends Fragment implements BaseSliderView.OnSlid
         setAction();
         setUp();
         getPolicies();
+        getHistory();
         userPolicy();
         SLide();
+
+        mTrasactnNotifyBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fragment = new TransactionHistoryFragment();
+                showFragment(fragment);
+            }
+        });
+
+
         return view;
     }
 
@@ -172,11 +198,13 @@ public class DashboardFragment extends Fragment implements BaseSliderView.OnSlid
 
                         showMessage("Fetch Failed: " + apiError.getErrors());
                         Log.i("Invalid Fetch", String.valueOf(apiError.getErrors()));
+                        timeout_alert();
                         //Log.i("Invalid Entry", response.errorBody().toString());
 
                     } catch (Exception e) {
                         Log.i("Fetch Failed", e.getMessage());
                         showMessage("Fetch Failed");
+                        timeout_alert();
 
                     }
 
@@ -197,34 +225,44 @@ public class DashboardFragment extends Fragment implements BaseSliderView.OnSlid
 
                 //policySpinnerList.add("Select Policy Number");
                 if(count_vehicle!=0){
-                    for(int i=0; i<vehicleList.size();i++){
-                       // policySpinnerList.add(vehicleList.get(i).getPolicyNumber());
+                    for(int i = 0; i<vehicleList.size(); i++){
+                        // policySpinnerList.add(vehicleList.get(i).getPolicyNumber());
                         vehicleTypeString.add(vehicleList.get(i).getPolicyNumber());
                     }
+                } else {
+                    vehicleTypeString.add("No Vehicle Policy");
                 }
                 if(count_swis!=0) {
                     for (int i = 0; i < swisList.size(); i++) {
                         //policySpinnerList.add(swisList.get(i).getPolicyNumber());
                         swissTypeString.add(swisList.get(i).getPolicyNumber());
                     }
+                } else {
+                    swissTypeString.add("No SWIS-F Policy");
                 }
                 if(count_travel!=0) {
                     for (int i = 0; i < travelList.size(); i++) {
-                       // policySpinnerList.add(travelList.get(i).getPolicyNumber());
+                        // policySpinnerList.add(travelList.get(i).getPolicyNumber());
                         travelTypeString.add(travelList.get(i).getPolicyNumber());
                     }
+                } else {
+                    swissTypeString.add("No Travel Policy");
                 }
                 if(count_marine!=0) {
                     for (int i = 0; i < marineList.size(); i++) {
                         //policySpinnerList.add(marineList.get(i).getPolicyNumber());
                         marineTypeString.add(marineList.get(i).getPolicyNumber());
                     }
+                } else {
+                    marineTypeString.add("No Marine Policy");
                 }
                 if(count_allrisk!=0) {
                     for (int i = 0; i < allRiskList.size(); i++) {
                         //policySpinnerList.add(allRiskList.get(i).getPolicyNumber());
                         allriskTypeString.add(allRiskList.get(i).getPolicyNumber());
                     }
+                } else {
+                    allriskTypeString.add("No All-Risk Policy");
                 }
                 
                 if(count_allrisk==0&&count_marine==0&&count_swis==0&&count_travel==0&&count_vehicle==0){
@@ -238,6 +276,71 @@ public class DashboardFragment extends Fragment implements BaseSliderView.OnSlid
             public void onFailure(Call<PolicyHead> call, Throwable t) {
                 showMessage("Fetch failed, please try again "+t.getMessage());
                 Log.i("GEtError",t.getMessage());
+            }
+        });
+
+
+    }
+
+    private void getHistory() {
+
+
+        //get client and call object for request
+
+        Call<TransactionHead> call = client.transaction_hist("Token " + userPreferences.getUserToken());
+        call.enqueue(new Callback<TransactionHead>() {
+            @Override
+            public void onResponse(Call<TransactionHead> call, Response<TransactionHead> response) {
+
+                if (!response.isSuccessful()) {
+                    try {
+                        APIError apiError = ErrorUtils.parseError(response);
+
+                        showMessage("Fetch Failed: " + apiError.getErrors());
+                        Log.i("Invalid Fetch", String.valueOf(apiError.getErrors()));
+                        //Log.i("Invalid Entry", response.errorBody().toString());
+
+                    } catch (Exception e) {
+                        Log.i("Fetch Failed", e.getMessage());
+                        showMessage("Fetch Failed");
+
+                    }
+
+                    return;
+                }
+
+                policy_item = response.body().getHistory();
+
+
+                int count = policy_item.size();
+
+                Log.i("Re-SuccessSize", String.valueOf(policy_item.size()));
+
+                if (count == 0) {
+                    mTransactnNotify.setVisibility(View.GONE);
+
+                } else {
+
+                    for (int i = 0; i < count; i++) {
+                        checkIncomplete = policy_item.get(i).getStatus();
+                        if (checkIncomplete.equals("Pending") || checkIncomplete.equals("Initiated")) {
+                            mTransactnNotify.setVisibility(View.VISIBLE);
+                            String name = userPreferences.getLastName();
+                            String full_note = "Hi! " + name + ", you have an incomplete transaction";
+                            mTrasactnNote.setText(full_note);
+                            return;
+                        }
+                    }
+
+                    Log.i("SuccessChecked", checkIncomplete);
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<TransactionHead> call, Throwable t) {
+                showMessage("Fetch failed, check your internet " + t.getMessage());
+                Log.i("GEtError", t.getMessage());
             }
         });
 
@@ -541,7 +644,7 @@ public class DashboardFragment extends Fragment implements BaseSliderView.OnSlid
 
     @Override
     public void onSliderClick(BaseSliderView slider) {
-        Toast.makeText(getContext(), slider.getBundle().get("extra") +"" , Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getContext(), slider.getBundle().get("extra") +"" , Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -562,4 +665,24 @@ public class DashboardFragment extends Fragment implements BaseSliderView.OnSlid
     private void showMessage(String s) {
         Snackbar.make(mDashboardLayout, s, Snackbar.LENGTH_SHORT).show();
     }
+
+
+    private void timeout_alert() {
+
+        new AlertDialog.Builder(getContext())
+                .setTitle("Error !")
+                .setIcon(R.drawable.ic_error_outline_black_24dp)
+                .setMessage("Session Time-Out, Click Okay to re-login")
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int i) {
+                        dialog.dismiss();
+                        startActivity(new Intent(getActivity(), SignIn.class));
+                        getActivity().finish();
+                    }
+                })
+                .show();
+
+    }
+
 }

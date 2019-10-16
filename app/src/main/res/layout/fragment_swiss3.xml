@@ -108,7 +108,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:padding="@dimen/size_fifteen"
-                        android:visibility="gone"
+                        android:visibility="visible"
                         android:weightSum="2"
                         >
 

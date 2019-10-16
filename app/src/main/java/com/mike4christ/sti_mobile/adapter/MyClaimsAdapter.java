@@ -19,7 +19,10 @@ import com.mike4christ.sti_mobile.activity.MyClaimsDetail;
 import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
 import com.mike4christ.sti_mobile.retrofit_interface.ItemClickListener;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,8 +53,20 @@ public class MyClaimsAdapter extends RecyclerView.Adapter<MyClaimsAdapter.MyView
         String claim_num="Claim Num:";
         String policy_type="Policy Type:";
         holder.mClaimNum.setText(String.format("%s%s", claim_num, claimOption.getReference()));
-        holder.mCost.setText(claimOption.getCostEstimate());
-        holder.mType.setText(String.format("%s%s",policy_type,claimOption.getCostEstimate()));
+
+        if (claimOption.getCostEstimate() != null) {
+            NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
+            nf.setMaximumFractionDigits(2);
+            DecimalFormat df = (DecimalFormat) nf;
+            String v_cost = "₦" + df.format(Double.valueOf(claimOption.getCostEstimate()));
+
+            holder.mCost.setText(v_cost);
+        } else {
+
+            holder.mCost.setText("--");
+        }
+
+        holder.mType.setText(String.format("%s%s", policy_type, claimOption.getType()));
         holder.mDateTime.setText(claimOption.getCreatedAt());
         holder.mStatus.setText(claimOption.getStatus());
         holder.mDecription.setText(claimOption.getDescription());

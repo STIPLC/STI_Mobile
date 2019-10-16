@@ -6,12 +6,15 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.FileProvider;
@@ -31,6 +34,7 @@ import com.mike4christ.sti_mobile.Model.Vehicle.VehiclePolicy;
 import com.mike4christ.sti_mobile.NetworkConnection;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.activity.Dashboard;
 import com.shuhart.stepview.StepView;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -46,7 +50,7 @@ import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmList;
 
-class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
+public class MotorInsureFragment4 extends Fragment implements View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String VEHICLE_MAKER = "vehicle_maker";
@@ -59,6 +63,8 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
     @BindView(R.id.step_view)
     StepView stepView;
 
+    @BindView(R.id.vehicle_not_compul)
+    TextView vehicle_not_compul;
     @BindView(R.id.v_next_btn2)
     Button v_next_btn;
 
@@ -76,7 +82,6 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
 
     @BindView(R.id.fabAdd)
     FloatingActionButton fabAdd;
-
 
     @BindView(R.id.qb_form_layout3)
     FrameLayout qb_form_layout4;
@@ -173,10 +178,34 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
 
         realm=Realm.getDefaultInstance();
 
+        if (userPreferences.getMotorPolySelectType().equals("third_party_only")) {
+
+            vehicle_not_compul.setVisibility(View.VISIBLE);
+
+        }
+
 
 
 
         setViewActions();
+        Toast.makeText(getActivity(), "Click the Add Button, to add more vehicle", Toast.LENGTH_LONG).show();
+
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+        view.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                Log.i("backPress_KeyCode", "keyCode: " + keyCode);
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    Log.i("backPress", "onKey Back listener is working!!!");
+                    userPreferences.setTempQuotePrice("0.0");
+                    startActivity(new Intent(getActivity(), Dashboard.class));
+                    return true;
+                }
+                return false;
+            }
+        });
+
 
         return  view;
     }
@@ -1063,7 +1092,6 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
                 stepView.done(false);
                 stepView.go(currentStep, true);
                 userPreferences.setTempQuotePrice("0.0");
-                Fragment motorInsureFragment3 = new MotorInsureFragment3();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_motor_form_container, MotorInsureFragment3.newInstance(userPreferences.getMotorVehicleMake(),p_amount), MotorInsureFragment4.class.getSimpleName());
                 ft.commit();
@@ -1072,138 +1100,286 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
 
             case R.id.fabAdd:
 
-                if(frontview_img_url!=null&&leftview_img_url!=null&&rightview_img_url!=null&&backview_img_url!=null) {
+                if (!userPreferences.getMotorPolySelectType().equals("third_party_only")) {
+                    if (frontview_img_url != null && leftview_img_url != null && rightview_img_url != null && backview_img_url != null) {
 
-                UserPreferences userPreferences=new UserPreferences(getContext());
+                        UserPreferences userPreferences = new UserPreferences(getContext());
 
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
 
-                realm.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
+                                Personal_detail personal_detail = new Personal_detail();
 
-                        Personal_detail personal_detail=new Personal_detail();
+                                if (realm.isEmpty()) {
 
-                        if(realm.isEmpty()){
+                                    personal_detail.setPrefix(userPreferences.getMotorIPrefix());
+                                    personal_detail.setFirst_name(userPreferences.getMotorIFirstName());
+                                    personal_detail.setLast_name(userPreferences.getMotorILastName());
+                                    personal_detail.setEmail(userPreferences.getMotorIEmail());
+                                    personal_detail.setGender(userPreferences.getMotorIGender());
+                                    personal_detail.setPhone(userPreferences.getMotorIPhoneNum());
+                                    personal_detail.setBusiness(userPreferences.getMotorIBusiness());
+                                    personal_detail.setState(userPreferences.getMotorIState());
+                                    personal_detail.setResident_address(userPreferences.getMotorIResAdrr());
+                                    personal_detail.setNext_of_kin(userPreferences.getMotorINextKin());
+                                    personal_detail.setNext_of_kin_address("");
+                                    personal_detail.setCustomer_type(userPreferences.getMotorPtype());
+                                    personal_detail.setCompany_name(userPreferences.getMotorICompanyName());
+                                    personal_detail.setMailing_address(userPreferences.getMotorIMailingAddr());
+                                    personal_detail.setTin_number(userPreferences.getMotorITinNumber());
+                                    personal_detail.setOffice_address(userPreferences.getMotorIOff_addr());
+                                    personal_detail.setContact_person(userPreferences.getMotorIContPerson());
+                                    personal_detail.setPicture(userPreferences.getMotorIPersonal_image());
+                                    //Vehicle List
+                                    VehicleDetails vehicleDetails = new VehicleDetails();
+                                    vehicleDetails.setPeriod("12 Months");
+                                    vehicleDetails.setStartDate(userPreferences.getMotorStartDate());
+                                    vehicleDetails.setPrivate_com_type(userPreferences.getMotorPolicyType());
+                                    vehicleDetails.setEnhanced_third_party(userPreferences.getMotorPEnhanceType());
+                                    vehicleDetails.setPolicy_select_type(userPreferences.getMotorPolySelectType());
+                                    vehicleDetails.setVehicle_make(userPreferences.getMotorVehicleMake());
+                                    vehicleDetails.setVehicle_type(userPreferences.getMotorVehicleType());
+                                    vehicleDetails.setBody_type(userPreferences.getMotorVehicleBody());
+                                    vehicleDetails.setYear(userPreferences.getMotorVehicleYear());
+                                    vehicleDetails.setRegistration_number(userPreferences.getMotorVehicleRegNum());
+                                    vehicleDetails.setChasis_number(userPreferences.getMotorVehicleChasisNum());
+                                    vehicleDetails.setEngine_number(userPreferences.getMotorVehicleEngNum());
+                                    vehicleDetails.setMotorcylce_value(userPreferences.getMotorCycleValue());
+                                    vehicleDetails.setVehicle_value(userPreferences.getMotorVehicleValue());
+                                    vehicleDetails.setPrice(userPreferences.getInitQuotePrice());
 
+                                    //Vehicle Picture List
+                                    VehiclePictures vehiclePictures = new VehiclePictures();
+                                    vehiclePictures.setFront_view(frontview_img_url);
+                                    vehiclePictures.setBack_view(backview_img_url);
+                                    vehiclePictures.setLeft_view(leftview_img_url);
+                                    vehiclePictures.setRight_view(rightview_img_url);
 
+                                    vehicleDetails.setVehiclePictures(vehiclePictures);
 
-                            personal_detail.setPrefix(userPreferences.getMotorIPrefix());
-                            personal_detail.setFirst_name(userPreferences.getMotorIFirstName());
-                            personal_detail.setLast_name(userPreferences.getMotorILastName());
-                            personal_detail.setEmail(userPreferences.getMotorIEmail());
-                            personal_detail.setGender(userPreferences.getMotorIGender());
-                            personal_detail.setPhone(userPreferences.getMotorIPhoneNum());
-                            personal_detail.setBusiness(userPreferences.getMotorIBusiness());
-                            personal_detail.setState(userPreferences.getMotorIState());
-                            personal_detail.setResident_address(userPreferences.getMotorIResAdrr());
-                            personal_detail.setNext_of_kin(userPreferences.getMotorINextKin());
-                            personal_detail.setNext_of_kin_address("");
-                            personal_detail.setCustomer_type(userPreferences.getMotorPtype());
-                            personal_detail.setCompany_name(userPreferences.getMotorICompanyName());
-                            personal_detail.setMailing_address(userPreferences.getMotorIMailingAddr());
-                            personal_detail.setTin_number(userPreferences.getMotorITinNumber());
-                            personal_detail.setOffice_address(userPreferences.getMotorIOff_addr());
-                            personal_detail.setContact_person(userPreferences.getMotorIContPerson());
-                            personal_detail.setPicture(userPreferences.getMotorIPersonal_image());
-                            //Vehicle List
-                            VehicleDetails vehicleDetails=new VehicleDetails();
-                            vehicleDetails.setPeriod("12 Months");
-                            vehicleDetails.setStartDate(userPreferences.getMotorStartDate());
-                            vehicleDetails.setPrivate_com_type(userPreferences.getMotorPolicyType());
-                            vehicleDetails.setEnhanced_third_party(userPreferences.getMotorPEnhanceType());
-                            vehicleDetails.setPolicy_select_type(userPreferences.getMotorPolySelectType());
-                            vehicleDetails.setVehicle_make(userPreferences.getMotorVehicleMake());
-                            vehicleDetails.setVehicle_type(userPreferences.getMotorVehicleType());
-                            vehicleDetails.setBody_type(userPreferences.getMotorVehicleBody());
-                            vehicleDetails.setYear(userPreferences.getMotorVehicleYear());
-                            vehicleDetails.setRegistration_number(userPreferences.getMotorVehicleRegNum());
-                            vehicleDetails.setChasis_number(userPreferences.getMotorVehicleChasisNum());
-                            vehicleDetails.setEngine_number(userPreferences.getMotorVehicleEngNum());
-                            vehicleDetails.setMotorcylce_value(userPreferences.getMotorCycleValue());
-                            vehicleDetails.setVehicle_value(userPreferences.getMotorVehicleValue());
+                                    RealmList<VehicleDetails> vehicleDetailsList = new RealmList<>();
+                                    vehicleDetailsList.add(vehicleDetails);
 
-                            //Vehicle Picture List
-                            VehiclePictures vehiclePictures=new VehiclePictures();
-                            vehiclePictures.setFront_view(frontview_img_url);
-                            vehiclePictures.setBack_view(backview_img_url);
-                            vehiclePictures.setLeft_view(leftview_img_url);
-                            vehiclePictures.setRight_view(rightview_img_url);
+                                    personal_detail.setVehicle_info(vehicleDetailsList);
 
-                            vehicleDetails.setVehiclePictures(vehiclePictures);
+                                    final Personal_detail personal_detail1 = realm.copyToRealm(personal_detail);
 
-                            RealmList<VehicleDetails>vehicleDetailsList=new RealmList<>();
-                            vehicleDetailsList.add(vehicleDetails);
-
-                            personal_detail.setVehicle_info(vehicleDetailsList);
-
-                                    final Personal_detail personal_detail1=realm.copyToRealm(personal_detail);
-
-                                    VehiclePolicy vehiclePolicy=realm.createObject(VehiclePolicy.class,primaryKey);
+                                    VehiclePolicy vehiclePolicy = realm.createObject(VehiclePolicy.class, primaryKey);
                                     vehiclePolicy.setAgent_id(userPreferences.getUserId());
                                     vehiclePolicy.setQuote_price(String.valueOf(userPreferences.getTempQuotePrice()));
                                     vehiclePolicy.setPayment_source("paystack");
                                     vehiclePolicy.setPin("0000");
 
-                                    Log.i("Primary1",primaryKey);
+                                    Log.i("Primary1", primaryKey);
 
                                     vehiclePolicy.getPersonal_info().add(personal_detail1);
 
-                        }else if(!realm.isEmpty()){
+                                } else if (!realm.isEmpty()) {
 
-                            //Vehicle List
-                            VehicleDetails vehicleDetails=new VehicleDetails();
-                            vehicleDetails.setPeriod("12 Months");
-                            vehicleDetails.setStartDate(userPreferences.getMotorStartDate());
-                            vehicleDetails.setPrivate_com_type(userPreferences.getMotorPolicyType());
-                            vehicleDetails.setEnhanced_third_party(userPreferences.getMotorPEnhanceType());
-                            vehicleDetails.setPolicy_select_type(userPreferences.getMotorPolySelectType());
-                            vehicleDetails.setVehicle_make(userPreferences.getMotorVehicleMake());
-                            vehicleDetails.setVehicle_type(userPreferences.getMotorVehicleType());
-                            vehicleDetails.setBody_type(userPreferences.getMotorVehicleBody());
-                            vehicleDetails.setYear(userPreferences.getMotorVehicleYear());
-                            vehicleDetails.setRegistration_number(userPreferences.getMotorVehicleRegNum());
-                            vehicleDetails.setChasis_number(userPreferences.getMotorVehicleChasisNum());
-                            vehicleDetails.setEngine_number(userPreferences.getMotorVehicleEngNum());
-                            vehicleDetails.setMotorcylce_value(userPreferences.getMotorCycleValue());
-                            vehicleDetails.setVehicle_value(userPreferences.getMotorVehicleValue());
-                            //Vehicle Picture List
-                            VehiclePictures vehiclePictures=new VehiclePictures();
+                                    //Vehicle List
+                                    VehicleDetails vehicleDetails = new VehicleDetails();
+                                    vehicleDetails.setPeriod("12 Months");
+                                    vehicleDetails.setStartDate(userPreferences.getMotorStartDate());
+                                    vehicleDetails.setPrivate_com_type(userPreferences.getMotorPolicyType());
+                                    vehicleDetails.setEnhanced_third_party(userPreferences.getMotorPEnhanceType());
+                                    vehicleDetails.setPolicy_select_type(userPreferences.getMotorPolySelectType());
+                                    vehicleDetails.setVehicle_make(userPreferences.getMotorVehicleMake());
+                                    vehicleDetails.setVehicle_type(userPreferences.getMotorVehicleType());
+                                    vehicleDetails.setBody_type(userPreferences.getMotorVehicleBody());
+                                    vehicleDetails.setYear(userPreferences.getMotorVehicleYear());
+                                    vehicleDetails.setRegistration_number(userPreferences.getMotorVehicleRegNum());
+                                    vehicleDetails.setChasis_number(userPreferences.getMotorVehicleChasisNum());
+                                    vehicleDetails.setEngine_number(userPreferences.getMotorVehicleEngNum());
+                                    vehicleDetails.setMotorcylce_value(userPreferences.getMotorCycleValue());
+                                    vehicleDetails.setVehicle_value(userPreferences.getMotorVehicleValue());
+                                    vehicleDetails.setPrice(userPreferences.getInitQuotePrice());
+                                    //Vehicle Picture List
+                                    VehiclePictures vehiclePictures = new VehiclePictures();
 
-                                vehiclePictures.setFront_view(frontview_img_url);
-                                vehiclePictures.setBack_view(backview_img_url);
-                                vehiclePictures.setLeft_view(leftview_img_url);
-                                vehiclePictures.setRight_view(rightview_img_url);
+                                    vehiclePictures.setFront_view(frontview_img_url);
+                                    vehiclePictures.setBack_view(backview_img_url);
+                                    vehiclePictures.setLeft_view(leftview_img_url);
+                                    vehiclePictures.setRight_view(rightview_img_url);
 
-                            vehicleDetails.setVehiclePictures(vehiclePictures);
+                                    vehicleDetails.setVehiclePictures(vehiclePictures);
 
-                            RealmList<VehicleDetails>vehicleDetailsList=new RealmList<>();
-                            vehicleDetailsList.add(vehicleDetails);
-                            personal_detail.setVehicle_info(vehicleDetailsList);
+                                    RealmList<VehicleDetails> vehicleDetailsList = new RealmList<>();
+                                    vehicleDetailsList.add(vehicleDetails);
+                                    personal_detail.setVehicle_info(vehicleDetailsList);
 
-                            final Personal_detail personal_detail2=realm.copyToRealm(personal_detail);
-                            VehiclePolicy vehiclePolicy=realm.createObject(VehiclePolicy.class,primaryKey);
-                            vehiclePolicy.setQuote_price(String.valueOf(userPreferences.getTempQuotePrice()));
+                                    final Personal_detail personal_detail2 = realm.copyToRealm(personal_detail);
+                                    VehiclePolicy vehiclePolicy = realm.createObject(VehiclePolicy.class, primaryKey);
+                                    vehiclePolicy.setQuote_price(String.valueOf(userPreferences.getTempQuotePrice()));
 
-                            vehiclePolicy.getPersonal_info().add(personal_detail2);
+                                    vehiclePolicy.getPersonal_info().add(personal_detail2);
 
-                        }else {
-                            showMessage("Invalid transaction");
-                        }
+                                } else {
+                                    showMessage("Invalid transaction");
+                                }
 
+                            }
+                        });
+
+                        stepView.done(false);
+                        stepView.go(1, true);
+
+                        Fragment quoteBuyFragment2 = new MotorInsureFragment2();
+                        FragmentTransaction ftrans = getFragmentManager().beginTransaction();
+                        ftrans.replace(R.id.fragment_motor_form_container, quoteBuyFragment2);
+                        ftrans.commit();
+
+                    } else {
+                        showMessage("Invalid Entry please upload your image");
+                        return;
                     }
-                });
+                } else {
+                    UserPreferences userPreferences = new UserPreferences(getContext());
 
-                stepView.done(false);
-                stepView.go(1, true);
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
 
-                Fragment quoteBuyFragment2 = new MotorInsureFragment2();
-                FragmentTransaction ftrans = getFragmentManager().beginTransaction();
-                ftrans.replace(R.id.fragment_motor_form_container, quoteBuyFragment2);
-                ftrans.commit();
+                            Personal_detail personal_detail = new Personal_detail();
 
-                }else{
-                    showMessage("Invalid Entry please upload your image");
-                    return;
+                            if (realm.isEmpty()) {
+
+                                personal_detail.setPrefix(userPreferences.getMotorIPrefix());
+                                personal_detail.setFirst_name(userPreferences.getMotorIFirstName());
+                                personal_detail.setLast_name(userPreferences.getMotorILastName());
+                                personal_detail.setEmail(userPreferences.getMotorIEmail());
+                                personal_detail.setGender(userPreferences.getMotorIGender());
+                                personal_detail.setPhone(userPreferences.getMotorIPhoneNum());
+                                personal_detail.setBusiness(userPreferences.getMotorIBusiness());
+                                personal_detail.setState(userPreferences.getMotorIState());
+                                personal_detail.setResident_address(userPreferences.getMotorIResAdrr());
+                                personal_detail.setNext_of_kin(userPreferences.getMotorINextKin());
+                                personal_detail.setNext_of_kin_address("");
+                                personal_detail.setCustomer_type(userPreferences.getMotorPtype());
+                                personal_detail.setCompany_name(userPreferences.getMotorICompanyName());
+                                personal_detail.setMailing_address(userPreferences.getMotorIMailingAddr());
+                                personal_detail.setTin_number(userPreferences.getMotorITinNumber());
+                                personal_detail.setOffice_address(userPreferences.getMotorIOff_addr());
+                                personal_detail.setContact_person(userPreferences.getMotorIContPerson());
+                                personal_detail.setPicture(userPreferences.getMotorIPersonal_image());
+                                //Vehicle List
+                                VehicleDetails vehicleDetails = new VehicleDetails();
+                                vehicleDetails.setPeriod("12 Months");
+                                vehicleDetails.setStartDate(userPreferences.getMotorStartDate());
+                                vehicleDetails.setPrivate_com_type(userPreferences.getMotorPolicyType());
+                                vehicleDetails.setEnhanced_third_party(userPreferences.getMotorPEnhanceType());
+                                vehicleDetails.setPolicy_select_type(userPreferences.getMotorPolySelectType());
+                                vehicleDetails.setVehicle_make(userPreferences.getMotorVehicleMake());
+                                vehicleDetails.setVehicle_type(userPreferences.getMotorVehicleType());
+                                vehicleDetails.setBody_type(userPreferences.getMotorVehicleBody());
+                                vehicleDetails.setYear(userPreferences.getMotorVehicleYear());
+                                vehicleDetails.setRegistration_number(userPreferences.getMotorVehicleRegNum());
+                                vehicleDetails.setChasis_number(userPreferences.getMotorVehicleChasisNum());
+                                vehicleDetails.setEngine_number(userPreferences.getMotorVehicleEngNum());
+                                vehicleDetails.setMotorcylce_value(userPreferences.getMotorCycleValue());
+                                vehicleDetails.setVehicle_value(userPreferences.getMotorVehicleValue());
+                                vehicleDetails.setPrice(userPreferences.getInitQuotePrice());
+
+                                //Vehicle Picture List
+
+                                if (frontview_img_url == null || leftview_img_url == null || rightview_img_url == null || backview_img_url == null) {
+                                    VehiclePictures vehiclePictures = new VehiclePictures();
+                                    vehiclePictures.setFront_view("--");
+                                    vehiclePictures.setBack_view("--");
+                                    vehiclePictures.setLeft_view("--");
+                                    vehiclePictures.setRight_view("--");
+                                    vehicleDetails.setVehiclePictures(vehiclePictures);
+                                } else {
+                                    VehiclePictures vehiclePictures = new VehiclePictures();
+                                    vehiclePictures.setFront_view(frontview_img_url);
+                                    vehiclePictures.setBack_view(backview_img_url);
+                                    vehiclePictures.setLeft_view(leftview_img_url);
+                                    vehiclePictures.setRight_view(rightview_img_url);
+                                    vehicleDetails.setVehiclePictures(vehiclePictures);
+                                }
+
+
+                                RealmList<VehicleDetails> vehicleDetailsList = new RealmList<>();
+                                vehicleDetailsList.add(vehicleDetails);
+
+                                personal_detail.setVehicle_info(vehicleDetailsList);
+
+                                final Personal_detail personal_detail1 = realm.copyToRealm(personal_detail);
+
+                                VehiclePolicy vehiclePolicy = realm.createObject(VehiclePolicy.class, primaryKey);
+                                vehiclePolicy.setAgent_id(userPreferences.getUserId());
+                                vehiclePolicy.setQuote_price(String.valueOf(userPreferences.getTempQuotePrice()));
+                                vehiclePolicy.setPayment_source("paystack");
+                                vehiclePolicy.setPin("0000");
+
+                                Log.i("Primary1", primaryKey);
+
+                                vehiclePolicy.getPersonal_info().add(personal_detail1);
+
+                            } else if (!realm.isEmpty()) {
+
+                                //Vehicle List
+                                VehicleDetails vehicleDetails = new VehicleDetails();
+                                vehicleDetails.setPeriod("12 Months");
+                                vehicleDetails.setStartDate(userPreferences.getMotorStartDate());
+                                vehicleDetails.setPrivate_com_type(userPreferences.getMotorPolicyType());
+                                vehicleDetails.setEnhanced_third_party(userPreferences.getMotorPEnhanceType());
+                                vehicleDetails.setPolicy_select_type(userPreferences.getMotorPolySelectType());
+                                vehicleDetails.setVehicle_make(userPreferences.getMotorVehicleMake());
+                                vehicleDetails.setVehicle_type(userPreferences.getMotorVehicleType());
+                                vehicleDetails.setBody_type(userPreferences.getMotorVehicleBody());
+                                vehicleDetails.setYear(userPreferences.getMotorVehicleYear());
+                                vehicleDetails.setRegistration_number(userPreferences.getMotorVehicleRegNum());
+                                vehicleDetails.setChasis_number(userPreferences.getMotorVehicleChasisNum());
+                                vehicleDetails.setEngine_number(userPreferences.getMotorVehicleEngNum());
+                                vehicleDetails.setMotorcylce_value(userPreferences.getMotorCycleValue());
+                                vehicleDetails.setVehicle_value(userPreferences.getMotorVehicleValue());
+                                vehicleDetails.setPrice(userPreferences.getInitQuotePrice());
+                                //Vehicle Picture List
+
+                                if (frontview_img_url == null || leftview_img_url == null || rightview_img_url == null || backview_img_url == null) {
+                                    VehiclePictures vehiclePictures = new VehiclePictures();
+                                    vehiclePictures.setFront_view("--");
+                                    vehiclePictures.setBack_view("--");
+                                    vehiclePictures.setLeft_view("--");
+                                    vehiclePictures.setRight_view("--");
+                                    vehicleDetails.setVehiclePictures(vehiclePictures);
+                                } else {
+                                    VehiclePictures vehiclePictures = new VehiclePictures();
+                                    vehiclePictures.setFront_view(frontview_img_url);
+                                    vehiclePictures.setBack_view(backview_img_url);
+                                    vehiclePictures.setLeft_view(leftview_img_url);
+                                    vehiclePictures.setRight_view(rightview_img_url);
+                                    vehicleDetails.setVehiclePictures(vehiclePictures);
+                                }
+
+
+                                RealmList<VehicleDetails> vehicleDetailsList = new RealmList<>();
+                                vehicleDetailsList.add(vehicleDetails);
+                                personal_detail.setVehicle_info(vehicleDetailsList);
+
+                                final Personal_detail personal_detail2 = realm.copyToRealm(personal_detail);
+                                VehiclePolicy vehiclePolicy = realm.createObject(VehiclePolicy.class, primaryKey);
+                                vehiclePolicy.setQuote_price(String.valueOf(userPreferences.getTempQuotePrice()));
+
+                                vehiclePolicy.getPersonal_info().add(personal_detail2);
+
+                            } else {
+                                showMessage("Invalid transaction");
+                            }
+
+                        }
+                    });
+
+                    stepView.done(false);
+                    stepView.go(1, true);
+
+                    Fragment quoteBuyFragment2 = new MotorInsureFragment2();
+                    FragmentTransaction ftrans = getFragmentManager().beginTransaction();
+                    ftrans.replace(R.id.fragment_motor_form_container, quoteBuyFragment2);
+                    ftrans.commit();
+
+
                 }
 
                 break;
@@ -1211,93 +1387,182 @@ class MotorInsureFragment4 extends Fragment implements View.OnClickListener{
     }
 
     private void mSummary() {
+        if (!userPreferences.getMotorPolySelectType().equals("third_party_only")) {
+            if (frontview_img_url != null && leftview_img_url != null && rightview_img_url != null && backview_img_url != null) {
 
-        if(frontview_img_url!=null&&leftview_img_url!=null&&rightview_img_url!=null&&backview_img_url!=null) {
+                btn_layout3.setVisibility(View.GONE);
+                progressbar.setVisibility(View.VISIBLE);
+                Personal_detail personal_detail = new Personal_detail();
 
+                personal_detail.setPrefix(userPreferences.getMotorIPrefix());
+                personal_detail.setFirst_name(userPreferences.getMotorIFirstName());
+                personal_detail.setLast_name(userPreferences.getMotorILastName());
+                personal_detail.setEmail(userPreferences.getMotorIEmail());
+                personal_detail.setBusiness(userPreferences.getMotorIBusiness());
+                personal_detail.setState(userPreferences.getMotorIState());
+                personal_detail.setGender(userPreferences.getMotorIGender());
+                personal_detail.setPhone(userPreferences.getMotorIPhoneNum());
+                personal_detail.setResident_address(userPreferences.getMotorIResAdrr());
+                personal_detail.setNext_of_kin(userPreferences.getMotorINextKin());
+                personal_detail.setNext_of_kin_address("");
+                personal_detail.setCustomer_type(userPreferences.getMotorPtype());
+                personal_detail.setCompany_name(userPreferences.getMotorICompanyName());
+                personal_detail.setMailing_address(userPreferences.getMotorIMailingAddr());
+                personal_detail.setTin_number(userPreferences.getMotorITinNumber());
+                personal_detail.setOffice_address(userPreferences.getMotorIOff_addr());
+                personal_detail.setContact_person(userPreferences.getMotorIContPerson());
+                personal_detail.setPicture(userPreferences.getMotorIPersonal_image());
+                //Vehicle List
+                VehicleDetails vehicleDetails = new VehicleDetails();
+                vehicleDetails.setPeriod("12 Months");
+                vehicleDetails.setStartDate(userPreferences.getMotorStartDate());
+                vehicleDetails.setPrivate_com_type(userPreferences.getMotorPolicyType());
+                vehicleDetails.setEnhanced_third_party(userPreferences.getMotorPEnhanceType());
+                vehicleDetails.setPolicy_select_type(userPreferences.getMotorPolySelectType());
+                vehicleDetails.setVehicle_make(userPreferences.getMotorVehicleMake());
+                vehicleDetails.setVehicle_type(userPreferences.getMotorVehicleType());
+                vehicleDetails.setBody_type(userPreferences.getMotorVehicleBody());
+                vehicleDetails.setYear(userPreferences.getMotorVehicleYear());
+                vehicleDetails.setRegistration_number(userPreferences.getMotorVehicleRegNum());
+                vehicleDetails.setChasis_number(userPreferences.getMotorVehicleChasisNum());
+                vehicleDetails.setEngine_number(userPreferences.getMotorVehicleEngNum());
+                vehicleDetails.setMotorcylce_value(userPreferences.getMotorCycleValue());
+                vehicleDetails.setVehicle_value(userPreferences.getMotorVehicleValue());
+                vehicleDetails.setPrice(userPreferences.getInitQuotePrice());
 
+                //Vehicle Picture List
+                VehiclePictures vehiclePictures = new VehiclePictures();
+                vehiclePictures.setFront_view(frontview_img_url);
+                vehiclePictures.setBack_view(backview_img_url);
+                vehiclePictures.setLeft_view(leftview_img_url);
+                vehiclePictures.setRight_view(rightview_img_url);
 
-        btn_layout3.setVisibility(View.GONE);
-        progressbar.setVisibility(View.VISIBLE);
-
-
-        Personal_detail personal_detail=new Personal_detail();
-
-        personal_detail.setPrefix(userPreferences.getMotorIPrefix());
-        personal_detail.setFirst_name(userPreferences.getMotorIFirstName());
-        personal_detail.setLast_name(userPreferences.getMotorILastName());
-        personal_detail.setEmail(userPreferences.getMotorIEmail());
-        personal_detail.setBusiness(userPreferences.getMotorIBusiness());
-        personal_detail.setState(userPreferences.getMotorIState());
-        personal_detail.setGender(userPreferences.getMotorIGender());
-        personal_detail.setPhone(userPreferences.getMotorIPhoneNum());
-        personal_detail.setResident_address(userPreferences.getMotorIResAdrr());
-        personal_detail.setNext_of_kin(userPreferences.getMotorINextKin());
-        personal_detail.setNext_of_kin_address("");
-        personal_detail.setCustomer_type(userPreferences.getMotorPtype());
-        personal_detail.setCompany_name(userPreferences.getMotorICompanyName());
-        personal_detail.setMailing_address(userPreferences.getMotorIMailingAddr());
-        personal_detail.setTin_number(userPreferences.getMotorITinNumber());
-        personal_detail.setOffice_address(userPreferences.getMotorIOff_addr());
-        personal_detail.setContact_person(userPreferences.getMotorIContPerson());
-        personal_detail.setPicture(userPreferences.getMotorIPersonal_image());
-        //Vehicle List
-        VehicleDetails vehicleDetails=new VehicleDetails();
-        vehicleDetails.setPeriod("");
-        vehicleDetails.setStartDate(userPreferences.getMotorStartDate());
-        vehicleDetails.setPrivate_com_type(userPreferences.getMotorPolicyType());
-        vehicleDetails.setEnhanced_third_party(userPreferences.getMotorPEnhanceType());
-        vehicleDetails.setPolicy_select_type(userPreferences.getMotorPolySelectType());
-        vehicleDetails.setVehicle_make(userPreferences.getMotorVehicleMake());
-        vehicleDetails.setVehicle_type(userPreferences.getMotorVehicleType());
-        vehicleDetails.setBody_type(userPreferences.getMotorVehicleBody());
-        vehicleDetails.setYear(userPreferences.getMotorVehicleYear());
-        vehicleDetails.setRegistration_number(userPreferences.getMotorVehicleRegNum());
-        vehicleDetails.setChasis_number(userPreferences.getMotorVehicleChasisNum());
-        vehicleDetails.setEngine_number(userPreferences.getMotorVehicleEngNum());
-        vehicleDetails.setMotorcylce_value(userPreferences.getMotorCycleValue());
-        vehicleDetails.setVehicle_value(userPreferences.getMotorVehicleValue());
-
-        //Vehicle Picture List
-        VehiclePictures vehiclePictures=new VehiclePictures();
-            vehiclePictures.setFront_view(frontview_img_url);
-            vehiclePictures.setBack_view(backview_img_url);
-            vehiclePictures.setLeft_view(leftview_img_url);
-            vehiclePictures.setRight_view(rightview_img_url);
-
-        vehicleDetails.setVehiclePictures(vehiclePictures);
+                vehicleDetails.setVehiclePictures(vehiclePictures);
 
 
-        RealmList<VehicleDetails>vehicleDetailsList=new RealmList<>();
-        vehicleDetailsList.add(vehicleDetails);
+                RealmList<VehicleDetails> vehicleDetailsList = new RealmList<>();
+                vehicleDetailsList.add(vehicleDetails);
 
-        personal_detail.setVehicle_info(vehicleDetailsList);
-
-
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
+                personal_detail.setVehicle_info(vehicleDetailsList);
 
 
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
 
-                final Personal_detail personal_detail1=realm.copyToRealm(personal_detail);
 
-                VehiclePolicy vehiclePolicy=realm.createObject(VehiclePolicy.class,primaryKey);
-                vehiclePolicy.setAgent_id(userPreferences.getUserId());
-                vehiclePolicy.setQuote_price(String.valueOf(userPreferences.getTempQuotePrice()));
-                vehiclePolicy.setPayment_source("paystack");
-                vehiclePolicy.setPin("0000");
+                        final Personal_detail personal_detail1 = realm.copyToRealm(personal_detail);
 
-                vehiclePolicy.getPersonal_info().add(personal_detail1);
+                        VehiclePolicy vehiclePolicy = realm.createObject(VehiclePolicy.class, primaryKey);
+                        vehiclePolicy.setAgent_id(userPreferences.getUserId());
+                        vehiclePolicy.setQuote_price(String.valueOf(userPreferences.getTempQuotePrice()));
+                        vehiclePolicy.setPayment_source("paystack");
+                        vehiclePolicy.setPin("0000");
 
+                        vehiclePolicy.getPersonal_info().add(personal_detail1);
+
+                    }
+                });
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_motor_form_container, MotorInsureFragment5.newInstance(primaryKey));
+                ft.commit();
+
+            } else {
+                showMessage("Invalid entry please upload your image");
             }
-        });
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_motor_form_container, MotorInsureFragment5.newInstance(primaryKey));
-        ft.commit();
+        } else {
 
-        }else{
-            showMessage("Invalid Entry please upload your image");
-            return;
+            btn_layout3.setVisibility(View.GONE);
+            progressbar.setVisibility(View.VISIBLE);
+
+
+            Personal_detail personal_detail = new Personal_detail();
+
+            personal_detail.setPrefix(userPreferences.getMotorIPrefix());
+            personal_detail.setFirst_name(userPreferences.getMotorIFirstName());
+            personal_detail.setLast_name(userPreferences.getMotorILastName());
+            personal_detail.setEmail(userPreferences.getMotorIEmail());
+            personal_detail.setBusiness(userPreferences.getMotorIBusiness());
+            personal_detail.setState(userPreferences.getMotorIState());
+            personal_detail.setGender(userPreferences.getMotorIGender());
+            personal_detail.setPhone(userPreferences.getMotorIPhoneNum());
+            personal_detail.setResident_address(userPreferences.getMotorIResAdrr());
+            personal_detail.setNext_of_kin(userPreferences.getMotorINextKin());
+            personal_detail.setNext_of_kin_address("");
+            personal_detail.setCustomer_type(userPreferences.getMotorPtype());
+            personal_detail.setCompany_name(userPreferences.getMotorICompanyName());
+            personal_detail.setMailing_address(userPreferences.getMotorIMailingAddr());
+            personal_detail.setTin_number(userPreferences.getMotorITinNumber());
+            personal_detail.setOffice_address(userPreferences.getMotorIOff_addr());
+            personal_detail.setContact_person(userPreferences.getMotorIContPerson());
+            personal_detail.setPicture(userPreferences.getMotorIPersonal_image());
+            //Vehicle List
+            VehicleDetails vehicleDetails = new VehicleDetails();
+            vehicleDetails.setPeriod("12 Months");
+            vehicleDetails.setStartDate(userPreferences.getMotorStartDate());
+            vehicleDetails.setPrivate_com_type(userPreferences.getMotorPolicyType());
+            vehicleDetails.setEnhanced_third_party(userPreferences.getMotorPEnhanceType());
+            vehicleDetails.setPolicy_select_type(userPreferences.getMotorPolySelectType());
+            vehicleDetails.setVehicle_make(userPreferences.getMotorVehicleMake());
+            vehicleDetails.setVehicle_type(userPreferences.getMotorVehicleType());
+            vehicleDetails.setBody_type(userPreferences.getMotorVehicleBody());
+            vehicleDetails.setYear(userPreferences.getMotorVehicleYear());
+            vehicleDetails.setRegistration_number(userPreferences.getMotorVehicleRegNum());
+            vehicleDetails.setChasis_number(userPreferences.getMotorVehicleChasisNum());
+            vehicleDetails.setEngine_number(userPreferences.getMotorVehicleEngNum());
+            vehicleDetails.setMotorcylce_value(userPreferences.getMotorCycleValue());
+            vehicleDetails.setVehicle_value(userPreferences.getMotorVehicleValue());
+            vehicleDetails.setPrice(userPreferences.getInitQuotePrice());
+
+            //Vehicle Picture List
+
+            if (frontview_img_url == null || leftview_img_url == null || rightview_img_url == null || backview_img_url == null) {
+                VehiclePictures vehiclePictures = new VehiclePictures();
+                vehiclePictures.setFront_view("--");
+                vehiclePictures.setBack_view("--");
+                vehiclePictures.setLeft_view("--");
+                vehiclePictures.setRight_view("--");
+                vehicleDetails.setVehiclePictures(vehiclePictures);
+
+            } else {
+                VehiclePictures vehiclePictures = new VehiclePictures();
+                vehiclePictures.setFront_view(frontview_img_url);
+                vehiclePictures.setBack_view(backview_img_url);
+                vehiclePictures.setLeft_view(leftview_img_url);
+                vehiclePictures.setRight_view(rightview_img_url);
+                vehicleDetails.setVehiclePictures(vehiclePictures);
+            }
+
+
+            RealmList<VehicleDetails> vehicleDetailsList = new RealmList<>();
+            vehicleDetailsList.add(vehicleDetails);
+
+            personal_detail.setVehicle_info(vehicleDetailsList);
+
+
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+
+
+                    final Personal_detail personal_detail1 = realm.copyToRealm(personal_detail);
+
+                    VehiclePolicy vehiclePolicy = realm.createObject(VehiclePolicy.class, primaryKey);
+                    vehiclePolicy.setAgent_id(userPreferences.getUserId());
+                    vehiclePolicy.setQuote_price(String.valueOf(userPreferences.getTempQuotePrice()));
+                    vehiclePolicy.setPayment_source("paystack");
+                    vehiclePolicy.setPin("0000");
+
+                    vehiclePolicy.getPersonal_info().add(personal_detail1);
+
+                }
+            });
+
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.replace(R.id.fragment_motor_form_container, MotorInsureFragment5.newInstance(primaryKey));
+            ft.commit();
+
+
         }
 
 

@@ -12,13 +12,16 @@ public class Vehicle implements Serializable
     @SerializedName("period")
     @Expose
     public String period;
+    @SerializedName("start_date")
+    @Expose
+    public String start_date;
     @SerializedName("policy_type")
     @Expose
     public String policyType;
     @SerializedName("enhanced_third_party")
     @Expose
     public String enhancedThirdParty;
-    @SerializedName("public_commercial")
+    @SerializedName("private_commercial")
     @Expose
     public String publicCommercial;
     @SerializedName("motor_cycle_policy")
@@ -48,12 +51,16 @@ public class Vehicle implements Serializable
     @SerializedName("vehicle_value")
     @Expose
     public String vehicleValue;
+    @SerializedName("price")
+    @Expose
+    public String price;
     @SerializedName("pictures")
     @Expose
     public List<String> pictures = null;
 
-    public Vehicle(String period, String policyType, String enhancedThirdParty, String publicCommercial, String motorCyclePolicy, String make, String bodyType, String year, String homeAddress, String registrationNumber, String chasisNumber, String engineNumber, String vehicleValue, List<String> pictures) {
+    public Vehicle(String period, String start_date, String policyType, String enhancedThirdParty, String publicCommercial, String motorCyclePolicy, String make, String bodyType, String year, String homeAddress, String registrationNumber, String chasisNumber, String engineNumber, String vehicleValue, String price, List<String> pictures) {
         this.period = period;
+        this.start_date = start_date;
         this.policyType = policyType;
         this.enhancedThirdParty = enhancedThirdParty;
         this.publicCommercial = publicCommercial;
@@ -66,6 +73,7 @@ public class Vehicle implements Serializable
         this.chasisNumber = chasisNumber;
         this.engineNumber = engineNumber;
         this.vehicleValue = vehicleValue;
+        this.price = price;
         this.pictures = pictures;
     }
 }

@@ -38,7 +38,10 @@ import com.wang.avi.AVLoadingIndicatorView;
 
 import org.json.JSONException;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -108,9 +111,13 @@ public class PolicyPaymentActivity extends AppCompatActivity {
         ref=intent.getStringExtra(Constant.REF);
         poliy_type=intent.getStringExtra(Constant.POLICY_TYPE);
 
+        NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
+        nf.setMaximumFractionDigits(2);
+        DecimalFormat df = (DecimalFormat) nf;
+        String v_price = df.format(Double.valueOf(amount));
 
 
-        String amt=getString(R.string.naira_currency)+" "+amount;
+        String amt = getString(R.string.naira_currency) + " " + v_price;
         poly_num=getString(R.string.policy_no)+": "+poly_num;
         mAmount.setText(amt);
         mPolicyNum.setText(poly_num);
@@ -185,6 +192,7 @@ public class PolicyPaymentActivity extends AppCompatActivity {
                                         // Retrieve the transaction, and send its reference to your server
                                         // for verification.
                                         provider_ref=transaction.getReference();
+                                        Log.i("provider_ref", provider_ref);
                                         showShortMsg("Transaction Successfully, Please hold on");
 
                                         payButton.setVisibility(View.GONE);
@@ -249,9 +257,7 @@ public class PolicyPaymentActivity extends AppCompatActivity {
                                                     payButton.setVisibility(View.VISIBLE);
                                                     mProgress.setVisibility(View.GONE);
 
-                                                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                                                    Toast.makeText(getApplicationContext(), "Transaction Successful !", Toast.LENGTH_LONG).show();
-
+                                                    gotoDashboard();
 
                                                 }catch (Exception e){
                                                     Log.i("PaymentUpdateError", e.getMessage());
@@ -269,7 +275,7 @@ public class PolicyPaymentActivity extends AppCompatActivity {
                                             }
                                         });
 
-                                        
+
                                          }
 
                                     @Override
@@ -302,6 +308,7 @@ public class PolicyPaymentActivity extends AppCompatActivity {
                             } else {
                                 payButton.setEnabled(true);
                                 showShortMsg("Invalid card!");
+                                dismissDialog();
                             }
 
                         }
@@ -408,7 +415,10 @@ public class PolicyPaymentActivity extends AppCompatActivity {
     }
 
 
-    private void updatePayment(){
+    private void gotoDashboard() {
+        startActivity(new Intent(PolicyPaymentActivity.this, Dashboard.class));
+        this.finish();
+        Toast.makeText(getApplicationContext(), "Transaction Successful, Check Your Policy", Toast.LENGTH_LONG).show();
 
 
     }
@@ -426,8 +436,14 @@ public class PolicyPaymentActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        finish();
+        this.finish();
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(PolicyPaymentActivity.this, Dashboard.class));
+        this.finish();
+        super.onBackPressed();
+    }
 }

@@ -115,6 +115,8 @@ public class SwissFragment2 extends Fragment implements View.OnClickListener{
 
     private int currentStep = 1;
 
+    int benefit_count = 0;
+
     String cameraFilePath;
     int PICK_IMAGE_PASSPORT = 1;
     int CAM_IMAGE_PASSPORT = 2;
@@ -128,6 +130,7 @@ public class SwissFragment2 extends Fragment implements View.OnClickListener{
     String maritalString,genderString,benefitString;
     UserPreferences userPreferences;
     String quote_price,category;
+
 
     public SwissFragment2() {
         // Required empty public constructor
@@ -195,7 +198,7 @@ public class SwissFragment2 extends Fragment implements View.OnClickListener{
 
         mLastnameEditxtS2.setText(userPreferences.getSwissIAddLastName());
 
-        mDobEditxtS2.setText(userPreferences.getSwissIAddDOB());
+        //mDobEditxtS2.setText(userPreferences.getSwissIAddDOB());
 
         mPhoneNoEditxtS2.setText(userPreferences.getSwissIAddPhoneNum());
 
@@ -284,6 +287,20 @@ public class SwissFragment2 extends Fragment implements View.OnClickListener{
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
                 String benefitTypeString = (String) parent.getItemAtPosition(position);
+                switch (benefitTypeString) {
+                    case "Single":
+                        benefit_count = 1;
+                        break;
+                    case "Double":
+                        benefit_count = 2;
+                        break;
+                    case "Triple":
+                        benefit_count = 3;
+                        break;
+                    default:
+                        showMessage("Pick a benefit category");
+                        break;
+                }
 
             }
 
@@ -406,7 +423,7 @@ public class SwissFragment2 extends Fragment implements View.OnClickListener{
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == 0 || data == null || data.getData() == null) {
+        if (resultCode == 0) {
             showMessage("No image is selected, try again");
             return;
         }
@@ -616,13 +633,13 @@ public class SwissFragment2 extends Fragment implements View.OnClickListener{
         }
 
         if (addpersonal_img_url==null) {
-            showMessage("Please upload an image: passport,company license..etc");
+            showMessage("Please upload an image: Passport.");
             isValid = false;
         }
         // Spinner Validations
         //policyType validation
         genderString = mGenderSpinnerS2.getSelectedItem().toString();
-        if (genderString.equals("Gender")) {
+        if (genderString.equals("Gender*")) {
             showMessage("Select Gender Type");
             isValid = false;
         }
@@ -741,6 +758,21 @@ public class SwissFragment2 extends Fragment implements View.OnClickListener{
 
                     quote_price=response.body().getData().getPrice();
                     category=response.body().getData().getCategory();
+                    switch (category) {
+                        case "Adult":
+                            int mul_price_adult = 1500 * benefit_count;
+                            quote_price = String.valueOf(mul_price_adult);
+                            break;
+                        case "Child":
+                            int mul_price_child = 250 * benefit_count;
+                            quote_price = String.valueOf(mul_price_child);
+                            break;
+
+                        default:
+                            quote_price = "0.0";
+                            break;
+
+                    }
 
                     double roundOff = Math.round(Double.valueOf(quote_price)*100)/100.00;
 
@@ -748,11 +780,12 @@ public class SwissFragment2 extends Fragment implements View.OnClickListener{
                     showMessage("Successfully Fetched Quote");
                     mBtnLayout2S2.setVisibility(View.VISIBLE);
                     mProgressbar2S2.setVisibility(View.GONE);
+                    userPreferences.setInitSwissQuotePrice(String.valueOf(roundOff));
 
-                    // Fragment quoteBuyFragment3 = new SwissInsureFragment3();
                     FragmentTransaction ft = getFragmentManager().beginTransaction();
                     ft.replace(R.id.fragment_swiss_form_container, SwissFragment3.newInstance(category, String.valueOf(roundOff)), SwissFragment3.class.getSimpleName());
                     ft.commit();
+
                 }catch (Exception e){
                     Log.i("policyResponse", e.getMessage());
                     mBtnLayout2S2.setVisibility(View.VISIBLE);

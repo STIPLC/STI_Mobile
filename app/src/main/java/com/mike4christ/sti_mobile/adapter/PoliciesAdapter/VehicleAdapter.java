@@ -20,7 +20,10 @@ import com.mike4christ.sti_mobile.activity.MyVehicleDetail;
 import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
 import com.mike4christ.sti_mobile.retrofit_interface.ItemClickListener;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,63 +52,63 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.MyViewHo
     public void onBindViewHolder(@NonNull MyViewHolder holder, int i) {
         Vehicle vehicleOption = vehicleList.get(i);
 
-        holder.mPolicyNum.setText(vehicleOption.getPolicyNumber());
-        holder.mPrice.setText(vehicleOption.getPrice());
-        holder.mDateTime.setText(vehicleOption.getCreatedAt());
-        holder.mStatus.setText(vehicleOption.getStatus());
-        holder.mPaymentStatus.setText(vehicleOption.getPaymentStatus());
-        holder.mPolicyType.setText(vehicleOption.getPolicyType());
 
-        /*"id": 559,
-                "customer_id": "474",
-                "policy_number": "MOT/MC/09/19/SA/00376",
-                "period": "365",
-                "policy_type": "comprehensive",
-                "private": null,
-                "enhanced_third_party": "",
-                "private_commercial": "motor_cycle",
-                "motor_cycle_policy": "",
-                "make": " ",
-                "created_at": "2019-09-18 06:55:50",
-                "updated_at": "2019-09-18 06:59:03",
-                "body_type": null,
-                "year": "2017",
-                "registration_number": "YTY6567",
-                "chasis_number": "677848489",
-                "engine_number": "765467",
-                "vehicle_value": "21000",
-                "pictures": null,
-                "start": "2019-09-18",
-                "end": "2020-09-17",
-                "status": "Active",
-                "payment_reference": null,
-                "payment_status": "paid",
-                "user_id": "89",
-                "price": "525"*/
+        if (vehicleOption.getPrice() != null) {
+            holder.mPolicyNum.setText(vehicleOption.getPolicyNumber());
+            NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
+            nf.setMaximumFractionDigits(2);
+            DecimalFormat df = (DecimalFormat) nf;
+            String v_price = "₦" + df.format(Double.valueOf(vehicleOption.getPrice()));
 
+            holder.mPrice.setText(v_price);
+            holder.mDateTime.setText(vehicleOption.getCreatedAt());
+            holder.mStatus.setText(vehicleOption.getStatus());
+            holder.mPaymentStatus.setText(vehicleOption.getPaymentStatus());
+            holder.mPolicyType.setText(vehicleOption.getPolicyType());
 
-        holder.setItemClickListener(pos -> {
+            holder.setItemClickListener(pos -> {
 
-            nextActivity(vehicleList.get(pos).getBodyType(),vehicleList.get(pos).getChasisNumber(),vehicleList.get(pos).getEnd(),vehicleList.get(pos).getStart(),
-                    vehicleList.get(pos).getEngineNumber(),vehicleList.get(pos).getMake(),vehicleList.get(pos).getPaymentReference(),
-                    vehicleList.get(pos).getPeriod(),vehicleList.get(pos).getPolicyType(),vehicleList.get(pos).getPrice(),vehicleList.get(pos).getPrivateCommercial(),
-                    vehicleList.get(pos).getStatus(),vehicleList.get(pos).getPaymentStatus(),vehicleList.get(pos).getRegistrationNumber(),vehicleList.get(pos).getVehicleValue(),
-                    vehicleList.get(pos).getYear(),vehicleList.get(pos).getPolicyNumber(), MyVehicleDetail.class);
+                nextActivity(vehicleList.get(pos).getBodyType(), vehicleList.get(pos).getChasisNumber(), vehicleList.get(pos).getEnd(), vehicleList.get(pos).getStart(),
+                        vehicleList.get(pos).getEngineNumber(), vehicleList.get(pos).getMake(), vehicleList.get(pos).getPaymentReference(),
+                        vehicleList.get(pos).getPeriod(), vehicleList.get(pos).getPolicyType(), vehicleList.get(pos).getEnhancedThirdParty(), vehicleList.get(pos).getPrice(), vehicleList.get(pos).getPrivateCommercial(),
+                        vehicleList.get(pos).getStatus(), vehicleList.get(pos).getPaymentStatus(), vehicleList.get(pos).getRegistrationNumber(), vehicleList.get(pos).getVehicleValue(),
+                        vehicleList.get(pos).getYear(), vehicleList.get(pos).getPolicyNumber(), MyVehicleDetail.class);
 
             });
+
+        } else {
+            holder.mPolicyNum.setText(vehicleOption.getPolicyNumber());
+            holder.mPrice.setText(vehicleOption.getPrice());
+            holder.mDateTime.setText(vehicleOption.getCreatedAt());
+            holder.mStatus.setText(vehicleOption.getStatus());
+            holder.mPaymentStatus.setText(vehicleOption.getPaymentStatus());
+            holder.mPolicyType.setText(vehicleOption.getPolicyType());
+
+            holder.setItemClickListener(pos -> {
+
+                nextActivity(vehicleList.get(pos).getBodyType(), vehicleList.get(pos).getChasisNumber(), vehicleList.get(pos).getEnd(), vehicleList.get(pos).getStart(),
+                        vehicleList.get(pos).getEngineNumber(), vehicleList.get(pos).getMake(), vehicleList.get(pos).getPaymentReference(),
+                        vehicleList.get(pos).getPeriod(), vehicleList.get(pos).getPolicyType(), vehicleList.get(pos).getEnhancedThirdParty(), vehicleList.get(pos).getPrice(), vehicleList.get(pos).getPrivateCommercial(),
+                        vehicleList.get(pos).getStatus(), vehicleList.get(pos).getPaymentStatus(), vehicleList.get(pos).getRegistrationNumber(), vehicleList.get(pos).getVehicleValue(),
+                        vehicleList.get(pos).getYear(), vehicleList.get(pos).getPolicyNumber(), MyVehicleDetail.class);
+
+            });
+
+        }
     }
 
-    private void nextActivity(String body_type,String chasis_num,String end_date,String start_date,
-                    String engine_num,String make,String payment_ref,
-                    String period,String policy_type,String price,String cover_type,
-                    String status,String payment_status,String reg_num,String value,
-                    String year,String policy_num,Class vehicleActivityClass) {
+    private void nextActivity(String body_type, String chasis_num, String end_date, String start_date,
+                              String engine_num, String make, String payment_ref,
+                              String period, String policy_type, String enhancePolicetype, String price, String cover_type,
+                              String status, String payment_status, String reg_num, String value,
+                              String year, String policy_num, Class vehicleActivityClass) {
 
         Intent i = new Intent(context, vehicleActivityClass);
         i.putExtra("body_type", body_type);
         i.putExtra("chasis_num", chasis_num);
         i.putExtra("engine_num", engine_num);
         i.putExtra("policy_type", policy_type);
+        i.putExtra("eh_policy_type", enhancePolicetype);
         i.putExtra("make", make);
         i.putExtra("start_date", start_date);
         i.putExtra("end_date", end_date);

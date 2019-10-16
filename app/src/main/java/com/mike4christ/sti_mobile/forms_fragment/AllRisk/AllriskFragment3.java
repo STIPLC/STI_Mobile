@@ -1,7 +1,9 @@
 package com.mike4christ.sti_mobile.forms_fragment.AllRisk;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +11,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -20,15 +23,20 @@ import com.mike4christ.sti_mobile.Model.AllRisk.ItemDetail;
 import com.mike4christ.sti_mobile.Model.AllRisk.Personal_Detail_allrisk;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.activity.Dashboard;
 import com.shuhart.stepview.StepView;
 import com.wang.avi.AVLoadingIndicatorView;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmList;
 
-class AllriskFragment3 extends Fragment implements View.OnClickListener{
+public class AllriskFragment3 extends Fragment implements View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String SELECTED_ITEM = "seleted_item";
@@ -55,8 +63,8 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
     Button mVNextBtn3A3;
     @BindView(R.id.progressbar)
     AVLoadingIndicatorView mProgressbar;
-    @BindView(R.id.fabAddItem_a3)
-    FloatingActionButton fabAddItem_a3;
+    /*@BindView(R.id.fabAddItem_a3)
+    FloatingActionButton fabAddItem_a3;*/
 
 
     private  int currentStep=2;
@@ -104,7 +112,6 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
             userPreferences.setTempAllRiskQuotePrice(String.valueOf(total_quote));
             Log.i("PrimaryVariable",primaryKey);
 
-
         }
     }
 
@@ -126,11 +133,35 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
             String format = p_amount + ".00";
             mAmountA3.setText(format);
         }else {
-            String format = p_amount + ".00";
-            mAmountA3.setText(format);
+            //String format = p_amount ;
+
+            NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
+            nf.setMaximumFractionDigits(2);
+            DecimalFormat df = (DecimalFormat) nf;
+            String v_price = "₦" + df.format(Double.valueOf(p_amount));
+            mAmountA3.setText(v_price);
         }
 
+        //Toast.makeText(getActivity(), "Click the Add Button, to add more Item", Toast.LENGTH_LONG).show();
+
         setViewActions();
+
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+        view.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                Log.i("backPress_KeyCode", "keyCode: " + keyCode);
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    Log.i("backPress", "onKey Back listener is working!!!");
+                    userPreferences.setTempAllRiskQuotePrice("0.0");
+                    startActivity(new Intent(getActivity(), Dashboard.class));
+                    return true;
+                }
+                return false;
+            }
+        });
+
 
         return  view;
     }
@@ -142,7 +173,7 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
 
         mVNextBtn3A3.setOnClickListener(this);
         mVBackBtn3A3.setOnClickListener(this);
-        fabAddItem_a3.setOnClickListener(this);
+        // fabAddItem_a3.setOnClickListener(this);
 
     }
 
@@ -168,7 +199,7 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
 
                 break;
 
-            case R.id.fabAddItem_a3:
+            /*case R.id.fabAddItem_a3:
                 UserPreferences userPreferences=new UserPreferences(getContext());
 
 
@@ -274,7 +305,7 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
                 FragmentTransaction ftrans = getFragmentManager().beginTransaction();
                 ftrans.replace(R.id.fragment_allrisk_form_container, allriskFragment2);
                 ftrans.commit();
-                break;
+                break;*/
         }
     }
 
@@ -302,6 +333,7 @@ class AllriskFragment3 extends Fragment implements View.OnClickListener{
         personal_detail_allrisk.setTin_num(userPreferences.getAllRiskITinNumber());
         personal_detail_allrisk.setOffice_address(userPreferences.getAllRiskIOff_addr());
         personal_detail_allrisk.setContact_person(userPreferences.getAllRiskIContPerson());
+        personal_detail_allrisk.setPicture(userPreferences.getAllRiskPersonalImage());
         //Item List
         ItemDetail itemDetail=new ItemDetail();
         itemDetail.setStartDate(userPreferences.getAllRiskStartDate());

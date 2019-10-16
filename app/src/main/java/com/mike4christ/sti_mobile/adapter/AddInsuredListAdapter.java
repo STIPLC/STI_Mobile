@@ -62,6 +62,7 @@ private Context context;
 
         holder.firstnameList_txt.setText(temp.getFirst_name());
         holder.lastnameList_txt.setText(temp.getLast_name());
+        holder.dob_txt.setText(temp.getDate_of_birth());
         holder.phoneList_txt.setText(temp.getPhone());
         holder.disableList_txt.setText(temp.getDisability());
         holder.maritalList_txt.setText(temp.getMarital_status());
@@ -72,28 +73,6 @@ private Context context;
     }
 
 
-
-  /*  //To Delete Record
-    private void asyncRemoveRecord(final String id){
-        AsyncTask<Void,Void,Void>remoteItem =new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-
-                realm=Realm.getDefaultInstance();
-
-                Monthly monthly=realm.where(Monthly.class).equalTo("id",id).findFirst();
-                if(monthly !=null){
-                    realm.beginTransaction();
-                    monthly.deleteFromRealm();
-                    realm.commitTransaction();
-                }
-                realm.close();
-                return null;
-            }
-        };
-        remoteItem.execute();
-    }
-*/
     public class MyViewHolder extends
             RecyclerView.ViewHolder {
 
@@ -107,6 +86,8 @@ private Context context;
           TextView phoneList_txt;
           @BindView(R.id.disableList_txt)
           TextView disableList_txt;
+        @BindView(R.id.dob_txt)
+        TextView dob_txt;
           @BindView(R.id.maritalList_txt)
           TextView maritalList_txt;
 

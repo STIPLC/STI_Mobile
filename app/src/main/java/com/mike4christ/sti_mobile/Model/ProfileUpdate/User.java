@@ -14,9 +14,6 @@ public class User implements Serializable
     @SerializedName("phone")
     @Expose
     private String phone;
-    @SerializedName("password")
-    @Expose
-    private String password;
     @SerializedName("username")
     @Expose
     private String username;
@@ -27,10 +24,9 @@ public class User implements Serializable
     @Expose
     private String lastName;
 
-    public User(String email, String phone, String password, String username, String firstName, String lastName) {
+    public User(String email, String phone, String username, String firstName, String lastName) {
         this.email = email;
         this.phone = phone;
-        this.password = password;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;

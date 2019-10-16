@@ -21,6 +21,9 @@ public class Personal_Detail_swiss extends RealmObject {
 
     String next_of_kin;
     String next_of_kin_phone;
+
+
+    String price;
     String next_of_kin_address;
     String prefix;
     String disability;
@@ -120,6 +123,15 @@ public class Personal_Detail_swiss extends RealmObject {
     public void setNext_of_kin_phone(String next_of_kin_phone) {
         this.next_of_kin_phone = next_of_kin_phone;
     }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
     public String getPicture() {
         return picture;
     }

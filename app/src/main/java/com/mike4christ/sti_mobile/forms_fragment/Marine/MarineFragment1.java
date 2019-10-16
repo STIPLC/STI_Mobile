@@ -518,22 +518,13 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
             if (mEmailEditxtM1.getText().toString().isEmpty()&&mInputLayoutEmailM1.isClickable()) {
                 mInputLayoutEmailM1.setError("Email is required!");
                 isValid = false;
-            } else if (!isValidEmailAddress(mEmailEditxtM1.getText().toString())) {
+            }/* else if (!isValidEmailAddress(mEmailEditxtM1.getText().toString())) {
                 mInputLayoutEmailM1.setError("Valid Email is required!");
                 isValid = false;
-            } else {
+            }*/ else {
                 mInputLayoutEmailM1.setErrorEnabled(false);
             }
 
-            if (mMailAddrEditxtM1.getText().toString().isEmpty()&& mInputLayoutMailingAddrM1.isClickable()) {
-                mInputLayoutMailingAddrM1.setError("Mailing Address is required!");
-                isValid = false;
-            } else if (!isValidEmailAddress(mMailAddrEditxtM1.getText().toString())&&mInputLayoutMailingAddrM1.isClickable()) {
-                mInputLayoutMailingAddrM1.setError("Valid Mailing Address is required!");
-                isValid = false;
-            } else {
-                mInputLayoutMailingAddrM1.setErrorEnabled(false);
-            }
 
 
             if (mPhoneNoEditxtM1.getText().toString().isEmpty()&&mInputLayoutPhoneM1.isClickable()) {
@@ -565,30 +556,30 @@ public class MarineFragment1 extends Fragment implements View.OnClickListener{
             }
             //Tyepe Spinner
             typeString = mTypeSpinnerM1.getSelectedItem().toString();
-            if (typeString.equals("Select Type")&&mTypeSpinnerM1.isClickable()) {
+        if (typeString.equals("Select Type*") && mTypeSpinnerM1.isClickable()) {
 
                 showMessage("Select Product Type");
                 isValid = false;
             }
             //Prefix Spinner
             prifixString = mPrefixSpinnerM1.getSelectedItem().toString();
-            if (prifixString.equals("Select Prefix")&&mPrefixSpinnerM1.isClickable()) {
+        if (prifixString.equals("Select Prefix*") && mPrefixSpinnerM1.isClickable()) {
                 showMessage("Select your Prefix e.g Mr.");
                 isValid = false;
             }
 
             genderString = mGenderSpinnerM1.getSelectedItem().toString();
-            if (genderString.equals("Gender")&&mGenderSpinnerM1.isClickable()) {
+        if (genderString.equals("Gender*") && mGenderSpinnerM1.isClickable()) {
                 showMessage("Don't forget to Select Gender");
                 isValid = false;
             }
             stateString = state_spinner.getSelectedItem().toString();
-            if (stateString.equals("Geographical Location")&&state_spinner.isClickable()) {
+        if (stateString.equals("Geographical Location*") && state_spinner.isClickable()) {
                 showMessage("Select Geographical Location");
                 isValid = false;
             }
             maritalString = mMaritalSpinnerM1.getSelectedItem().toString();
-            if (maritalString.equals("Select Marital Status")&&mMaritalSpinnerM1.isClickable()) {
+        if (maritalString.equals("Select Marital Status*") && mMaritalSpinnerM1.isClickable()) {
                 showMessage("Don't forget to Select Marital Status");
                 isValid = false;
             }

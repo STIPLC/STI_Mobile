@@ -20,7 +20,10 @@ import com.mike4christ.sti_mobile.activity.MySwissDetail;
 import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
 import com.mike4christ.sti_mobile.retrofit_interface.ItemClickListener;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,23 +52,50 @@ public class SwissAdapter extends RecyclerView.Adapter<SwissAdapter.MyViewHolder
     public void onBindViewHolder(@NonNull MyViewHolder holder, int i) {
         Swis swisOption = swisList.get(i);
 
-        holder.mPolicyNum.setText(swisOption.getPolicyNumber());
-        holder.mPrice.setText(swisOption.getPrice());
-        holder.mDateTime.setText(swisOption.getCreatedAt());
-        holder.mStatus.setText(swisOption.getStatus());
-        holder.mPaymentStatus.setText(swisOption.getPaymentStatus());
-        holder.mPolicyType.setText("Swiss-F Insurance");
+
+        if (swisOption.getPrice() != null) {
+            holder.mPolicyNum.setText(swisOption.getPolicyNumber());
+            NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
+            nf.setMaximumFractionDigits(2);
+            DecimalFormat df = (DecimalFormat) nf;
+            String v_price = "₦" + df.format(Double.valueOf(swisOption.getPrice()));
+
+            holder.mPrice.setText(v_price);
+            holder.mDateTime.setText(swisOption.getCreatedAt());
+            holder.mStatus.setText(swisOption.getStatus());
+            holder.mPaymentStatus.setText(swisOption.getPaymentStatus());
+            holder.mPolicyType.setText("Swiss-F Insurance");
 
 
-        holder.setItemClickListener(pos -> {
+            holder.setItemClickListener(pos -> {
 
-            nextActivity(swisList.get(pos).getFirstName(),swisList.get(pos).getLastName(),
-                    swisList.get(pos).getPhone(),swisList.get(pos).getPicture(),swisList.get(pos).getAddress(),swisList.get(pos).getDateOfBirth(),
-                    swisList.get(pos).getCategory(),swisList.get(pos).getEmail(),swisList.get(pos).getStart(),swisList.get(pos).getEnd(),
-                    swisList.get(pos).getPrice(),swisList.get(pos).getStatus(),swisList.get(pos).getPaymentStatus(),
-                    swisList.get(pos).getNextOfKin(),swisList.get(pos).getNextOfKinPhone(),swisList.get(pos).getGender(),swisList.get(pos).getMaritalStatus(),swisList.get(pos).getPolicyNumber(), MySwissDetail.class);
-            
+                nextActivity(swisList.get(pos).getFirstName(), swisList.get(pos).getLastName(),
+                        swisList.get(pos).getPhone(), swisList.get(pos).getPicture(), swisList.get(pos).getAddress(), swisList.get(pos).getDateOfBirth(),
+                        swisList.get(pos).getCategory(), swisList.get(pos).getEmail(), swisList.get(pos).getStart(), swisList.get(pos).getEnd(),
+                        swisList.get(pos).getPrice(), swisList.get(pos).getStatus(), swisList.get(pos).getPaymentStatus(),
+                        swisList.get(pos).getNextOfKin(), swisList.get(pos).getNextOfKinPhone(), swisList.get(pos).getGender(), swisList.get(pos).getMaritalStatus(), swisList.get(pos).getPolicyNumber(), MySwissDetail.class);
+
             });
+
+        } else {
+            holder.mPolicyNum.setText(swisOption.getPolicyNumber());
+            holder.mPrice.setText(swisOption.getPrice());
+            holder.mDateTime.setText(swisOption.getCreatedAt());
+            holder.mStatus.setText(swisOption.getStatus());
+            holder.mPaymentStatus.setText(swisOption.getPaymentStatus());
+            holder.mPolicyType.setText("Swiss-F Insurance");
+
+
+            holder.setItemClickListener(pos -> {
+
+                nextActivity(swisList.get(pos).getFirstName(), swisList.get(pos).getLastName(),
+                        swisList.get(pos).getPhone(), swisList.get(pos).getPicture(), swisList.get(pos).getAddress(), swisList.get(pos).getDateOfBirth(),
+                        swisList.get(pos).getCategory(), swisList.get(pos).getEmail(), swisList.get(pos).getStart(), swisList.get(pos).getEnd(),
+                        swisList.get(pos).getPrice(), swisList.get(pos).getStatus(), swisList.get(pos).getPaymentStatus(),
+                        swisList.get(pos).getNextOfKin(), swisList.get(pos).getNextOfKinPhone(), swisList.get(pos).getGender(), swisList.get(pos).getMaritalStatus(), swisList.get(pos).getPolicyNumber(), MySwissDetail.class);
+
+            });
+        }
     }
 
     private void nextActivity(String firstname,String lastname,

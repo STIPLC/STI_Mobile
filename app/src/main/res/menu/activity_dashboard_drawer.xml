@@ -19,7 +19,7 @@
         <item
             android:id="@+id/transaction_history"
             android:icon="@drawable/ic_payment_black_24dp"
-            android:title="Payment History" />
+            android:title="Transaction History" />
 
         <item
             android:id="@+id/make_claim"
@@ -37,18 +37,26 @@
             android:id="@+id/val_motor_insured"
             android:icon="@drawable/ic_local_taxi_black_24dp"
             android:title="Validate Motor Policy" />
+
+        <item
+            android:id="@+id/change_pass"
+            android:icon="@drawable/ic_vpn_key_black_24dp"
+            android:title="Change Password" />
+
+        <item
+            android:id="@+id/nav_account"
+            android:icon="@drawable/ic_person_black_24dp"
+            android:title="My Account" />
+
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="Support">
         <menu>
-            <item
-                android:id="@+id/nav_account"
-                android:icon="@drawable/ic_person_black_24dp"
-                android:title="My Account" />
-            <item
-                android:id="@+id/set_change_pin"
-                android:icon="@drawable/ic_vpn_key_black_24dp"
-                android:title="Set/Change Pin" />
+
+            <!--   <item
+                   android:id="@+id/set_change_pin"
+                   android:icon="@drawable/ic_vpn_key_black_24dp"
+                   android:title="Set/Change Pin" />-->
 
             <item
                 android:id="@+id/find_us"

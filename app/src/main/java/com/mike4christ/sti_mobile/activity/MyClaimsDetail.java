@@ -58,8 +58,8 @@ public class MyClaimsDetail extends AppCompatActivity {
     TextView mType;
     @BindView(R.id.decription)
     TextView mDecription;
-    @BindView(R.id.date_loss)
-    TextView mDateLoss;
+    /* @BindView(R.id.date_loss)
+     TextView mDateLoss;*/
     @BindView(R.id.date_time)
     TextView mDateTime;
     /** ButterKnife Code **/
@@ -97,7 +97,7 @@ public class MyClaimsDetail extends AppCompatActivity {
         mPolicyNum.setText(policynum);
         mType.setText(policy_type);
         mDecription.setText(desc);
-        mDateLoss.setText(date_loss);
+        // mDateLoss.setText(date_loss);
         mDateTime.setText(claim_date);
 
 

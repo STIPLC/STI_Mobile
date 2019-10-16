@@ -1,5 +1,6 @@
 package com.mike4christ.sti_mobile.activity;
 
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,20 +16,26 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.material.card.MaterialCardView;
 import com.mike4christ.sti_mobile.Constant;
 import com.mike4christ.sti_mobile.Model.Errors.APIError;
 import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
+import com.mike4christ.sti_mobile.Model.Etic.QouteHeadEtic;
 import com.mike4christ.sti_mobile.Model.RenewPolicyGet;
 import com.mike4christ.sti_mobile.Model.ServiceGenerator;
 import com.mike4christ.sti_mobile.NetworkConnection;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.UserPreferences;
+import com.mike4christ.sti_mobile.forms_fragment.Etic.EticFragment3;
 import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.wang.avi.AVLoadingIndicatorView;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -67,18 +74,23 @@ public class MyEticDetail extends AppCompatActivity {
     TextView mStartDate;
     @BindView(R.id.end_date)
     TextView mEndDate;
-    @BindView(R.id.payment_ref)
-    TextView mPaymentRef;
-    @BindView(R.id.renew_btn)
-    TextView mRenew;
+    /*@BindView(R.id.payment_ref)
+    TextView mPaymentRef;*/
+    /*@BindView(R.id.renew_btn)
+    TextView mRenew;*/
     @BindView(R.id.progress)
     AVLoadingIndicatorView mProgress;
+    @BindView(R.id.user_policy_btn)
+    MaterialCardView user_policy_btn;
     /** ButterKnife Code **/
 
-    Animation slide_front_left, blink;
+    Animation slide_front_left, blink, slide_front_right;
+    double roundOff;
+    String policynum;
 
     private UserPreferences userPreferences;
     NetworkConnection networkConnection=new NetworkConnection();
+    ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +101,7 @@ public class MyEticDetail extends AppCompatActivity {
         applyToolbarChildren("My Policy Detail");
 
         Intent intent=getIntent();
-        String policynum=intent.getStringExtra("policynum");
+        policynum = intent.getStringExtra("policynum");
         String trip_duration=intent.getStringExtra("trip_duration");
         String departure_plc=intent.getStringExtra("departure_plc");
         String policy_type=intent.getStringExtra("policy_type");
@@ -104,6 +116,12 @@ public class MyEticDetail extends AppCompatActivity {
         String addr_country_visit=intent.getStringExtra("addr_country_visit");
 
 
+        NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
+        nf.setMaximumFractionDigits(2);
+        DecimalFormat df = (DecimalFormat) nf;
+        String v_price = "₦" + df.format(Double.valueOf(policy_price));
+
+
         mTripDuratn.setText(trip_duration);
         mStatus.setText(status);
         mPaymentStatus.setText(payment_status);
@@ -113,12 +131,17 @@ public class MyEticDetail extends AppCompatActivity {
         mStartDate.setText(start_date);
         mEndDate.setText(end_date);
         mArrivalPlc.setText(arrive_place);
-        mPrice.setText(policy_price);
+        mPrice.setText(v_price);
         mPaymentStatus.setText(payment_status);
         mStatus.setText(status);
-        mPaymentRef.setText(payment_reference);
+        //mPaymentRef.setText(payment_reference);
         mTravelMode.setText(travel_mode);
         mAddrCountryVisit.setText(addr_country_visit);
+
+
+        slide_front_right = AnimationUtils.loadAnimation(getApplicationContext(),
+                R.anim.slide_to_right);
+        user_policy_btn.startAnimation(slide_front_right);
 
 
         slide_front_left = AnimationUtils.loadAnimation(getApplicationContext(),
@@ -133,7 +156,7 @@ public class MyEticDetail extends AppCompatActivity {
         mStatus.startAnimation(blink);
 
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
+        /*SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
         Date strDate = null;
         try {
             strDate = sdf.parse(end_date);
@@ -150,92 +173,12 @@ public class MyEticDetail extends AppCompatActivity {
                         if(networkConnection.isNetworkConnected(getBaseContext())){
                         mRenew.setVisibility(View.GONE);
                         mProgress.setVisibility(View.VISIBLE);
+                        sendEticData();
                         //get client and call object for request
-                        ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
 
 
-                        Call<RenewPolicyGet> call=client.renew_policy("Token "+userPreferences.getUserToken(),policynum,policy_price,"paystack");
-
-                        call.enqueue(new Callback<RenewPolicyGet>() {
-                            @Override
-                            public void onResponse(Call<RenewPolicyGet> call, Response<RenewPolicyGet> response) {
-                                Log.i("ResponseCode", String.valueOf(response.code()));
-
-                                if(response.code()==400){
-                                    showShortMsg("Check your internet connection");
-                                    mRenew.setVisibility(View.VISIBLE);
-                                    mProgress.setVisibility(View.GONE);
-                                    return;
-                                }else if(response.code()==429){
-                                    showShortMsg("Too many requests on database");
-                                    mRenew.setVisibility(View.VISIBLE);
-                                    mProgress.setVisibility(View.GONE);
-                                    return;
-                                }else if(response.code()==500){
-                                    showShortMsg("Server Error");
-                                    mRenew.setVisibility(View.VISIBLE);
-                                    mProgress.setVisibility(View.GONE);
-                                    return;
-                                }else if(response.code()==401){
-                                    showShortMsg("Unauthorized access, please try login again");
-                                    mRenew.setVisibility(View.VISIBLE);
-                                    mProgress.setVisibility(View.GONE);
-                                    return;
-                                }
-                                try {
-                                    if (!response.isSuccessful()) {
-
-                                        try{
-                                            APIError apiError= ErrorUtils.parseError(response);
-
-                                            showShortMsg("Invalid Entry: "+apiError.getErrors());
-                                            Log.i("Invalid EntryK",apiError.getErrors().toString());
-                                            Log.i("Invalid Entry",response.errorBody().toString());
-
-                                        }catch (Exception e){
-                                            Log.i("InvalidEntry",e.getMessage());
-                                            Log.i("ResponseError",response.errorBody().string());
-                                            showShortMsg("Failed to Renew"+e.getMessage());
-                                            mRenew.setVisibility(View.VISIBLE);
-                                            mProgress.setVisibility(View.GONE);
-
-                                        }
-                                        mRenew.setVisibility(View.VISIBLE);
-                                        mProgress.setVisibility(View.GONE);
-                                        return;
-                                    }
 
 
-                                    String amount=response.body().getAmount();
-                                    String policyNumber=response.body().getPolicyNumber();
-                                    String reference=response.body().getReference();
-
-
-                                    Intent i = new Intent(MyEticDetail.this, PolicyPaymentActivity.class);
-                                    i.putExtra(Constant.POLICY_NUM, policyNumber);
-                                    i.putExtra(Constant.TOTAL_PRICE, amount);
-                                    i.putExtra(Constant.POLICY_TYPE, "travel");
-                                    i.putExtra(Constant.REF, reference);
-                                    startActivity(i);
-
-                                    mRenew.setVisibility(View.VISIBLE);
-                                    mProgress.setVisibility(View.GONE);
-
-                                }catch (Exception e){
-                                    Log.i("PolicyRenewError", e.getMessage());
-                                    mRenew.setVisibility(View.VISIBLE);
-                                    mProgress.setVisibility(View.GONE);
-                                }
-
-                            }
-                            @Override
-                            public void onFailure(Call<RenewPolicyGet> call, Throwable t) {
-                                showShortMsg("Renewed Failed "+t.getMessage());
-                                Log.i("GetError",t.getMessage());
-                                mRenew.setVisibility(View.VISIBLE);
-                                mProgress.setVisibility(View.GONE);
-                            }
-                        });
                         }else{
                             showShortMsg("No Internet Connection");
                         }
@@ -253,12 +196,180 @@ public class MyEticDetail extends AppCompatActivity {
         } catch (ParseException e) {
             e.printStackTrace();
             showShortMsg("Error: "+e.getMessage());
-        }
-
+        }*/
 
 
     }
 
+
+    /*private void sendEticData(){
+
+        Call<QouteHeadEtic> call=client.etic_quote("Token "+userPreferences.getUserToken(), 2000);
+
+        call.enqueue(new Callback<QouteHeadEtic>() {
+            @Override
+            public void onResponse(Call<QouteHeadEtic> call, Response<QouteHeadEtic> response) {
+                Log.i("ResponseCode", String.valueOf(response.code()));
+
+                if(response.code()==406){
+                    showShortMsg("Error! Wrong Value provided!");
+                    mRenew.setVisibility(View.VISIBLE);
+                    mProgress.setVisibility(View.GONE);
+                    return;
+                }
+
+                if(response.code()==400){
+                    showShortMsg("Check your internet connection");
+                    mRenew.setVisibility(View.VISIBLE);
+                    mProgress.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==429){
+                    showShortMsg("Too many requests on database");
+                    mRenew.setVisibility(View.VISIBLE);
+                    mProgress.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==500){
+                    showShortMsg("Server Error");
+                    mRenew.setVisibility(View.VISIBLE);
+                    mProgress.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==401){
+                    showShortMsg("Unauthorized access, please try login again");
+                    mRenew.setVisibility(View.VISIBLE);
+                    mProgress.setVisibility(View.GONE);
+                    return;
+                }
+
+                try {
+                    if (!response.isSuccessful()) {
+
+                        try{
+                            APIError apiError= ErrorUtils.parseError(response);
+
+                            showShortMsg("Invalid Entry: "+apiError.getErrors());
+                            Log.i("Invalid EntryK",apiError.getErrors().toString());
+                            Log.i("Invalid Entry",response.errorBody().toString());
+
+                        }catch (Exception e){
+                            Log.i("InvalidEntry",e.getMessage());
+                            Log.i("ResponseError",response.errorBody().string());
+                            showShortMsg("Failed to Fetch Quote"+e.getMessage());
+                            mRenew.setVisibility(View.VISIBLE);
+                            mProgress.setVisibility(View.GONE);
+
+                        }
+                        mRenew.setVisibility(View.VISIBLE);
+                        mProgress.setVisibility(View.GONE);
+                        return;
+                    }
+
+                    String quote_price=response.body().getData().getPrice();
+
+                    roundOff = Math.round(Double.valueOf(quote_price)*100)/100.00;
+
+                    Log.i("quote_price", String.valueOf(roundOff));
+                    Call<RenewPolicyGet> call2=client.renew_policy("Token "+userPreferences.getUserToken(),policynum, String.valueOf(roundOff),"paystack");
+
+                    call2.enqueue(new Callback<RenewPolicyGet>() {
+                        @Override
+                        public void onResponse(Call<RenewPolicyGet> call, Response<RenewPolicyGet> response) {
+                            Log.i("ResponseCode", String.valueOf(response.code()));
+
+                            if(response.code()==400){
+                                showShortMsg("Check your internet connection");
+                                mRenew.setVisibility(View.VISIBLE);
+                                mProgress.setVisibility(View.GONE);
+                                return;
+                            }else if(response.code()==429){
+                                showShortMsg("Too many requests on database");
+                                mRenew.setVisibility(View.VISIBLE);
+                                mProgress.setVisibility(View.GONE);
+                                return;
+                            }else if(response.code()==500){
+                                showShortMsg("Server Error");
+                                mRenew.setVisibility(View.VISIBLE);
+                                mProgress.setVisibility(View.GONE);
+                                return;
+                            }else if(response.code()==401){
+                                showShortMsg("Unauthorized access, please try login again");
+                                mRenew.setVisibility(View.VISIBLE);
+                                mProgress.setVisibility(View.GONE);
+                                return;
+                            }
+                            try {
+                                if (!response.isSuccessful()) {
+
+                                    try{
+                                        APIError apiError= ErrorUtils.parseError(response);
+
+                                        showShortMsg("Invalid Entry: "+apiError.getErrors());
+                                        Log.i("Invalid EntryK",apiError.getErrors().toString());
+                                        Log.i("Invalid Entry",response.errorBody().toString());
+
+                                    }catch (Exception e){
+                                        Log.i("InvalidEntry",e.getMessage());
+                                        Log.i("ResponseError",response.errorBody().string());
+                                        showShortMsg("Failed to Renew"+e.getMessage());
+                                        mRenew.setVisibility(View.VISIBLE);
+                                        mProgress.setVisibility(View.GONE);
+
+                                    }
+                                    mRenew.setVisibility(View.VISIBLE);
+                                    mProgress.setVisibility(View.GONE);
+                                    return;
+                                }
+
+
+                                String amount=response.body().getAmount();
+                                String policyNumber=response.body().getPolicyNumber();
+                                String reference=response.body().getReference();
+
+
+                                Intent i = new Intent(MyEticDetail.this, PolicyPaymentActivity.class);
+                                i.putExtra(Constant.POLICY_NUM, policyNumber);
+                                i.putExtra(Constant.TOTAL_PRICE, amount);
+                                i.putExtra(Constant.POLICY_TYPE, "travel");
+                                i.putExtra(Constant.REF, reference);
+                                startActivity(i);
+
+                                mRenew.setVisibility(View.VISIBLE);
+                                mProgress.setVisibility(View.GONE);
+
+                            }catch (Exception e){
+                                Log.i("PolicyRenewError", e.getMessage());
+                                mRenew.setVisibility(View.VISIBLE);
+                                mProgress.setVisibility(View.GONE);
+                            }
+
+                        }
+                        @Override
+                        public void onFailure(Call<RenewPolicyGet> call, Throwable t) {
+                            showShortMsg("Renewed Failed "+t.getMessage());
+                            Log.i("GetError",t.getMessage());
+                            mRenew.setVisibility(View.VISIBLE);
+                            mProgress.setVisibility(View.GONE);
+                        }
+                    });
+
+
+                }catch (Exception e){
+                    Log.i("policyResponse", e.getMessage());
+                    mRenew.setVisibility(View.VISIBLE);
+                    mProgress.setVisibility(View.GONE);
+                }
+
+            }
+            @Override
+            public void onFailure(Call<QouteHeadEtic> call, Throwable t) {
+                showShortMsg("Submission Failed "+t.getMessage());
+                Log.i("GEtError",t.getMessage());
+                mRenew.setVisibility(View.VISIBLE);
+                mProgress.setVisibility(View.GONE);
+            }
+        });
+
+    }*/
+    
     private void applyToolbarChildren(String title) {
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

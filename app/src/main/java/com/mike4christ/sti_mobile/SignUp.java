@@ -179,7 +179,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener{
         mSignupBtn.setVisibility(View.GONE);
         mAvi1.setVisibility(View.VISIBLE);
 
-        User dataPart=new User(mFirstnameEditxt.getText().toString(),mLastnameEditxt.getText().toString(),
+        User dataPart = new User(mFirstnameEditxt.getText().toString(), mLastnameEditxt.getText().toString().replace(" ", "-"),
                 mEmailEditxt.getText().toString(),mPasswordEditxt.getText().toString(),mPhonenumEditxt.getText().toString());
 
         RegisterObj regPostData=new RegisterObj(dataPart);
@@ -205,15 +205,23 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener{
 
                 if(response.code()==400){
                     showMessage("Check your internet connection");
+                    mSignupBtn.setVisibility(View.VISIBLE);
+                    mAvi1.setVisibility(View.GONE);
                     return;
                 }else if(response.code()==429){
                     showMessage("Too many requests on database");
+                    mSignupBtn.setVisibility(View.VISIBLE);
+                    mAvi1.setVisibility(View.GONE);
                     return;
                 }else if(response.code()==500){
                     showMessage("Server Error");
+                    mSignupBtn.setVisibility(View.VISIBLE);
+                    mAvi1.setVisibility(View.GONE);
                     return;
                 }else if(response.code()==401){
                     showMessage("Unauthorized access, please try login again");
+                    mSignupBtn.setVisibility(View.VISIBLE);
+                    mAvi1.setVisibility(View.GONE);
                     return;
                 }
 
@@ -227,6 +235,8 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener{
                             showMessage("Invalid Entry: "+apiError.getErrors());
                             Log.i("Invalid EntryK",apiError.getErrors().toString());
                             Log.i("Invalid Entry",response.errorBody().toString());
+                            mSignupBtn.setVisibility(View.VISIBLE);
+                            mAvi1.setVisibility(View.GONE);
 
                         }catch (Exception e){
                             Log.i("InvalidEntry",e.getMessage());
@@ -243,8 +253,8 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener{
 
                     Log.i("response", user_email);
 
-                    showMessage("User ID: " + user_email);
-                    Log.i("User ID", response.body().getUser().toString());
+                    showMessage("ProfileImageUser ID: " + user_email);
+                    Log.i("ProfileImageUser ID", response.body().getUser().toString());
 
                     mSignupBtn.setVisibility(View.VISIBLE);
                     mAvi1.setVisibility(View.GONE);

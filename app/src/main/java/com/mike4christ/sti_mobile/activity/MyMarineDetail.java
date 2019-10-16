@@ -1,5 +1,6 @@
 package com.mike4christ.sti_mobile.activity;
 
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,9 +16,11 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.material.card.MaterialCardView;
 import com.mike4christ.sti_mobile.Constant;
 import com.mike4christ.sti_mobile.Model.Errors.APIError;
 import com.mike4christ.sti_mobile.Model.Errors.ErrorUtils;
+import com.mike4christ.sti_mobile.Model.Marine.QouteHeadMarine;
 import com.mike4christ.sti_mobile.Model.RenewPolicyGet;
 import com.mike4christ.sti_mobile.Model.ServiceGenerator;
 import com.mike4christ.sti_mobile.NetworkConnection;
@@ -26,9 +29,12 @@ import com.mike4christ.sti_mobile.UserPreferences;
 import com.mike4christ.sti_mobile.retrofit_interface.ApiInterface;
 import com.wang.avi.AVLoadingIndicatorView;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -71,20 +77,26 @@ public class MyMarineDetail extends AppCompatActivity {
     TextView mConversionRate;
     @BindView(R.id.price)
     TextView mPrice;
-    @BindView(R.id.payment_ref)
-    TextView mPaymentRef;
+    /*@BindView(R.id.payment_ref)
+    TextView mPaymentRef;*/
     @BindView(R.id.value)
     TextView mValue;
-    @BindView(R.id.renew_btn)
-    TextView mRenew;
+    /* @BindView(R.id.renew_btn)
+     TextView mRenew;*/
     @BindView(R.id.progress)
     AVLoadingIndicatorView mProgress;
+    @BindView(R.id.user_policy_btn)
+    MaterialCardView user_policy_btn;
     /** ButterKnife Code **/
 
-    Animation slide_front_left, blink;
+    Animation slide_front_left, blink, slide_front_right;
+    String value, policy_num, coversion_rate;
+    double roundOff;
+    
 
     private UserPreferences userPreferences;
     NetworkConnection networkConnection=new NetworkConnection();
+    ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
 
 
     @Override
@@ -96,7 +108,7 @@ public class MyMarineDetail extends AppCompatActivity {
         applyToolbarChildren("My Policy Detail");
 
         Intent intent=getIntent();
-        String policy_num=intent.getStringExtra("policy_num");
+        policy_num = intent.getStringExtra("policy_num");
         String desc=intent.getStringExtra("desc");
         String loadingPort=intent.getStringExtra("loadingPort");
         String dischargeport=intent.getStringExtra("dischargeport");
@@ -109,9 +121,14 @@ public class MyMarineDetail extends AppCompatActivity {
         String status=intent.getStringExtra("status");
         String Pfi_date=intent.getStringExtra("Pfi_date");
         String pfi_num=intent.getStringExtra("pfi_num");
-        String value=intent.getStringExtra("value");
+        value = intent.getStringExtra("value");
         String covey_mode=intent.getStringExtra("covey_mode");
-        String coversion_rate=intent.getStringExtra("coversion_rate");
+        coversion_rate = intent.getStringExtra("coversion_rate");
+
+        NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
+        nf.setMaximumFractionDigits(2);
+        DecimalFormat df = (DecimalFormat) nf;
+        String v_price = "₦" + df.format(Double.valueOf(price));
 
 
         mPolicyNum.setText(policy_num);
@@ -122,8 +139,8 @@ public class MyMarineDetail extends AppCompatActivity {
         mPolicyType.setText(policy_type);
         mStartDate.setText(start_date);
         mEndDate.setText(end_date);
-        mPrice.setText(price);
-        mPaymentRef.setText(payment_ref);
+        mPrice.setText(v_price);
+        //mPaymentRef.setText(payment_ref);
         mPaymentStatus.setText(payment_status);
         mProfNum.setText(pfi_num);
         mProfDate.setText(Pfi_date);
@@ -132,6 +149,9 @@ public class MyMarineDetail extends AppCompatActivity {
         mConversionRate.setText(coversion_rate);
 
 
+        slide_front_right = AnimationUtils.loadAnimation(getApplicationContext(),
+                R.anim.slide_to_right);
+        user_policy_btn.startAnimation(slide_front_right);
         slide_front_left = AnimationUtils.loadAnimation(getApplicationContext(),
                 R.anim.slide_from_left);
 
@@ -144,7 +164,7 @@ public class MyMarineDetail extends AppCompatActivity {
         mStatus.startAnimation(blink);
 
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
+       /* SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
         Date strDate = null;
         try {
             strDate = sdf.parse(end_date);
@@ -161,92 +181,11 @@ public class MyMarineDetail extends AppCompatActivity {
                         mRenew.setVisibility(View.GONE);
                         mProgress.setVisibility(View.VISIBLE);
 
+                        sendMarineData();
                         //get client and call object for request
-                        ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
 
 
-                        Call<RenewPolicyGet> call=client.renew_policy("Token "+userPreferences.getUserToken(),policy_num,price,"paystack");
 
-                        call.enqueue(new Callback<RenewPolicyGet>() {
-                            @Override
-                            public void onResponse(Call<RenewPolicyGet> call, Response<RenewPolicyGet> response) {
-                                Log.i("ResponseCode", String.valueOf(response.code()));
-
-                                if(response.code()==400){
-                                    showShortMsg("Check your internet connection");
-                                    mRenew.setVisibility(View.VISIBLE);
-                                    mProgress.setVisibility(View.GONE);
-                                    return;
-                                }else if(response.code()==429){
-                                    showShortMsg("Too many requests on database");
-                                    mRenew.setVisibility(View.VISIBLE);
-                                    mProgress.setVisibility(View.GONE);
-                                    return;
-                                }else if(response.code()==500){
-                                    showShortMsg("Server Error");
-                                    mRenew.setVisibility(View.VISIBLE);
-                                    mProgress.setVisibility(View.GONE);
-                                    return;
-                                }else if(response.code()==401){
-                                    showShortMsg("Unauthorized access, please try login again");
-                                    mRenew.setVisibility(View.VISIBLE);
-                                    mProgress.setVisibility(View.GONE);
-                                    return;
-                                }
-                                try {
-                                    if (!response.isSuccessful()) {
-
-                                        try{
-                                            APIError apiError= ErrorUtils.parseError(response);
-
-                                            showShortMsg("Invalid Entry: "+apiError.getErrors());
-                                            Log.i("Invalid EntryK",apiError.getErrors().toString());
-                                            Log.i("Invalid Entry",response.errorBody().toString());
-
-                                        }catch (Exception e){
-                                            Log.i("InvalidEntry",e.getMessage());
-                                            Log.i("ResponseError",response.errorBody().string());
-                                            showShortMsg("Failed to Renew"+e.getMessage());
-                                            mRenew.setVisibility(View.VISIBLE);
-                                            mProgress.setVisibility(View.GONE);
-
-                                        }
-                                        mRenew.setVisibility(View.VISIBLE);
-                                        mProgress.setVisibility(View.GONE);
-                                        return;
-                                    }
-
-
-                                    String amount=response.body().getAmount();
-                                    String policyNumber=response.body().getPolicyNumber();
-                                    String reference=response.body().getReference();
-
-
-                                    Intent i = new Intent(MyMarineDetail.this, PolicyPaymentActivity.class);
-                                    i.putExtra(Constant.POLICY_NUM, policyNumber);
-                                    i.putExtra(Constant.TOTAL_PRICE, amount);
-                                    i.putExtra(Constant.POLICY_TYPE, "marine");
-                                    i.putExtra(Constant.REF, reference);
-                                    startActivity(i);
-
-                                    mRenew.setVisibility(View.VISIBLE);
-                                    mProgress.setVisibility(View.GONE);
-
-                                }catch (Exception e){
-                                    Log.i("PolicyRenewError", e.getMessage());
-                                    mRenew.setVisibility(View.VISIBLE);
-                                    mProgress.setVisibility(View.GONE);
-                                }
-
-                            }
-                            @Override
-                            public void onFailure(Call<RenewPolicyGet> call, Throwable t) {
-                                showShortMsg("Renewed Failed "+t.getMessage());
-                                Log.i("GetError",t.getMessage());
-                                mRenew.setVisibility(View.VISIBLE);
-                                mProgress.setVisibility(View.GONE);
-                            }
-                        });
                         }else{
                             showShortMsg("No Internet Connection");
                         }
@@ -263,11 +202,175 @@ public class MyMarineDetail extends AppCompatActivity {
         } catch (ParseException e) {
             e.printStackTrace();
             showShortMsg("Error: "+e.getMessage());
-        }
-
+        }*/
 
 
     }
+
+  /*  private void sendMarineData(){
+
+        //get client and call object for request
+        ApiInterface client = ServiceGenerator.createService(ApiInterface.class);
+        Call<QouteHeadMarine> call=client.marine_quote("Token "+userPreferences.getUserToken(),value,coversion_rate);
+
+        call.enqueue(new Callback<QouteHeadMarine>() {
+            @Override
+            public void onResponse(Call<QouteHeadMarine> call, Response<QouteHeadMarine> response) {
+                Log.i("ResponseCode", String.valueOf(response.code()));
+
+
+                if(response.code()==400){
+                    showShortMsg("Check your internet connection");
+                    mRenew.setVisibility(View.VISIBLE);
+                    mProgress.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==429){
+                    showShortMsg("Too many requests on database");
+                    mRenew.setVisibility(View.VISIBLE);
+                    mProgress.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==500){
+                    showShortMsg("Server Error");
+                    mRenew.setVisibility(View.VISIBLE);
+                    mProgress.setVisibility(View.GONE);
+                    return;
+                }else if(response.code()==401){
+                    showShortMsg("Unauthorized access, please try login again");
+                    mRenew.setVisibility(View.VISIBLE);
+                    mProgress.setVisibility(View.GONE);
+                    return;
+                }
+
+                try {
+                    if (!response.isSuccessful()) {
+
+                        try{
+                            APIError apiError= ErrorUtils.parseError(response);
+
+                            showShortMsg("Invalid Entry: "+apiError.getErrors());
+                            Log.i("Invalid EntryK",apiError.getErrors().toString());
+                            Log.i("Invalid Entry",response.errorBody().toString());
+
+                        }catch (Exception e){
+                            Log.i("InvalidEntry",e.getMessage());
+                            Log.i("ResponseError",response.errorBody().string());
+                            showShortMsg("Failed to Fetch Quote"+e.getMessage());
+                            mRenew.setVisibility(View.VISIBLE);
+                            mProgress.setVisibility(View.GONE);
+
+                        }
+                        mRenew.setVisibility(View.VISIBLE);
+                        mProgress.setVisibility(View.GONE);
+                        return;
+                    }
+
+                    double quote_price=response.body().getData().getPrice();
+                    double sum_insured=response.body().getData().getSum_insured();
+
+                   roundOff = Math.round(quote_price*100)/100.00;
+                    Log.i("quote_price", String.valueOf(roundOff));
+
+                    Call<RenewPolicyGet> call2=client.renew_policy("Token "+userPreferences.getUserToken(),policy_num, String.valueOf(roundOff),"paystack");
+
+                    call2.enqueue(new Callback<RenewPolicyGet>() {
+                        @Override
+                        public void onResponse(Call<RenewPolicyGet> call, Response<RenewPolicyGet> response) {
+                            Log.i("ResponseCode", String.valueOf(response.code()));
+
+                            if(response.code()==400){
+                                showShortMsg("Check your internet connection");
+                                mRenew.setVisibility(View.VISIBLE);
+                                mProgress.setVisibility(View.GONE);
+                                return;
+                            }else if(response.code()==429){
+                                showShortMsg("Too many requests on database");
+                                mRenew.setVisibility(View.VISIBLE);
+                                mProgress.setVisibility(View.GONE);
+                                return;
+                            }else if(response.code()==500){
+                                showShortMsg("Server Error");
+                                mRenew.setVisibility(View.VISIBLE);
+                                mProgress.setVisibility(View.GONE);
+                                return;
+                            }else if(response.code()==401){
+                                showShortMsg("Unauthorized access, please try login again");
+                                mRenew.setVisibility(View.VISIBLE);
+                                mProgress.setVisibility(View.GONE);
+                                return;
+                            }
+                            try {
+                                if (!response.isSuccessful()) {
+
+                                    try{
+                                        APIError apiError= ErrorUtils.parseError(response);
+
+                                        showShortMsg("Invalid Entry: "+apiError.getErrors());
+                                        Log.i("Invalid EntryK",apiError.getErrors().toString());
+                                        Log.i("Invalid Entry",response.errorBody().toString());
+
+                                    }catch (Exception e){
+                                        Log.i("InvalidEntry",e.getMessage());
+                                        Log.i("ResponseError",response.errorBody().string());
+                                        showShortMsg("Failed to Renew"+e.getMessage());
+                                        mRenew.setVisibility(View.VISIBLE);
+                                        mProgress.setVisibility(View.GONE);
+
+                                    }
+                                    mRenew.setVisibility(View.VISIBLE);
+                                    mProgress.setVisibility(View.GONE);
+                                    return;
+                                }
+
+
+                                String amount=response.body().getAmount();
+                                String policyNumber=response.body().getPolicyNumber();
+                                String reference=response.body().getReference();
+
+
+                                Intent i = new Intent(MyMarineDetail.this, PolicyPaymentActivity.class);
+                                i.putExtra(Constant.POLICY_NUM, policyNumber);
+                                i.putExtra(Constant.TOTAL_PRICE, amount);
+                                i.putExtra(Constant.POLICY_TYPE, "marine");
+                                i.putExtra(Constant.REF, reference);
+                                startActivity(i);
+
+                                mRenew.setVisibility(View.VISIBLE);
+                                mProgress.setVisibility(View.GONE);
+
+                            }catch (Exception e){
+                                Log.i("PolicyRenewError", e.getMessage());
+                                mRenew.setVisibility(View.VISIBLE);
+                                mProgress.setVisibility(View.GONE);
+                            }
+
+                        }
+                        @Override
+                        public void onFailure(Call<RenewPolicyGet> call, Throwable t) {
+                            showShortMsg("Renewed Failed "+t.getMessage());
+                            Log.i("GetError",t.getMessage());
+                            mRenew.setVisibility(View.VISIBLE);
+                            mProgress.setVisibility(View.GONE);
+                        }
+                    });
+                   
+                }catch (Exception e){
+                    Log.i("policyResponse", e.getMessage());
+                    mRenew.setVisibility(View.VISIBLE);
+                    mProgress.setVisibility(View.GONE);
+                }
+
+            }
+            @Override
+            public void onFailure(Call<QouteHeadMarine> call, Throwable t) {
+                showShortMsg("Submission Failed "+t.getMessage());
+                Log.i("GEtError",t.getMessage());
+                mRenew.setVisibility(View.VISIBLE);
+                mProgress.setVisibility(View.GONE);
+            }
+        });
+
+    }*/
+
 
     private void applyToolbarChildren(String title) {
         setSupportActionBar(mToolbar);

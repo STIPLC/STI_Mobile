@@ -65,24 +65,37 @@
                         android:padding="10dp"
                         >
 
-                        <ScrollView
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="8dp"
-                            >
+                            android:orientation="vertical"
+                            android:layout_height="match_parent">
 
-                            <TextView
-                                android:id="@+id/personal_info"
+
+                            <ScrollView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Test"
-                                android:textColor="@color/colorGrey"
-                                android:textSize="18sp"
-                                />
+                                android:layout_margin="8dp">
 
-                        </ScrollView>
+                                <TextView
+                                    android:id="@+id/personal_info"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="Test"
+                                    android:textColor="@color/colorGrey"
+                                    android:textSize="18sp" />
 
+                            </ScrollView>
 
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="13sp"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginBottom="4dp"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginEnd="8dp"
+                                android:text="Click the Drop down Button, for Vehicle(s) detail" />
 
 
                             <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -95,9 +108,11 @@
                                 app:srcCompat="@drawable/ic_down_24dp"
                                 tools:ignore="VectorDrawableCompat"/>
 
+
+                        </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
-                    <com.google.android.material.textfield.TextInputLayout
+                    <!--<com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/inputLayoutPin_m5"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -117,7 +132,7 @@
                             tools:targetApi="o"
                             />
                     </com.google.android.material.textfield.TextInputLayout>
-
+-->
                     <Spinner
                         android:id="@+id/modeOfPayment_spinner_m5"
                         android:layout_width="match_parent"

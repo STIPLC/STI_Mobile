@@ -139,7 +139,6 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
             if (isValid) {
 
                 //Post Request to Api
-
                 sendData();
               }
 
@@ -160,7 +159,6 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
         Log.i("UserObj",userPostData.toString());
         UserPostObj userPostObj=new UserPostObj(userPostData);
         Log.i("UserHead",userPostObj.toString());
-
         sentNetworkRequest(userPostObj);
     }
 
@@ -198,7 +196,7 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
 
                             if(response.code()==422){
 
-                                showMessage("Invalid login credentials");
+                                showMessage("Invalid email or password");
                                 mSigninBtn.setVisibility(View.VISIBLE);
                                 mAvi1.setVisibility(View.GONE);
                                 return;
@@ -207,13 +205,13 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
                             try {
                                 APIError apiError = ErrorUtils.parseError(response);
 
-                                showMessage("Invalid Entry: " + apiError.getErrors());
+                                showMessage("Login Failed: " + apiError.getErrors());
                                 Log.i("Invalid EntryK", apiError.getErrors().toString());
                                 Log.i("Invalid Entry", response.errorBody().toString());
 
                             } catch (Exception e) {
                                 Log.i("InvalidEntry", e.getMessage());
-                                showMessage("Invalid Entry");
+                                showMessage("Login Failed");
 
                             }
                             mSigninBtn.setVisibility(View.VISIBLE);
