@@ -20,7 +20,7 @@ public class Item implements Serializable
     @SerializedName("receipt")
     @Expose
     private String receipt;
-    @SerializedName("serial")
+    @SerializedName("serial_number")
     @Expose
     private String serial;
     @SerializedName("imei")

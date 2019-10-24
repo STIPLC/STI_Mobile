@@ -77,6 +77,8 @@ public class MyAllRiskDetail extends AppCompatActivity {
     TextView mPrice;
     @BindView(R.id.imei_num)
     TextView mImeiNum;
+    @BindView(R.id.serial_num)
+    TextView mSerialNum;
     /* @BindView(R.id.payment_ref)
      TextView mPaymentRef;*/
     @BindView(R.id.renew_btn)
@@ -120,6 +122,7 @@ public class MyAllRiskDetail extends AppCompatActivity {
         String status=intent.getStringExtra("status");
         String payment_reference=intent.getStringExtra("payment_reference");
         String imei=intent.getStringExtra("imei");
+        String serial = intent.getStringExtra("serial");
 
 
         NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
@@ -140,6 +143,7 @@ public class MyAllRiskDetail extends AppCompatActivity {
         mPaymentStatus.setText(payment_status);
         //mPaymentRef.setText(payment_reference);
         mImeiNum.setText(imei);
+        mSerialNum.setText(serial);
 
         slide_front_right = AnimationUtils.loadAnimation(getApplicationContext(),
                 R.anim.slide_to_right);

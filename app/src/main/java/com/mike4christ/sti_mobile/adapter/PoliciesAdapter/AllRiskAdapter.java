@@ -75,7 +75,7 @@ public class AllRiskAdapter extends RecyclerView.Adapter<AllRiskAdapter.MyViewHo
                         allriskList.get(pos).getPolicyNumber(), allriskList.get(pos).getPolicyType(),
                         allriskList.get(pos).getPrice(), allriskList.get(pos).getStart(), allriskList.get(pos).getEnd(), allriskList.get(pos).getReceipt(),
                         allriskList.get(pos).getPaymentStatus(), allriskList.get(pos).getStatus(), allriskList.get(pos).getPaymentReference(),
-                        allriskList.get(pos).getImei(), MyAllRiskDetail.class);
+                        allriskList.get(pos).getImei(), allriskList.get(pos).getSerial(), MyAllRiskDetail.class);
 
             });
         } else {
@@ -92,17 +92,17 @@ public class AllRiskAdapter extends RecyclerView.Adapter<AllRiskAdapter.MyViewHo
                         allriskList.get(pos).getPolicyNumber(), allriskList.get(pos).getPolicyType(),
                         allriskList.get(pos).getPrice(), allriskList.get(pos).getStart(), allriskList.get(pos).getEnd(), allriskList.get(pos).getReceipt(),
                         allriskList.get(pos).getPaymentStatus(), allriskList.get(pos).getStatus(), allriskList.get(pos).getPaymentReference(),
-                        allriskList.get(pos).getImei(), MyAllRiskDetail.class);
+                        allriskList.get(pos).getImei(), allriskList.get(pos).getSerial(), MyAllRiskDetail.class);
 
             });
         }
     }
 
-    private void nextActivity(String Item,String value,String period,
-                    String policynum,String policy_type,
-                    String policy_price,String start_date,String end_date,String receipt_link,
-                    String payment_status,String status,String payment_reference,String imei,
-    Class allriskActivityClass) {
+    private void nextActivity(String Item, String value, String period,
+                              String policynum, String policy_type,
+                              String policy_price, String start_date, String end_date, String receipt_link,
+                              String payment_status, String status, String payment_reference, String imei, String serial,
+                              Class allriskActivityClass) {
         Intent i = new Intent(context, allriskActivityClass);
         i.putExtra("Item", Item);
         i.putExtra("value", value);
@@ -117,6 +117,7 @@ public class AllRiskAdapter extends RecyclerView.Adapter<AllRiskAdapter.MyViewHo
         i.putExtra("status", status);
         i.putExtra("payment_reference", payment_reference);
         i.putExtra("imei", imei);
+        i.putExtra("serial", serial);
 
         context.startActivity(i);
     }

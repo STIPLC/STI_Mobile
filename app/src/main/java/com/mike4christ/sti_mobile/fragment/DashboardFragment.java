@@ -51,6 +51,7 @@ import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.SignIn;
 import com.mike4christ.sti_mobile.UserPreferences;
 import com.mike4christ.sti_mobile.activity.Dashboard;
+import com.mike4christ.sti_mobile.activity.NewsDetail;
 import com.mike4christ.sti_mobile.adapter.PoliciesAdapter.AllRiskAdapter;
 import com.mike4christ.sti_mobile.adapter.PoliciesAdapter.EticAdapter;
 import com.mike4christ.sti_mobile.adapter.PoliciesAdapter.MarineAdapter;
@@ -163,6 +164,23 @@ public class DashboardFragment extends Fragment implements BaseSliderView.OnSlid
             public void onClick(View view) {
                 fragment = new TransactionHistoryFragment();
                 showFragment(fragment);
+            }
+        });
+
+        String news_info = getResources().getString(R.string.news_info);
+        //String news_img=getResources().getString(R.string.news_img);
+        String news_title = getResources().getString(R.string.news_title);
+        String news_datetime = getResources().getString(R.string.news_datetime);
+
+        mReadMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), NewsDetail.class);
+                intent.putExtra("news_info", news_info);
+                //intent.putExtra("news_img",news_img);
+                intent.putExtra("news_title", news_title);
+                intent.putExtra("news_datetime", news_datetime);
+                startActivity(intent);
             }
         });
 

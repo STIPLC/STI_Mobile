@@ -4,6 +4,28 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="privacy">I declare to the best of my knowledge and belief that the above information are true and all necessary particulars affecting the assessment of the risk have been disclosed.</string>
 
+    <string name="news_info">Sovereign Trust Insurance Plc recently demonstrated another noble gesture in line with its Corporate Social Responsibility by giving out school bags and other educational items to a primary school within the locality of its corporate Head Office in Victoria Island, Lagos. This initiative was to commemorate the celebration of Children’s Day which was marked on May 27, 2018.
+
+According to Segun Bankole, Head of Corporate Communications and Brand Management of the Underwriting Firm, “the initiative is geared at promoting academic excellence and good behavioral conduct amongst pupils in public primary schools in the country.” He further mentioned that the initiative will go beyond the Children’s Day celebration as the company intends to make it an on-going one in some other locations where they have business presence.
+
+Part of the criteria set in determining recipients included best pupils in all arms of the classes, (male and female) in Mathematics and English Language, most punctual pupil in the school, best behaved boy and girl, most improved pupil in the school in the male and female category as well.
+
+The Head Teacher of the School was full of praises for the organization as he thanked the Underwriting Firm for the kind gesture shown to the Pupils. He said in his words, “I am indeed very grateful for this very thoughtful initiative and I want to thank your organization on behalf of the Pupils of the School and their parents who you have helped one way or the other with this good gesture of yours”. I can only continue to wish your organization well in all your business endeavors.
+
+The Managing Director and Chief Executive Officer of Sovereign Trust Insurance Plc, Mr. Olaotan Soyinka in his remarks reiterated the commitment of the organization in giving back to the society whenever the opportunity presents itself. He concluded by saying that “the organization will from time to time, identify and implement initiatives that will positively impact upon the lives of Nigerians at every level of the society without recourse to religious, gender or ethnic biases”. He said the company is a wholly-owned Nigerian Insurance company that is interested in the welfare and the aspirations of every Nigerian both at home and in the diaspora. He seized the opportunity to appeal to the public to embrace insurance as it remains the only business that is established to ensure wealth creation and preservation of assets and human lives.
+
+
+
+OLUSEGUN BANKOLE
+
+AGM/Head, Corporate Communications and Brand Management
+
+Sovereign Trust Insurance Plc</string>
+
+
+    <string name="news_datetime">2018-8-29</string>
+    <string name="news_img">https://stiplc.com/web/press-details.php?a=sti-promotes-academic-excellence-in-primary-schools</string>
+    <string name="news_title">STI Promotes Academic Excellence In Primary Schools - Donates School Bags Et Al</string>
 
     <string-array name="type_array">
         <item> Select Type* </item>

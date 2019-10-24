@@ -47,6 +47,9 @@ public class Persona implements Serializable
     @SerializedName("next_of_kin_address")
     @Expose
     public String nextOfKinAddress;
+    @SerializedName("business")
+    @Expose
+    public String business;
     @SerializedName("employer")
     @Expose
     public String employer;
@@ -72,7 +75,7 @@ public class Persona implements Serializable
     @Expose
     public String contactPerson;
 
-    public Persona(String firstName, String lastName, String email, String gender, String phone, String houseAddress, String accountNumber, String maritalStatus, String picture, String identificationMeans, String nextOfKin, String nextOfKinPhone, String nextOfKinAddress, String employer, String employerAddress, String customerType, String companyName, String mailingAddress, String tinNumber, String officeAddress, String contactPerson) {
+    public Persona(String firstName, String lastName, String email, String gender, String phone, String houseAddress, String accountNumber, String maritalStatus, String picture, String identificationMeans, String nextOfKin, String nextOfKinPhone, String nextOfKinAddress, String business, String employer, String employerAddress, String customerType, String companyName, String mailingAddress, String tinNumber, String officeAddress, String contactPerson) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -86,6 +89,7 @@ public class Persona implements Serializable
         this.nextOfKin = nextOfKin;
         this.nextOfKinPhone = nextOfKinPhone;
         this.nextOfKinAddress = nextOfKinAddress;
+        this.business = business;
         this.employer = employer;
         this.employerAddress = employerAddress;
         this.customerType = customerType;

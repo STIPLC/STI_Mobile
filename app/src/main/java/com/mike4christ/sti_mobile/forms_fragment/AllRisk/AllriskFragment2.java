@@ -815,7 +815,7 @@ public class AllriskFragment2 extends Fragment implements View.OnClickListener{
                 userPreferences.setAllRiskSerialNo(" ");
             }
             userPreferences.setAllRiskItemValue(mItemValueA2.getText().toString());
-            if (mInputLayoutSerialNoA2.isClickable()) {
+            if (mInputLayoutItemImeiA2.isClickable()) {
                 userPreferences.setAllRiskItemImei(mImeiA2.getText().toString());
             } else {
                 userPreferences.setAllRiskItemImei(" ");

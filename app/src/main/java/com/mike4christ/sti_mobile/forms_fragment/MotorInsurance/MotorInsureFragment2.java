@@ -656,6 +656,8 @@ public class MotorInsureFragment2 extends Fragment implements View.OnClickListen
             showMessage("Select your Covers");
             isValid = false;
         }
+
+
         private_commString = private_comm_spinner.getSelectedItem().toString();
         if (!private_commString.equals("Motor Cycle")) {
             //VehincleMaker Spinner

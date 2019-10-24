@@ -358,9 +358,10 @@
                     android:layout_height="match_parent"
                     android:text="Read more... "
                     android:textAlignment="textStart"
-                    android:textSize="11sp"
-                    android:textColor="@color/colorBlack"
-                    android:fontFamily="@font/montserrat_regular"
+                    android:textSize="16sp"
+                    android:textColor="@color/colorAccent"
+                    android:fontFamily="@font/montserrat_bold"
+
                     />
 
             </LinearLayout>

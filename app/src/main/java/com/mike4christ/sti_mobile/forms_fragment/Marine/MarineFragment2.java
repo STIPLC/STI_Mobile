@@ -671,6 +671,11 @@ public class MarineFragment2 extends Fragment implements View.OnClickListener{
             //isValid = false;
         }
 
+        if (doc_img_url == null) {
+            showMessage("Please upload the proforma invoice image");
+            isValid = false;
+        }
+
 
 
         if (isValid) {
@@ -775,21 +780,29 @@ public class MarineFragment2 extends Fragment implements View.OnClickListener{
 
                     double quote_price=response.body().getData().getPrice();
                     double sum_insured=response.body().getData().getSum_insured();
+                    Log.i("insured_price", String.valueOf(sum_insured));
 
                     double roundOff = Math.round(quote_price*100)/100.00;
+                    double roundOffInsured = Math.round(sum_insured * 100) / 100.00;
 
 
-                    Log.i("quote_price", String.valueOf(roundOff));
+
 
                     mBtnLayout2M2.setVisibility(View.VISIBLE);
                     mProgressbar2M2.setVisibility(View.GONE);
 
+                    String price_coverted = String.format("%.2f", roundOff);
+                    String sum_covert = String.format("%.2f", roundOffInsured);
+
+                    Log.i("quote_price", price_coverted);
+                    Log.i("insured_amt", sum_covert);
 
                     // Fragment quoteBuyFragment3 = new MarineInsureFragment3();
                     FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.replace(R.id.fragment_marine_form_container, MarineFragment3.newInstance("Price", String.valueOf(roundOff)), MarineFragment3.class.getSimpleName());
+                    ft.replace(R.id.fragment_marine_form_container, MarineFragment3.newInstance(sum_covert, price_coverted), MarineFragment3.class.getSimpleName());
                     ft.commit();
                     showMessage("Successfully Fetched Quote");
+
                 }catch (Exception e){
                     Log.i("policyResponse", e.getMessage());
                     mBtnLayout2M2.setVisibility(View.VISIBLE);

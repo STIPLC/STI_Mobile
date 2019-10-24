@@ -259,7 +259,7 @@ public class MotorInsureFragment5 extends Fragment implements View.OnClickListen
             String corperate = "Company Name: " + personal_details.get(0).getCompany_name() + "\n" + "TIN Number: " + personal_details.get(0).getTin_number() + "\n" +
                     "Phone Number: " + personal_details.get(0).getPhone() + "\n" +
                     "Office Address: "+personal_details.get(0).getOffice_address()+"\n"+"Contact Person: "+personal_details.get(0).getContact_person()+"\n"+
-                    "\n"+"Email Address: "+personal_details.get(0).getEmail()+"\n"+
+                    "Email Address: " + personal_details.get(0).getEmail() + "\n" +
                     "Total Premium: " + v_price;
             personal_info.setText(corperate);
 
@@ -415,7 +415,7 @@ public class MotorInsureFragment5 extends Fragment implements View.OnClickListen
 
             Persona persona=new Persona("null","null",personal_details.get(0).getEmail(),"null",personal_details.get(0).getPhone(),"null",
                     "null","null",personal_details.get(0).getPicture(),"null","null","null","null",personal_details.get(0).getBusiness(),
-                    personal_details.get(0).getState(),"2",personal_details.get(0).getCompany_name(),personal_details.get(0).getMailing_address(),personal_details.get(0).getTin_number(),
+                    "null", personal_details.get(0).getState(), "2", personal_details.get(0).getCompany_name(), personal_details.get(0).getMailing_address(), personal_details.get(0).getTin_number(),
                     personal_details.get(0).getOffice_address(),personal_details.get(0).getContact_person());
 
             for(int i=0;i<results.size();i++) {
@@ -468,7 +468,7 @@ public class MotorInsureFragment5 extends Fragment implements View.OnClickListen
 
             Persona persona=new Persona(personal_details.get(0).getFirst_name(),personal_details.get(0).getLast_name(),personal_details.get(0).getEmail(),personal_details.get(0).getGender(),personal_details.get(0).getPhone(),personal_details.get(0).getResident_address(),
                     "null","null",personal_details.get(0).getPicture(),"null",personal_details.get(0).getNext_of_kin(),"null","null",personal_details.get(0).getBusiness(),
-                    personal_details.get(0).getState(),"1","null",personal_details.get(0).getMailing_address(),"null",
+                    "null", personal_details.get(0).getState(), "1", "null", personal_details.get(0).getMailing_address(), "null",
                     "null","null");
 
             for(int i=0;i<picture_results.size();i++) {

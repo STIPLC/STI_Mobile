@@ -444,6 +444,39 @@
 
 
                     </LinearLayout>
+
+                    <LinearLayout
+
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Serial \nNumber: "
+                            android:fontFamily="@font/montserrat_semibold"
+                            android:textSize="15sp"
+
+                            />
+
+                        <TextView
+                            android:id="@+id/serial_num"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="$657744.00555555555555555555555555555555555555555555555555555555555555555"
+                            android:textSize="15sp"
+                            android:layout_gravity="center_vertical"
+                            android:textColor="@color/colorPrimary"
+                            android:fontFamily="@font/montserrat_semibold"
+                            android:layout_marginStart="@dimen/size_ten"
+
+                            />
+
+
+                    </LinearLayout>
+
+
                     <!-- <LinearLayout
 
                          android:layout_width="match_parent"
