@@ -534,7 +534,7 @@ public class ProfileActivity extends AppCompatActivity {
         mFirstname.setText("FirstName: "+userPreferences.getFirstName());
         mLastname.setText("LastName: "+userPreferences.getLastName());
 
-        if(userPreferences.getUsername()=="null"){
+        if(userPreferences.getUsername()==null){
             mUsernameTxt.setText("");
         }else{
             mUsernameTxt.setText(userPreferences.getUsername());
@@ -571,3 +571,6 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
 }
+
+
+

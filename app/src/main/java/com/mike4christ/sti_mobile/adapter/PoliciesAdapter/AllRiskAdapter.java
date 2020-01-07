@@ -14,11 +14,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
-import com.mike4christ.sti_mobile.Constant;
 import com.mike4christ.sti_mobile.Model.MyPolicies.AllRisk;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.activity.MyAllRiskDetail;
-import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
 import com.mike4christ.sti_mobile.retrofit_interface.ItemClickListener;
 
 import java.text.DecimalFormat;
@@ -55,7 +53,7 @@ public class AllRiskAdapter extends RecyclerView.Adapter<AllRiskAdapter.MyViewHo
 
         Log.i("PriceAllRisk", allriskOption.getPrice());
 
-        if (allriskOption.getPrice() != null) {
+        if (allriskOption.getPrice() != null&& !allriskOption.getPrice().equals("")) {
 
             holder.mPolicyNum.setText(allriskOption.getPolicyNumber());
             NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
@@ -80,7 +78,7 @@ public class AllRiskAdapter extends RecyclerView.Adapter<AllRiskAdapter.MyViewHo
             });
         } else {
             holder.mPolicyNum.setText(allriskOption.getPolicyNumber());
-            holder.mPrice.setText(allriskOption.getPrice());
+            holder.mPrice.setText("--");
             holder.mDateTime.setText(allriskOption.getCreatedAt());
             holder.mStatus.setText(allriskOption.getStatus());
             holder.mPaymentStatus.setText(allriskOption.getPaymentStatus());
@@ -88,12 +86,12 @@ public class AllRiskAdapter extends RecyclerView.Adapter<AllRiskAdapter.MyViewHo
 
 
             holder.setItemClickListener(pos -> {
-                nextActivity(allriskList.get(pos).getItem(), allriskList.get(pos).getValue(), allriskList.get(pos).getPeriod(),
+                /*nextActivity(allriskList.get(pos).getItem(), allriskList.get(pos).getValue(), allriskList.get(pos).getPeriod(),
                         allriskList.get(pos).getPolicyNumber(), allriskList.get(pos).getPolicyType(),
                         allriskList.get(pos).getPrice(), allriskList.get(pos).getStart(), allriskList.get(pos).getEnd(), allriskList.get(pos).getReceipt(),
                         allriskList.get(pos).getPaymentStatus(), allriskList.get(pos).getStatus(), allriskList.get(pos).getPaymentReference(),
                         allriskList.get(pos).getImei(), allriskList.get(pos).getSerial(), MyAllRiskDetail.class);
-
+*/
             });
         }
     }

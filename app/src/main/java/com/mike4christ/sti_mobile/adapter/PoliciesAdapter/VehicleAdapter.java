@@ -12,12 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
-import com.mike4christ.sti_mobile.Constant;
 import com.mike4christ.sti_mobile.Model.MyPolicies.Vehicle;
-import com.mike4christ.sti_mobile.Model.Vehicle.VehicleDetails;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.activity.MyVehicleDetail;
-import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
 import com.mike4christ.sti_mobile.retrofit_interface.ItemClickListener;
 
 import java.text.DecimalFormat;
@@ -53,7 +50,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.MyViewHo
         Vehicle vehicleOption = vehicleList.get(i);
 
 
-        if (vehicleOption.getPrice() != null) {
+        if (vehicleOption.getPrice() != null && !vehicleOption.getPrice().equals("")) {
             holder.mPolicyNum.setText(vehicleOption.getPolicyNumber());
             NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
             nf.setMaximumFractionDigits(2);
@@ -78,7 +75,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.MyViewHo
 
         } else {
             holder.mPolicyNum.setText(vehicleOption.getPolicyNumber());
-            holder.mPrice.setText(vehicleOption.getPrice());
+            holder.mPrice.setText("--");
             holder.mDateTime.setText(vehicleOption.getCreatedAt());
             holder.mStatus.setText(vehicleOption.getStatus());
             holder.mPaymentStatus.setText(vehicleOption.getPaymentStatus());
@@ -86,12 +83,12 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.MyViewHo
 
             holder.setItemClickListener(pos -> {
 
-                nextActivity(vehicleList.get(pos).getBodyType(), vehicleList.get(pos).getChasisNumber(), vehicleList.get(pos).getEnd(), vehicleList.get(pos).getStart(),
+               /* nextActivity(vehicleList.get(pos).getBodyType(), vehicleList.get(pos).getChasisNumber(), vehicleList.get(pos).getEnd(), vehicleList.get(pos).getStart(),
                         vehicleList.get(pos).getEngineNumber(), vehicleList.get(pos).getMake(), vehicleList.get(pos).getPaymentReference(),
                         vehicleList.get(pos).getPeriod(), vehicleList.get(pos).getPolicyType(), vehicleList.get(pos).getEnhancedThirdParty(), vehicleList.get(pos).getPrice(), vehicleList.get(pos).getPrivateCommercial(),
                         vehicleList.get(pos).getStatus(), vehicleList.get(pos).getPaymentStatus(), vehicleList.get(pos).getRegistrationNumber(), vehicleList.get(pos).getVehicleValue(),
                         vehicleList.get(pos).getYear(), vehicleList.get(pos).getPolicyNumber(), MyVehicleDetail.class);
-
+*/
             });
 
         }

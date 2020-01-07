@@ -115,6 +115,7 @@ public class ForgetPassword extends AppCompatActivity implements View.OnClickLis
             case R.id.reset_pass:
                 mInputLayoutToken.setVisibility(View.VISIBLE);
                 mInputLayoutNewPassword.setVisibility(View.VISIBLE);
+                inputLayoutConfirmPass.setVisibility(View.VISIBLE);
                 mInitiateBtn.setVisibility(View.GONE);
                 mResetBtn.setVisibility(View.VISIBLE);
                 mResetPass.setVisibility(View.GONE);

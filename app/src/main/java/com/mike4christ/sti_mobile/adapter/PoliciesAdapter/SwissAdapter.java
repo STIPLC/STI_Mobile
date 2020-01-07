@@ -12,12 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
-import com.mike4christ.sti_mobile.Constant;
 import com.mike4christ.sti_mobile.Model.MyPolicies.Swis;
 import com.mike4christ.sti_mobile.R;
-
 import com.mike4christ.sti_mobile.activity.MySwissDetail;
-import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
 import com.mike4christ.sti_mobile.retrofit_interface.ItemClickListener;
 
 import java.text.DecimalFormat;
@@ -53,7 +50,7 @@ public class SwissAdapter extends RecyclerView.Adapter<SwissAdapter.MyViewHolder
         Swis swisOption = swisList.get(i);
 
 
-        if (swisOption.getPrice() != null) {
+        if (swisOption.getPrice() != null && !swisOption.getPrice().equals("")) {
             holder.mPolicyNum.setText(swisOption.getPolicyNumber());
             NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
             nf.setMaximumFractionDigits(2);
@@ -79,7 +76,7 @@ public class SwissAdapter extends RecyclerView.Adapter<SwissAdapter.MyViewHolder
 
         } else {
             holder.mPolicyNum.setText(swisOption.getPolicyNumber());
-            holder.mPrice.setText(swisOption.getPrice());
+            holder.mPrice.setText("--");
             holder.mDateTime.setText(swisOption.getCreatedAt());
             holder.mStatus.setText(swisOption.getStatus());
             holder.mPaymentStatus.setText(swisOption.getPaymentStatus());
@@ -88,12 +85,12 @@ public class SwissAdapter extends RecyclerView.Adapter<SwissAdapter.MyViewHolder
 
             holder.setItemClickListener(pos -> {
 
-                nextActivity(swisList.get(pos).getFirstName(), swisList.get(pos).getLastName(),
+               /* nextActivity(swisList.get(pos).getFirstName(), swisList.get(pos).getLastName(),
                         swisList.get(pos).getPhone(), swisList.get(pos).getPicture(), swisList.get(pos).getAddress(), swisList.get(pos).getDateOfBirth(),
                         swisList.get(pos).getCategory(), swisList.get(pos).getEmail(), swisList.get(pos).getStart(), swisList.get(pos).getEnd(),
                         swisList.get(pos).getPrice(), swisList.get(pos).getStatus(), swisList.get(pos).getPaymentStatus(),
                         swisList.get(pos).getNextOfKin(), swisList.get(pos).getNextOfKinPhone(), swisList.get(pos).getGender(), swisList.get(pos).getMaritalStatus(), swisList.get(pos).getPolicyNumber(), MySwissDetail.class);
-
+*/
             });
         }
     }

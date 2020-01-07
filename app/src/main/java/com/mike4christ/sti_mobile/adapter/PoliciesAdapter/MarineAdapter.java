@@ -12,11 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
-import com.mike4christ.sti_mobile.Constant;
 import com.mike4christ.sti_mobile.Model.MyPolicies.Marine;
 import com.mike4christ.sti_mobile.R;
 import com.mike4christ.sti_mobile.activity.MyMarineDetail;
-import com.mike4christ.sti_mobile.activity.PolicyPaymentActivity;
 import com.mike4christ.sti_mobile.retrofit_interface.ItemClickListener;
 
 import java.text.DecimalFormat;
@@ -52,7 +50,7 @@ public class MarineAdapter extends RecyclerView.Adapter<MarineAdapter.MyViewHold
         Marine marineOption = marineList.get(i);
 
 
-        if (marineOption.getPrice() != null) {
+        if (marineOption.getPrice() != null&& !marineOption.getPrice().equals("")) {
             holder.mPolicyNum.setText(marineOption.getPolicyNumber());
 
             NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
@@ -81,7 +79,7 @@ public class MarineAdapter extends RecyclerView.Adapter<MarineAdapter.MyViewHold
         } else {
             holder.mPolicyNum.setText(marineOption.getPolicyNumber());
 
-            holder.mPrice.setText(marineOption.getPrice());
+            holder.mPrice.setText("--");
             holder.mDateTime.setText(marineOption.getCreatedAt());
             holder.mStatus.setText(marineOption.getStatus());
             holder.mPaymentStatus.setText(marineOption.getPaymentStatus());
@@ -90,13 +88,13 @@ public class MarineAdapter extends RecyclerView.Adapter<MarineAdapter.MyViewHold
 
             holder.setItemClickListener(pos -> {
 
-                nextActivity(marineList.get(pos).getPolicyNumber(), marineList.get(pos).getDescription(), marineList.get(pos).getValue()
+               /* nextActivity(marineList.get(pos).getPolicyNumber(), marineList.get(pos).getDescription(), marineList.get(pos).getValue()
                         , marineList.get(pos).getLoadingPort(), marineList.get(pos).getDischargePort(), marineList.get(pos).getPolicyType(),
                         marineList.get(pos).getPrice(), marineList.get(pos).getStart(), marineList.get(pos).getEnd(), marineList.get(pos).getPaymentReference()
                         , marineList.get(pos).getStatus(), marineList.get(pos).getPfiDate(), marineList.get(pos).getPfiNumber(), marineList.get(pos).getConveyanceMode(), marineList.get(pos).getPaymentStatus(), marineList.get(pos).getConversionRate()
                         , MyMarineDetail.class);
 
-
+*/
             });
         }
     }
