@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:id="@+id/email_us_layout"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.mike4christ.sti_mobile.fragment.EmailUsFragment">
+    tools:context="com.sti.sti_mobile.fragment.EmailUsFragment">
 
 
     <LinearLayout

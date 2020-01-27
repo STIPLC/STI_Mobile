@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.mike4christ.sti_mobile">
+    package="com.sti.sti_mobile">
 
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -22,7 +22,7 @@
         android:required="true" />
 
     <application
-        android:name=".BaseApplication"
+        android:name="com.sti.sti_mobile.BaseApplication"
         android:allowBackup="true"
         android:icon="@mipmap/sti__mobile_logo_dark"
         android:label="@string/app_name"
@@ -47,12 +47,12 @@
 
           <meta-data
          android:name="co.paystack.android.PublicKey"
-         android:value="pk_test_d0ca9d91eeee10ecba75c648e988170b29d0978e"/>
+         android:value="pk_live_fb910afc310835ca10c26860ba9a2de51d1cbebb"/>
 
         <activity
-            android:name=".activity.FindUs"
+            android:name="com.sti.sti_mobile.activity.FindUs"
             android:label="Find Us"
-            android:parentActivityName=".activity.Dashboard">
+            android:parentActivityName="com.sti.sti_mobile.activity.Dashboard">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -61,7 +61,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Splash">
+        <activity android:name="com.sti.sti_mobile.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -71,16 +71,16 @@
 
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
-            android:value=".activity.Dashboard" />
+            android:value="com.sti.sti_mobile.activity.Dashboard" />
 
-        <activity android:name=".SignUp">
+        <activity android:name="com.sti.sti_mobile.SignUp">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".SignIn">
+        <activity android:name="com.sti.sti_mobile.SignIn">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -88,7 +88,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.Dashboard"
+            android:name="com.sti.sti_mobile.activity.Dashboard"
             android:label="Sovereign Trust Insurance"
             android:theme="@style/AppThemeSuper.NoActionBar">
             <intent-filter>
@@ -98,8 +98,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Forms.EticForm"
-            android:parentActivityName=".activity.Dashboard"
+            android:name="com.sti.sti_mobile.Forms.EticForm"
+            android:parentActivityName="com.sti.sti_mobile.activity.Dashboard"
             android:theme="@style/AppThemeSuper.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -108,8 +108,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Forms.MotorInsuredForm"
-            android:parentActivityName=".activity.Dashboard"
+            android:name="com.sti.sti_mobile.Forms.MotorInsuredForm"
+            android:parentActivityName="com.sti.sti_mobile.activity.Dashboard"
             android:theme="@style/AppThemeSuper.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -118,8 +118,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Forms.MarineForm"
-            android:parentActivityName=".activity.Dashboard"
+            android:name="com.sti.sti_mobile.Forms.MarineForm"
+            android:parentActivityName="com.sti.sti_mobile.activity.Dashboard"
             android:theme="@style/AppThemeSuper.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -128,8 +128,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Forms.OtherInsuredForm"
-            android:parentActivityName=".activity.Dashboard"
+            android:name="com.sti.sti_mobile.Forms.OtherInsuredForm"
+            android:parentActivityName="com.sti.sti_mobile.activity.Dashboard"
             android:theme="@style/AppThemeSuper.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -138,8 +138,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Forms.Claim"
-            android:parentActivityName=".activity.Dashboard"
+            android:name="com.sti.sti_mobile.Forms.Claim"
+            android:parentActivityName="com.sti.sti_mobile.activity.Dashboard"
             android:theme="@style/AppThemeSuper.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -148,8 +148,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Forms.SwissForm"
-            android:parentActivityName=".activity.Dashboard">
+            android:name="com.sti.sti_mobile.Forms.SwissForm"
+            android:parentActivityName="com.sti.sti_mobile.activity.Dashboard">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -157,33 +157,33 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Forms.AllRiskForm"
-            android:parentActivityName=".activity.Dashboard">
+            android:name="com.sti.sti_mobile.Forms.AllRiskForm"
+            android:parentActivityName="com.sti.sti_mobile.activity.Dashboard">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.PolicyPaymentActivity"
-            android:parentActivityName=".activity.Dashboard"/>
+        <activity android:name="com.sti.sti_mobile.activity.PolicyPaymentActivity"
+            android:parentActivityName="com.sti.sti_mobile.activity.Dashboard"/>
 
-        <activity android:name=".ForgetPassword" />
-        <activity android:name=".activity.RenewPaymentActivity"
-            android:parentActivityName=".activity.Dashboard"/>
-        <activity android:name=".activity.MyClaimsDetail" />
-        <activity android:name=".activity.MySwissDetail" />
-        <activity android:name=".activity.MyAllRiskDetail" />
-        <activity android:name=".activity.MyVehicleDetail" />
-        <activity android:name=".activity.MyMarineDetail" />
-        <activity android:name=".activity.MyEticDetail" />
+        <activity android:name="com.sti.sti_mobile.ForgetPassword" />
+        <activity android:name="com.sti.sti_mobile.activity.RenewPaymentActivity"
+            android:parentActivityName="com.sti.sti_mobile.activity.Dashboard"/>
+        <activity android:name="com.sti.sti_mobile.activity.MyClaimsDetail" />
+        <activity android:name="com.sti.sti_mobile.activity.MySwissDetail" />
+        <activity android:name="com.sti.sti_mobile.activity.MyAllRiskDetail" />
+        <activity android:name="com.sti.sti_mobile.activity.MyVehicleDetail" />
+        <activity android:name="com.sti.sti_mobile.activity.MyMarineDetail" />
+        <activity android:name="com.sti.sti_mobile.activity.MyEticDetail" />
         <activity
-            android:name=".activity.ProfileActivity"
+            android:name="com.sti.sti_mobile.activity.ProfileActivity"
             android:label="My Account"
-            android:parentActivityName=".activity.Dashboard" />
+            android:parentActivityName="com.sti.sti_mobile.activity.Dashboard" />
         <activity
-            android:name=".activity.NewsDetail"
-            android:parentActivityName=".activity.Dashboard" />
+            android:name="com.sti.sti_mobile.activity.NewsDetail"
+            android:parentActivityName="com.sti.sti_mobile.activity.Dashboard" />
 
         <uses-library
             android:name="org.apache.http.legacy"
